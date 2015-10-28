@@ -78,15 +78,5 @@ public class Player extends Entity {
 		if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
 			jump();
 		}
-		if (Keyboard.getEventKey() == Keyboard.KEY_P) {
-			System.out.println("hello");
-			if (Keyboard.getEventKeyState()) {
-				if (Camera.getPOV() == Camera.POV.FIRST_PERSON_POV) {
-					Camera.setPOV(Camera.POV.THIRD_PERSON_POV);
-				} else {
-					Camera.setPOV(Camera.POV.FIRST_PERSON_POV);
-				}
-			}
-		}
 	}
 }

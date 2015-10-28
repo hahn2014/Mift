@@ -34,7 +34,7 @@ public class MainGameLoop {
 	public static final String RELEASE_TITLE = "Alpha";
 	public static final String NAME = "Mift";
 	
-	public static final Boolean fps = true;
+	public static final Boolean fps = false;
 	public static Camera camera;
 	
 	public static void main(String[] args) {
@@ -88,13 +88,14 @@ public class MainGameLoop {
 		MasterRenderer renderer = new MasterRenderer(loader);
 
 		Player player = new EntityCreater().createPlayer(loader, "person", "playerTexture", new Vector3f(30, 5, -90), new Vector3f(0, 100, 0), 0.6f);
-		if (fps == false) {
+
+		if (!fps) {
 			entities.add(player);
 			camera = new Camera(player, POV.THIRD_PERSON_POV);
 		} else {
 			camera = new Camera(player, POV.FIRST_PERSON_POV);
 		}
-		
+
 		List<GuiTexture> guiTextures = new ArrayList<GuiTexture>();
 		GuiRenderer guiRenderer = new GuiRenderer(loader);
 		MousePicker picker = new MousePicker(camera, renderer.getProjectionMatrix(), terrain);
@@ -118,6 +119,15 @@ public class MainGameLoop {
 		// ****************Game Loop Below*********************
 
 		while (!Display.isCloseRequested()) {
+			// If we're drawing close to the camera, or the top of the player's head,
+			// remove the player so it doesn't get drawn and we can see it in first person view
+			if (camera.distanceFromPlayer < 1) {
+				entities.remove(player);
+			} else {
+				if (!entities.contains(player)) {
+					entities.add(player);
+				}
+			}
 			player.move(terrain);
 			camera.move();
 			camera.rotate();
@@ -129,7 +139,7 @@ public class MainGameLoop {
 			
 			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
 
-			// render reflection teture
+			// render reflection texture
 			buffers.bindReflectionFrameBuffer();
 			float distance = 2 * (camera.getPosition().y - water.getHeight());
 			camera.getPosition().y -= distance;

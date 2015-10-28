@@ -11,19 +11,14 @@ import org.lwjgl.util.vector.Vector3f;
  * will explode! :P
  * @author Bryce Hahn
  * @since 1.1
- * @see Camera1
  */
 public class Camera {
-	public static enum POV {
-		FIRST_PERSON_POV,
-		THIRD_PERSON_POV
-	};
 	
-	private float distanceFromPlayer = 30, maxDistanceFromPlayer = 200, minDistanceFromPlayer = 20;
+	public float distanceFromPlayer = 30;
 	private float angleAroundPlayer = 0;
 
 	private Vector3f position = new Vector3f(20, 5, 0);
-	private float pitch = 40, maxPitch = 80, minPitch = -40;
+	private float pitch = 40, maxPitch, minPitch;
 	private static float yaw;
 	private float roll;
 	private float horizontalDistance;
@@ -32,25 +27,16 @@ public class Camera {
 	private float verticalSensitivity = 0.1f;
 	
 	private Player player;
-	private static POV pov;
 
-	public Camera(Player player, POV pv) {
+	public Camera(Player player) {
 		this.player = player;
-		pov = pv;
-		
-		if (pov == POV.THIRD_PERSON_POV) {
-			maxPitch = 60;
-			minPitch = 15;
-		} else if (pov == POV.FIRST_PERSON_POV) {
-			maxPitch = 80;
-			minPitch = -40;
-		}
+
+		maxPitch = 80;
+		minPitch = -40;
 	}
 	
 	public void move() {
-		if (pov == POV.THIRD_PERSON_POV) {
-			calculateZoom();
-		}
+		calculateZoom();
 		calculatePitch();
 		calculateAngleAroundPlayer();
 		horizontalDistance = calculateHorizontalDistance();
@@ -110,15 +96,9 @@ public class Camera {
 		float theta = player.getRotY() + angleAroundPlayer;
 		float offsetX = (float) (horizDistance * Math.sin(Math.toRadians(theta)));
 		float offsetZ = (float) (horizDistance * Math.cos(Math.toRadians(theta)));
-		if (pov == POV.THIRD_PERSON_POV) {
-			position.x = player.getPosition().x - offsetX;
-			position.z = player.getPosition().z - offsetZ;
-			position.y = player.getPosition().y + verticDistance;
-		} else {
-			position.x = player.getPosition().x;
-			position.z = player.getPosition().z;
-			position.y = player.getPosition().y + 7;
-		}
+		position.x = player.getPosition().x - offsetX;
+		position.z = player.getPosition().z - offsetZ;
+		position.y = player.getPosition().y + verticDistance + 7;
 	}
 
 	private float calculateHorizontalDistance() {
@@ -130,48 +110,26 @@ public class Camera {
 	}
 
 	private void calculateZoom() {
-		float zoomLevel = Mouse.getDWheel() * 0.1f;
-		if (distanceFromPlayer - zoomLevel >= minDistanceFromPlayer
-				&& distanceFromPlayer - zoomLevel <= maxDistanceFromPlayer) {
-			distanceFromPlayer -= zoomLevel;
+		float change = Mouse.getDWheel() / 120;
+		distanceFromPlayer -= change;
+		if (distanceFromPlayer < 0) {
+			distanceFromPlayer = 0;
 		}
 	}
 
 	private void calculatePitch() {
 		float pitchChange = Mouse.getDY() * verticalSensitivity;
-		if (pov == POV.THIRD_PERSON_POV) {
-			if (Mouse.isButtonDown(1) == true) {
-				if (pitch + pitchChange >= minPitch && pitch + pitchChange <= maxPitch) {
-					pitch += pitchChange;
-				}
-			}
-		} else if (pov == POV.FIRST_PERSON_POV) {
-			if (pitch - pitchChange >= minPitch && pitch - pitchChange <= maxPitch) {
-				pitch -= pitchChange;
-			}
+		if (pitch - pitchChange >= minPitch && pitch - pitchChange <= maxPitch) {
+			pitch -= pitchChange;
 		}
 	}
 
 	private void calculateAngleAroundPlayer() {
 		float angleChange = Mouse.getDX() * horizontalSensitivity;
-		if (pov == POV.THIRD_PERSON_POV) {
-			if (Mouse.isButtonDown(0)) {
-				angleAroundPlayer -= angleChange;
-			}
-		} else if (pov == POV.FIRST_PERSON_POV) {
-			player.setRotY(player.getRotY() - angleChange);
-		}
+		player.setRotY(player.getRotY() - angleChange);
 	}
-	
-	public static void setPOV(POV pv) {
-		pov = pv;
-	}
-	
-	public static POV getPOV() {
-		return pov;
-	}
-	
-	public static String getPOVName() {
-		return pov.toString();
+
+	public boolean isFPS() {
+		return (distanceFromPlayer < 1);
 	}
 }
