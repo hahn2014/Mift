@@ -14,7 +14,8 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public class Camera {
 	
-	public float distanceFromPlayer = 30;
+	public float distanceFromPlayer = 40, maxDistFromPlayer = 100;
+	public int zoomFactor = 120;
 	private float angleAroundPlayer = 0;
 
 	private Vector3f position = new Vector3f(20, 5, 0);
@@ -36,13 +37,15 @@ public class Camera {
 	}
 	
 	public void move() {
-		calculateZoom();
-		calculatePitch();
-		calculateAngleAroundPlayer();
-		horizontalDistance = calculateHorizontalDistance();
-		verticalDistance = calculateVerticalDistance();
-		calculateCameraPosition(horizontalDistance, verticalDistance);
-		yaw = 180 - (player.getRotY() + angleAroundPlayer);
+		if (Mouse.isGrabbed()) {
+			calculateZoom();
+			calculatePitch();
+			calculateAngleAroundPlayer();
+			horizontalDistance = calculateHorizontalDistance();
+			verticalDistance = calculateVerticalDistance();
+			calculateCameraPosition(horizontalDistance, verticalDistance);
+			yaw = 180 - (player.getRotY() + angleAroundPlayer);
+		}
 	}
 
 	public void rotate() {
@@ -66,6 +69,26 @@ public class Camera {
 			Mouse.setGrabbed(false);
 			System.exit(0);
 		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_F1)) {
+			Mouse.setGrabbed(false);
+		}
+	}
+	
+	public void getClicks() {
+		while (Mouse.next()){
+		    if (Mouse.getEventButtonState()) {
+		        if (Mouse.getEventButton() == 0) {
+		            //LEFT BUTTON PRESSED
+		        }
+		    } else {
+		        if (Mouse.getEventButton() == 0) {
+		            //LEFT BUTTON RELEASED
+		        	if (Mouse.isGrabbed() == false) {
+		        		Mouse.setGrabbed(true);
+		        	}
+		        }
+		    }
+		}
 	}
 	
 	public void setGrabbed(boolean grabbed) {
@@ -74,6 +97,10 @@ public class Camera {
 
 	public Vector3f getPosition() {
 		return position;
+	}
+	
+	public Vector3f getView() {
+		return new Vector3f(pitch, yaw, roll);
 	}
 
 	public float getPitch() {
@@ -110,10 +137,12 @@ public class Camera {
 	}
 
 	private void calculateZoom() {
-		float change = Mouse.getDWheel() / 120;
+		float change = Mouse.getDWheel() / zoomFactor;
 		distanceFromPlayer -= change;
 		if (distanceFromPlayer < 0) {
 			distanceFromPlayer = 0;
+		} else if (distanceFromPlayer > maxDistFromPlayer) {
+			distanceFromPlayer = maxDistFromPlayer;
 		}
 	}
 

@@ -59,8 +59,8 @@ public class WaterShader extends ShaderProgram {
 	}
 
 	public void loadLight(Light light) {
-		super.loadVector(location_lightColour, light.getColour());
-		super.loadVector(location_lightPosition, light.getPosition());
+		super.load3DVector(location_lightColour, light.getColour());
+		super.load3DVector(location_lightPosition, light.getPosition());
 	}
 
 	public void loadMoveFactor(float factor) {
@@ -74,7 +74,7 @@ public class WaterShader extends ShaderProgram {
 	public void loadViewMatrix(Camera camera) {
 		Matrix4f viewMatrix = Maths.createViewMatrix(camera);
 		loadMatrix(location_viewMatrix, viewMatrix);
-		super.loadVector(location_cameraPosition, camera.getPosition());
+		super.load3DVector(location_cameraPosition, camera.getPosition());
 	}
 
 	public void loadModelMatrix(Matrix4f modelMatrix) {

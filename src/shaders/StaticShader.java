@@ -67,7 +67,7 @@ public class StaticShader extends ShaderProgram {
 	}
 
 	public void loadClipPlane(Vector4f plane) {
-		super.loadVector(location_plane, plane);
+		super.load4DVector(location_plane, plane);
 	}
 
 	public void loadNumberOfRows(int numberOfRows) {
@@ -79,7 +79,7 @@ public class StaticShader extends ShaderProgram {
 	}
 
 	public void loadSkyColour(float r, float g, float b) {
-		super.loadVector(location_skyColour, new Vector3f(r, g, b));
+		super.load3DVector(location_skyColour, new Vector3f(r, g, b));
 	}
 
 	public void loadFakeLightingVariable(boolean useFake) {
@@ -98,13 +98,13 @@ public class StaticShader extends ShaderProgram {
 	public void loadLights(List<Light> lights) {
 		for (int i = 0; i < MAX_LIGHTS; i++) {
 			if (i < lights.size()) {
-				super.loadVector(location_lightPosition[i], lights.get(i).getPosition());
-				super.loadVector(location_lightColour[i], lights.get(i).getColour());
-				super.loadVector(location_attenuation[i], lights.get(i).getAttenuation());
+				super.load3DVector(location_lightPosition[i], lights.get(i).getPosition());
+				super.load3DVector(location_lightColour[i], lights.get(i).getColour());
+				super.load3DVector(location_attenuation[i], lights.get(i).getAttenuation());
 			} else {
-				super.loadVector(location_lightPosition[i], new Vector3f(0, 0, 0));
-				super.loadVector(location_lightColour[i], new Vector3f(0, 0, 0));
-				super.loadVector(location_attenuation[i], new Vector3f(1, 0, 0));
+				super.load3DVector(location_lightPosition[i], new Vector3f(0, 0, 0));
+				super.load3DVector(location_lightColour[i], new Vector3f(0, 0, 0));
+				super.load3DVector(location_attenuation[i], new Vector3f(1, 0, 0));
 			}
 		}
 	}

@@ -60,7 +60,7 @@ public class MasterRenderer {
 	}
 
 	public void renderScene(List<Entity> entities, List<Entity> normalEntities, List<Terrain> terrains,
-			List<Light> lights, Camera camera, Vector4f clipPlane) {
+		List<Light> lights, Camera camera, Vector4f clipPlane) {
 		for (Terrain terrain : terrains) {
 			processTerrain(terrain);
 		}

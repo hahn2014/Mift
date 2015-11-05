@@ -5,13 +5,13 @@ import models.TexturedModel;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector3f;
 
-import engineTester.MainGameLoop;
+import main.Mift;
 import renderEngine.DisplayManager;
 import terrains.Terrain;
 
 public class Player extends Entity {
 
-	private static final float RUN_SPEED = 50.0f;
+	private static final float RUN_SPEED = 30.0f;
 	private static final float GRAVITY = -50;
 	private static final float JUMP_POWER = 20;
 
@@ -23,11 +23,10 @@ public class Player extends Entity {
 
 	public Player(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
 		super(model, position, rotX, rotY, rotZ, scale);
-
 	}
 
 	public void move(Terrain terrain) {
-		camera = MainGameLoop.getCamera();
+		camera = Mift.getCamera();
 		checkInputs();
 		float distance = currentSpeed * DisplayManager.getFrameTimeSeconds();
 		float dx = (float) 	(distance * Math.sin(Math.toRadians(super.getRotY())));

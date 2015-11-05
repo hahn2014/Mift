@@ -77,11 +77,11 @@ public class TerrainShader extends ShaderProgram {
 	}
 
 	public void loadClipPlane(Vector4f clipPlane) {
-		super.loadVector(location_plane, clipPlane);
+		super.load4DVector(location_plane, clipPlane);
 	}
 
 	public void loadSkyColour(float r, float g, float b) {
-		super.loadVector(location_skyColour, new Vector3f(r, g, b));
+		super.load3DVector(location_skyColour, new Vector3f(r, g, b));
 	}
 
 	public void loadShineVariables(float damper, float reflectivity) {
@@ -96,13 +96,13 @@ public class TerrainShader extends ShaderProgram {
 	public void loadLights(List<Light> lights) {
 		for (int i = 0; i < MAX_LIGHTS; i++) {
 			if (i < lights.size()) {
-				super.loadVector(location_lightPosition[i], lights.get(i).getPosition());
-				super.loadVector(location_lightColour[i], lights.get(i).getColour());
-				super.loadVector(location_attenuation[i], lights.get(i).getAttenuation());
+				super.load3DVector(location_lightPosition[i], lights.get(i).getPosition());
+				super.load3DVector(location_lightColour[i], lights.get(i).getColour());
+				super.load3DVector(location_attenuation[i], lights.get(i).getAttenuation());
 			} else {
-				super.loadVector(location_lightPosition[i], new Vector3f(0, 0, 0));
-				super.loadVector(location_lightColour[i], new Vector3f(0, 0, 0));
-				super.loadVector(location_attenuation[i], new Vector3f(1, 0, 0));
+				super.load3DVector(location_lightPosition[i], new Vector3f(0, 0, 0));
+				super.load3DVector(location_lightColour[i], new Vector3f(0, 0, 0));
+				super.load3DVector(location_attenuation[i], new Vector3f(1, 0, 0));
 			}
 		}
 	}
