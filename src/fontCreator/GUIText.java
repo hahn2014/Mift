@@ -59,7 +59,7 @@ public class GUIText {
 	public FontType getFont() {
 		return font;
 	}
-
+	
 	public void setColor(float r, float g, float b) {
 		color.set(r, g, b);
 	}

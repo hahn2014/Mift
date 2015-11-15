@@ -78,9 +78,9 @@ public class MemoryData {
 	 */
 	public static void sendGraphicsInformationToFile() {
 		String filePath = "graphicsDetails.sysinf";
-		if (DisplayManager.debugPolys) {
-			//make sure the file doesn't already exist
-			if (new File("graphicsDetails.sysinf").exists() == false) {
+		//make sure the file doesn't already exist
+		if (new File("graphicsDetails.sysinf").exists() == false) {
+			if (DisplayManager.debugPolys) {
 				try {
 					System.out.println("We did not find the file " + filePath + ". We will attempt to create it");
 					// Use "dxdiag /t" variant to redirect output to a given file
@@ -104,24 +104,24 @@ public class MemoryData {
 				} catch (IOException | InterruptedException ex) {
 					ex.printStackTrace();
 				}
-			} else {
-				System.out.println("We have found an already existant copy of " + filePath + ". We will attempt to load from the file");
-				try {
-					@SuppressWarnings("resource")
-					BufferedReader br = new BufferedReader(new FileReader(filePath));
-					String line;
-					while ((line = br.readLine()) != null) {
-						if (line.trim().startsWith("Card name:")) {
-							GRAPHICS_CARD = line.trim().substring(10, line.trim().length());
-						} else if (line.trim().startsWith("Current Mode:")) {
-							NATIVE_RES = line.trim().substring(13, line.trim().length());
-						} else if (line.trim().startsWith("Display Memory:")) {
-							GRAPHICS_MEMORY = line.trim().substring(15, line.trim().length());
-						}
+			}
+		} else {
+			System.out.println("We have found an already existant copy of " + filePath + ". We will attempt to load from the file");
+			try {
+				@SuppressWarnings("resource")
+				BufferedReader br = new BufferedReader(new FileReader(filePath));
+				String line;
+				while ((line = br.readLine()) != null) {
+					if (line.trim().startsWith("Card name:")) {
+						GRAPHICS_CARD = line.trim().substring(10, line.trim().length());
+					} else if (line.trim().startsWith("Current Mode:")) {
+						NATIVE_RES = line.trim().substring(13, line.trim().length());
+					} else if (line.trim().startsWith("Display Memory:")) {
+						GRAPHICS_MEMORY = line.trim().substring(15, line.trim().length());
 					}
-				} catch (IOException ex) {
-					ex.printStackTrace();
 				}
+			} catch (IOException ex) {
+				ex.printStackTrace();
 			}
 		}
 	}

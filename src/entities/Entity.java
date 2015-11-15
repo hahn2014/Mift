@@ -53,6 +53,12 @@ public class Entity {
 		this.rotY += dy;
 		this.rotZ += dz;
 	}
+	
+	public void increaseRotation(Vector3f rotation) {
+		this.rotX += rotation.x;
+		this.rotY += rotation.y;
+		this.rotZ += rotation.z;
+	}
 
 	public TexturedModel getModel() {
 		return model;
@@ -89,9 +95,32 @@ public class Entity {
 	public float getRotZ() {
 		return rotZ;
 	}
+	
 
 	public void setRotZ(float rotZ) {
 		this.rotZ = rotZ;
+	}
+	
+	public void setRotation(Vector3f direction) {
+		this.rotX = direction.getX();
+		this.rotY = direction.getY();
+		this.rotZ = direction.getZ();
+	}
+	
+	public Vector3f getRotation() {
+		return new Vector3f(this.rotX, this.rotY, this.rotZ);
+	}
+	
+	public void setXPos(float x) {
+		this.position.x = x;
+	}
+	
+	public void setYPos(float y) {
+		this.position.y = y;
+	}
+	
+	public void setZPos(float z) {
+		this.position.z = z;
 	}
 
 	public float getScale() {

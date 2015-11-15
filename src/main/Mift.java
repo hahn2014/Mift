@@ -1,11 +1,12 @@
 package main;
 
-import java.io.File;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
+import org.lwjgl.Sys;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
@@ -14,17 +15,18 @@ import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import entities.Camera;
+import entities.Enemy;
+import entities.Enemy.move_factor;
 import entities.Entity;
 import entities.EntityCreator;
 import entities.Light;
 import entities.Player;
-import fontCreator.FontType;
+import fontCreator.FontHolder;
 import fontCreator.GUIText;
 import fontCreator.GUIText.ALIGNMENT;
 import fontRender.Text;
 import guis.GuiRenderer;
 import guis.GuiTexture;
-import menu.MainMenu;
 import models.TexturedModel;
 import renderEngine.DisplayManager;
 import renderEngine.DisplayManager.QUALITY;
@@ -55,13 +57,7 @@ public class Mift {
 	
 	public static final Boolean fps = false;
 	public static Camera camera;
-	
-	// init different fonts
-	private static FontType sans;
-	private static FontType arial;
-	private static FontType tahoma;
-	@SuppressWarnings("unused")
-	private static FontType calibri;
+	private static Random random;
 	
 	public static enum GAMESTATE {
 		MENU,
@@ -72,6 +68,8 @@ public class Mift {
 	
 	public static void main(String[] args) {
 		new ImportLibs(); //link the natives for lwjgl
+		random = new Random();
+		random.setSeed(Sys.getTime());
 		//initialize the quality of the game while loading
 		DisplayManager.createDisplay(QUALITY.ULTRA); // default quality value
 		List<String> arg = Arrays.asList(args);
@@ -90,7 +88,7 @@ public class Mift {
 		EntityCreator entityCreater = new EntityCreator();
 		FPSCounter fpsCounter = new FPSCounter();
 		Text.init(loader);
-		initFonts(loader);
+		FontHolder fontHolder = new FontHolder(loader);
 		
 		// *********TERRAIN TEXTURE STUFF**********
 
@@ -99,7 +97,6 @@ public class Mift {
 		terrains.add(terrain);
 
 		// *********MODELS TEXTURE STUFF **********
-
 
 		List<Entity> entities = new ArrayList<Entity>();
 
@@ -124,9 +121,20 @@ public class Mift {
 
 		MasterRenderer renderer = new MasterRenderer(loader);
 
-		Player player = new EntityCreator().createPlayer(loader, "person", "playerTexture", new Vector3f(30, 5, -90), new Vector3f(0, 100, 0), 0.6f);
+		Player player = new EntityCreator().createPlayer(loader, "person", "playerTexture", new Vector3f(30, 5, -90), new Vector3f(0, 100, 0), random.nextInt(3) * 0.6f);
 		entities.add(player);
 		camera = new Camera(player);
+		
+		
+		// *********** ENEMY TEST *******************************
+		
+		Enemy[] enemies = new Enemy[15];
+		for (int i = 0; i < enemies.length; i++) {
+			enemies[i] = new EntityCreator().createRandomEnemy(loader, "person", "playerTexture", random.nextInt(3) * 0.6f, 10, move_factor.FACE_TOWARDS, terrain);
+			entities.add(enemies[i]);
+		}
+		
+		// ******************* EXTRAS ****************
 		
 		List<GuiTexture> guiTextures = new ArrayList<GuiTexture>();
 		GuiRenderer guiRenderer = new GuiRenderer(loader);
@@ -147,30 +155,22 @@ public class Mift {
 		
 		Display.setTitle(NAME + " Release " + RELEASE + " b" + BUILD);
 		
-		
 		// ****************Text Rendering*********************
 		
 		GUIText[] texts = new GUIText[3];
 		
-		texts[0] = new GUIText(Mift.NAME + " Alpha Build " + Mift.RELEASE + "." + Mift.BUILD, 1.25f, tahoma, new Vector2f(0, 0), 0.25f, ALIGNMENT.LEFT);
+		texts[0] = new GUIText(Mift.NAME + " Alpha Build " + Mift.RELEASE + "." + Mift.BUILD, 1.25f, fontHolder.getBerlinSans(), new Vector2f(0, 0), 0.25f, ALIGNMENT.LEFT);
 			texts[0].setColor(255, 255, 255);
-		texts[1] = new GUIText("", 2.0f, arial, new Vector2f(0.85f, 0.0f), 0.25f, ALIGNMENT.CENTER);
+		texts[1] = new GUIText("", 2.0f, fontHolder.getCandara(), new Vector2f(0.85f, 0.0f), 0.25f, ALIGNMENT.CENTER);
 			texts[1].setColor(255, 223, 0);
-		if (DisplayManager.debugPolys) {
-			texts[2] = new GUIText("", 0.75f, sans, new Vector2f(0.75f, 0.1f), 0.25f, ALIGNMENT.CENTER);
-				texts[2].setColor(200, 200, 200);
-		}
-		
-		//************Main Menu*****************
-		
-		MainMenu mainMenu = new MainMenu(loader);
+		texts[2] = new GUIText("", 0.75f, fontHolder.getArial(), new Vector2f(0.75f, 0.1f), 0.25f, ALIGNMENT.CENTER);
+			texts[2].setColor(200, 200, 200);
 		
 		// ****************Game Loop Below*********************
 
 		while (!Display.isCloseRequested()) {
 			if (currentMenu == GAMESTATE.MENU) {
-				mainMenu.update();
-				mainMenu.render();
+				
 			} else if (currentMenu == GAMESTATE.INGAME) {
 				// If we're drawing close to the camera, or the top of the player's head,
 				// remove the player so it doesn't get drawn and we can see it in first person view
@@ -191,6 +191,12 @@ public class Mift {
 				
 				for (int i = 0; i < normalMapEntities.size(); i++) {
 					normalMapEntities.get(i).setRotY(normalMapEntities.get(i).getRotY() + 2);
+				}
+				
+				for (Enemy e : enemies) {
+					if (e != null) {
+						e.move(player);
+					}
 				}
 				
 				GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
@@ -241,32 +247,28 @@ public class Mift {
 		DecimalFormat df = new DecimalFormat();
 		df.setMaximumFractionDigits(2);
 		//update string
-		String toreturn = "Developer Mode: " + DisplayManager.debugPolys;
-		toreturn += "  -  Camera Distance: " + (int)camera.distanceFromPlayer;
-		toreturn += "  -  Camera Position: [" + df.format(camera.getPosition().x)
-			+ ", " + df.format(camera.getPosition().y) + ", "
-				+ df.format(camera.getPosition().z) + "]";
-		toreturn += "  -  Camera View Position: [" + df.format(camera.getView().x)
-			+ ", " + df.format(camera.getView().y) + ", "
-				+ df.format(camera.getPosition().z) + "]";
-		toreturn += "  -  Player Position: [" + df.format(player.getPosition().x)
-			+ ", " + df.format(player.getPosition().y) + ", "
-				+ df.format(player.getPosition().z) + "]";
-		toreturn += "  -  Used Memory: " + (MemoryData.getFreeMemory() / MemoryData.getUsedMemory())
-			+ "% (" + MemoryData.getUsedMemory() + "MB) of " + MemoryData.getFreeMemory() + "MB";
-		toreturn += "  -  Allocated Memory: " + (MemoryData.getMaxMemory() / MemoryData.getTotalMemory())
-			+ "% (" + MemoryData.getTotalMemory() + "MB) of " + MemoryData.getMaxMemory() + "MB";
-		toreturn += "  -  Graphics Card: " + MemoryData.getGraphicsCard();
-		toreturn += "  -  Graphics Memory: " + MemoryData.getGraphicsMemory();
-		toreturn += "  -  Native Resolution: " + MemoryData.getNativeResolution();
-		return toreturn;
-	}
-	
-	private static void initFonts(Loader loader) {
-		sans = new FontType(loader.loadFontTexture("sans"), new File("res/fonts/sans.fnt"));
-		arial = new FontType(loader.loadFontTexture("arial"), new File("res/fonts/arial.fnt"));
-		tahoma = new FontType(loader.loadFontTexture("tahoma"), new File("res/fonts/tahoma.fnt"));
-		calibri = new FontType(loader.loadFontTexture("calibri"), new File("res/fonts/calibri.fnt"));
+		StringBuilder sb = new StringBuilder();
+		sb.append(" Developer Mode: " + DisplayManager.debugPolys);
+		sb.append("  ~ Camera Distance: " + (int)camera.distanceFromPlayer);
+		sb.append("  ~ Camera POV: " + (camera.distanceFromPlayer == 0 ?
+				"First Person Perspective" : "Third Person Perspective"));
+		sb.append("  ~ Camera Position: [" + df.format(camera.getPosition().x)
+				+ ", " + df.format(camera.getPosition().y) + ", "
+				+ df.format(camera.getPosition().z) + "]");
+		sb.append("  ~ Camera View Position: [" + df.format(camera.getView().x)
+				+ ", " + df.format(camera.getView().y) + ", "
+				+ df.format(camera.getPosition().z) + "]");
+		sb.append("  ~ Player Position: [" + df.format(player.getPosition().x)
+				+ ", " + df.format(player.getPosition().y) + ", "
+				+ df.format(player.getPosition().z) + "]");
+		sb.append("  ~ Used Memory: " + (MemoryData.getFreeMemory() / MemoryData.getUsedMemory())
+				+ "% (" + MemoryData.getUsedMemory() + "MB) of " + MemoryData.getFreeMemory() + "MB");
+		sb.append("  ~ Allocated Memory: " + (MemoryData.getMaxMemory() / MemoryData.getTotalMemory())
+				+ "% (" + MemoryData.getTotalMemory() + "MB) of " + MemoryData.getMaxMemory() + "MB");
+		sb.append("  ~ Graphics Card: " + MemoryData.getGraphicsCard());
+		sb.append("  ~ Graphics Memory: " + MemoryData.getGraphicsMemory());
+		sb.append("  ~ Native Resolution: " + MemoryData.getNativeResolution());
+		return sb.toString();
 	}
 	
 	public static Camera getCamera() {

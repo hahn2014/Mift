@@ -31,7 +31,7 @@ public class Camera {
 
 	public Camera(Player player) {
 		this.player = player;
-
+		Mouse.setGrabbed(true);
 		maxPitch = 80;
 		minPitch = -40;
 	}

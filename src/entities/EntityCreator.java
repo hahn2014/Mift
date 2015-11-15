@@ -3,8 +3,10 @@ package entities;
 import java.util.List;
 import java.util.Random;
 
+import org.lwjgl.Sys;
 import org.lwjgl.util.vector.Vector3f;
 
+import entities.Enemy.move_factor;
 import models.RawModel;
 import models.TexturedModel;
 import normalMappingObjConverter.NormalMappedObjLoader;
@@ -24,6 +26,7 @@ public class EntityCreator {
 	private int light = 256;
 	private int moderate = 512;
 	private int ultra = 1024;
+	private Random random = new Random();
 
 	public EntityCreator() {
 	}
@@ -106,7 +109,51 @@ public class EntityCreator {
 		return new Player(texturedModel, location, rotation.getX(), rotation.getY(), rotation.getZ(), scale);
 	}
 	
-	public int getRes() {
+	/**
+	 * Create an entity to be used in game efficiently and in one line of code!
+	 * Created an enemy to be returned and used as either the an enemy or
+	 * another player online!
+	 * @param loader
+	 * @param objName
+	 * @param textureName
+	 * @param location
+	 * @param rotation
+	 * @param scale
+	 * @param runSpeed
+	 * @param move
+	 * @return TexturedModel
+	 */
+	public Enemy createEnemy(Loader loader, String objName, String textureName, Vector3f location, Vector3f rotation,
+			float scale, float runSpeed, move_factor move, Terrain terrain) {
+		texturedModel = new TexturedModel(OBJLoader.loadObjModel("models/" + objName, loader),
+				new ModelTexture(loader.loadTexture(textureName)));
+		return new Enemy(texturedModel, location, rotation, scale, runSpeed, move, terrain);
+	}
+	
+	/**
+	 * Create an entity to be used in game efficiently and in one line of code!
+	 * Created an enemy to be returned and used as either the an enemy or
+	 * another player online! This method is the exact same as it's predecessor,
+	 * but instead of setting parameters for the enemy location and rotation,
+	 * it is all randomly chosen within the call method.
+	 * No need for all the pesky random calls.
+	 * @param loader
+	 * @param objName
+	 * @param textureName
+	 * @param scale
+	 * @param runSpeed
+	 * @param move
+	 * @return Textured Model
+	 */
+	public Enemy createRandomEnemy(Loader loader, String objName, String textureName, float scale, float runSpeed, move_factor move, Terrain terrain) {
+		random.setSeed(Sys.getTime());
+		texturedModel = new TexturedModel(OBJLoader.loadObjModel("models/" + objName, loader),
+				new ModelTexture(loader.loadTexture(textureName)));
+		return new Enemy(texturedModel, new Vector3f(random.nextInt(120) + 30, random.nextInt(5) + 2, random.nextInt(100) - 100),
+				new Vector3f(0, random.nextInt(360), 0), scale, runSpeed, move, terrain);
+	}
+	
+	private int getRes() {
 		if (DisplayManager.quality == DisplayManager.QUALITY.LIGHT) {
 			return light;
 		} else if (DisplayManager.quality == DisplayManager.QUALITY.MODERATE) {

@@ -10,6 +10,7 @@ public class TextCreator {
 
 	protected static final double LINE_HEIGHT = 0.03f;
 	protected static final int SPACE_ASCII = 32;
+	protected static final int NEW_LINE_ASCII = 126;
 
 	private MetaFile metaData;
 
@@ -39,6 +40,11 @@ public class TextCreator {
 				}
 				currentWord = new Word(text.getFontSize());
 				continue;
+			} else if (ascii == NEW_LINE_ASCII) {
+				//make a new line
+				lines.add(currentLine);
+				currentLine = new Line(metaData.getSpaceWidth(), text.getFontSize(), text.getMaxLineSize());
+				continue;
 			}
 			Character character = metaData.getCharacter(ascii);
 			currentWord.addCharacter(character);
@@ -66,7 +72,7 @@ public class TextCreator {
 		for (Line line : lines) {
 			if (text.getAlignment().equals(ALIGNMENT.CENTER)) {
 				cursurX = (line.getMaxLength() - line.getLineLength()) / 2;
-			}else if (text.getAlignment().equals(ALIGNMENT.RIGHT)) {
+			} else if (text.getAlignment().equals(ALIGNMENT.RIGHT)) {
 				cursurX = (line.getLineLength());
 			}
 			for (Word word : line.getWords()) {

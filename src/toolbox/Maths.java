@@ -5,6 +5,8 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 import entities.Camera;
+import entities.Enemy;
+import entities.Player;
 
 public class Maths {
 
@@ -44,5 +46,30 @@ public class Maths {
 		Vector3f negativeCameraPos = new Vector3f(-cameraPos.x, -cameraPos.y, -cameraPos.z);
 		Matrix4f.translate(negativeCameraPos, viewMatrix, viewMatrix);
 		return viewMatrix;
+	}
+	
+	public static double distanceFormula3D(Vector3f position1, Vector3f position2) {
+		double section1 = Math.pow((position2.getX() - (position1.getX())), 2);
+		double section2 = Math.pow((position2.getY() - (position1.getY())), 2);
+		double section3 = Math.pow((position2.getZ() - (position1.getZ())), 2);
+		return Math.sqrt(section1 + section2 + section3);
+	}
+	
+	public static Vector3f getRotationFromPoint(Enemy enemy, Player player) {
+		double angle = Math.atan2((player.getPosition().x - enemy.getPosition().x), (player.getPosition().z - enemy.getPosition().z)) * 180 / Math.PI;
+	    if (angle < 0) {
+	        return new Vector3f(0, (float)(360 + angle), 0);
+	    } else {
+	        return new Vector3f(0, (float)(angle), 0);
+	    }
+	}
+	
+	public static Vector3f getRotationFromPointNegative(Enemy enemy, Player player) {
+		double angle = Math.atan2((player.getPosition().x - enemy.getPosition().x), (player.getPosition().z - enemy.getPosition().z)) * 180 / Math.PI;
+	    if (angle < 0) {
+	        return new Vector3f(0, (float) (360 + angle), 0);
+	    } else {
+	        return new Vector3f(0, (float) (angle), 0);
+	    }
 	}
 }
