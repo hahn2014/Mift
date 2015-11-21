@@ -13,6 +13,8 @@ import org.lwjgl.util.vector.Vector4f;
 import entities.Camera;
 import entities.Entity;
 import entities.Light;
+import entities.OverheadCamera;
+import main.Mift;
 import models.TexturedModel;
 import normalMappingRenderer.NormalMappingRenderer;
 import shaders.StaticShader;
@@ -46,12 +48,12 @@ public class MasterRenderer {
 	private Map<TexturedModel, List<Entity>> normalMapEntities = new HashMap<TexturedModel, List<Entity>>();
 	private List<Terrain> terrains = new ArrayList<Terrain>();
 
-	public MasterRenderer(Loader loader) {
+	public MasterRenderer() {
 		enableCulling();
 		createProjectionMatrix();
 		renderer = new EntityRenderer(shader, projectionMatrix);
 		terrainRenderer = new TerrainRenderer(terrainShader, projectionMatrix);
-		skyboxRenderer = new SkyboxRenderer(loader, projectionMatrix);
+		skyboxRenderer = new SkyboxRenderer(Mift.getLoader(), projectionMatrix);
 		normalMapRenderer = new NormalMappingRenderer(projectionMatrix);
 	}
 
@@ -73,7 +75,44 @@ public class MasterRenderer {
 		render(lights, camera, clipPlane);
 	}
 	
+	public void renderScene(List<Entity> entities, List<Entity> normalEntities, List<Terrain> terrains,
+			List<Light> lights, OverheadCamera camera, Vector4f clipPlane) {
+			for (Terrain terrain : terrains) {
+				processTerrain(terrain);
+			}
+			for (Entity entity : entities) {
+				processEntity(entity);
+			}
+			for (Entity entity : normalEntities) {
+				processNormalMapEntity(entity);
+			}
+			render(lights, camera, clipPlane);
+		}
+	
 	public void render(List<Light> lights, Camera camera, Vector4f clipPlane) {
+		prepare();
+		shader.start();
+		shader.loadClipPlane(clipPlane);
+		shader.loadSkyColour(RED, GREEN, BLUE);
+		shader.loadLights(lights);
+		shader.loadViewMatrix(camera);
+		renderer.render(entities);
+		shader.stop();
+		normalMapRenderer.render(normalMapEntities, clipPlane, lights, camera);
+		terrainShader.start();
+		terrainShader.loadClipPlane(clipPlane);
+		terrainShader.loadSkyColour(RED, GREEN, BLUE);
+		terrainShader.loadLights(lights);
+		terrainShader.loadViewMatrix(camera);
+		terrainRenderer.render(terrains);
+		terrainShader.stop();
+		skyboxRenderer.render(camera, RED, GREEN, BLUE);
+		terrains.clear();
+		entities.clear();
+		normalMapEntities.clear();
+	}
+	
+	public void render(List<Light> lights, OverheadCamera camera, Vector4f clipPlane) {
 		prepare();
 		shader.start();
 		shader.loadClipPlane(clipPlane);

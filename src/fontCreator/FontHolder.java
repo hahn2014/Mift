@@ -2,7 +2,7 @@ package fontCreator;
 
 import java.io.File;
 
-import renderEngine.Loader;
+import main.Mift;
 
 public class FontHolder {
 	private static FontType arial;
@@ -10,11 +10,11 @@ public class FontHolder {
 	private static FontType candara;
 	private static FontType segoe;
 	
-	public FontHolder(Loader loader) {
-		arial = new FontType(loader.loadFontTexture("arial"), new File("res/fonts/arial.fnt"));
-		berlinSans = new FontType(loader.loadFontTexture("berlinSans"), new File("res/fonts/berlinSans.fnt"));
-		candara = new FontType(loader.loadFontTexture("candara"), new File("res/fonts/candara.fnt"));
-		segoe = new FontType(loader.loadFontTexture("segoe"), new File("res/fonts/segoe.fnt"));
+	public FontHolder() {
+		arial = new FontType(Mift.getLoader().loadFontTexture("arial"), new File("res/fonts/arial.fnt"));
+		berlinSans = new FontType(Mift.getLoader().loadFontTexture("berlinSans"), new File("res/fonts/berlinSans.fnt"));
+		candara = new FontType(Mift.getLoader().loadFontTexture("candara"), new File("res/fonts/candara.fnt"));
+		segoe = new FontType(Mift.getLoader().loadFontTexture("segoe"), new File("res/fonts/segoe.fnt"));
 	}
 
 	public FontType getSegoe() {

@@ -6,7 +6,9 @@ import org.lwjgl.util.vector.Vector3f;
 
 import entities.Camera;
 import entities.Enemy;
+import entities.OverheadCamera;
 import entities.Player;
+import paths.Point;
 
 public class Maths {
 
@@ -48,6 +50,17 @@ public class Maths {
 		return viewMatrix;
 	}
 	
+	public static Matrix4f createViewMatrix(OverheadCamera camera) {
+		Matrix4f viewMatrix = new Matrix4f();
+		viewMatrix.setIdentity();
+		Matrix4f.rotate((float) Math.toRadians(camera.getPitch()), new Vector3f(1, 0, 0), viewMatrix, viewMatrix);
+		Matrix4f.rotate((float) Math.toRadians(camera.getYaw()), new Vector3f(0, 1, 0), viewMatrix, viewMatrix);
+		Vector3f cameraPos = camera.getPosition();
+		Vector3f negativeCameraPos = new Vector3f(-cameraPos.x, -cameraPos.y, -cameraPos.z);
+		Matrix4f.translate(negativeCameraPos, viewMatrix, viewMatrix);
+		return viewMatrix;
+	}
+	
 	public static double distanceFormula3D(Vector3f position1, Vector3f position2) {
 		double section1 = Math.pow((position2.getX() - (position1.getX())), 2);
 		double section2 = Math.pow((position2.getY() - (position1.getY())), 2);
@@ -57,6 +70,24 @@ public class Maths {
 	
 	public static Vector3f getRotationFromPoint(Enemy enemy, Player player) {
 		double angle = Math.atan2((player.getPosition().x - enemy.getPosition().x), (player.getPosition().z - enemy.getPosition().z)) * 180 / Math.PI;
+	    if (angle < 0) {
+	        return new Vector3f(0, (float)(360 + angle), 0);
+	    } else {
+	        return new Vector3f(0, (float)(angle), 0);
+	    }
+	}
+	
+	public static Vector3f getRotationFromPoint(Enemy p1, Point p2) {
+		double angle = Math.atan2((p2.getX() - p1.getPosition().getX()), (p2.getZ() - p1.getPosition().getZ())) * 180 / Math.PI;
+	    if (angle < 0) {
+	        return new Vector3f(0, (float)(360 + angle), 0);
+	    } else {
+	        return new Vector3f(0, (float)(angle), 0);
+	    }
+	}
+	
+	public static Vector3f getRotationFromPoint(Point p1, Point p2) {
+		double angle = Math.atan2((p2.getX() - p1.getX()), (p2.getZ() - p1.getZ())) * 180 / Math.PI;
 	    if (angle < 0) {
 	        return new Vector3f(0, (float)(360 + angle), 0);
 	    } else {

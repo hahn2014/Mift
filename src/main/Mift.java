@@ -14,50 +14,44 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
-import entities.Camera;
-import entities.Enemy;
+import entities.*;
 import entities.Enemy.move_factor;
-import entities.Entity;
-import entities.EntityCreator;
-import entities.Light;
-import entities.Player;
-import fontCreator.FontHolder;
-import fontCreator.GUIText;
+import fontCreator.*;
 import fontCreator.GUIText.ALIGNMENT;
 import fontRender.Text;
-import guis.GuiRenderer;
-import guis.GuiTexture;
+import guis.*;
 import models.TexturedModel;
-import renderEngine.DisplayManager;
+import renderEngine.*;
 import renderEngine.DisplayManager.QUALITY;
-import renderEngine.Loader;
-import renderEngine.MasterRenderer;
-import terrains.Terrain;
-import terrains.TerrainCreator;
-import toolbox.FPSCounter;
-import toolbox.MemoryData;
-import toolbox.MousePicker;
-import water.WaterFrameBuffers;
-import water.WaterRenderer;
-import water.WaterShader;
-import water.WaterTile;
+import terrains.*;
+import toolbox.*;
+import water.*;
 
 /**
  * Already surpassed 4k lines of code while trending currently at 4670! Keep up
- * the good work - Mift Build 37
+ * the good work - Mift Build 39
  * 
  * @author Bryce Hahn, Mason Cluff
  * @since 1.0
  */
 public class Mift {
-	public static final String BUILD = "37";
+	public static final String BUILD = "39";
 	public static final String RELEASE = "1";
 	public static final String RELEASE_TITLE = "Alpha";
 	public static final String NAME = "Mift";
 	
 	public static final Boolean fps = false;
-	public static Camera camera;
 	private static Random random;
+	
+	//camera stuff
+	public static Camera camera;
+	public static OverheadCamera overheadCamera;
+	
+	private static MousePicker defaultMouse;
+	private static MousePicker overheadMouse;
+	public static List<Entity> entities = new ArrayList<Entity>();
+	private static Terrain terrain;
+	private static Loader loader = new Loader();
 	
 	public static enum GAMESTATE {
 		MENU,
@@ -84,80 +78,77 @@ public class Mift {
 		//test graphics import
 		MemoryData.sendGraphicsInformationToFile();
 		//init main objects
-		Loader loader = new Loader();
 		EntityCreator entityCreater = new EntityCreator();
 		FPSCounter fpsCounter = new FPSCounter();
-		Text.init(loader);
-		FontHolder fontHolder = new FontHolder(loader);
+		Text.init();
+		FontHolder fontHolder = new FontHolder();
+		EntityTypeHolder entityTypeHolder = new EntityTypeHolder();
 		
-		// *********TERRAIN TEXTURE STUFF**********
+		// ********* TERRAIN TEXTURE STUFF **********
 
-		Terrain terrain = new TerrainCreator(loader, 0, -1, "lunar_surface", "dirt", "lunar_surface", "path", "blendMap", "heightmap").getTerrain();
+		terrain = new TerrainCreator(0, -1, "lunar_surface", "dirt", "lunar_surface", "path", "blendMap", "heightmap").getTerrain();
 		List<Terrain> terrains = new ArrayList<Terrain>();
 		terrains.add(terrain);
 
-		// *********MODELS TEXTURE STUFF **********
+		// ****************** NORMAL MAP MODELS ************************
 
-		List<Entity> entities = new ArrayList<Entity>();
-
-		// ******************NORMAL MAP MODELS************************
-
-		TexturedModel barrelModel = entityCreater.createNormalTexturedModel(loader, "barrel", "barrelNormal", 10, 0.5f);
-		TexturedModel crateModel = entityCreater.createNormalTexturedModel(loader, "crate", "crateNormal", 10, 0.5f);
-		TexturedModel boulderModel = entityCreater.createNormalTexturedModel(loader, "boulder", "boulderNormal", 10, 0.5f);
+		TexturedModel barrelModel = entityCreater.createNormalTexturedModel("barrel", "barrelNormal", 10, 0.5f);
+		TexturedModel crateModel = entityCreater.createNormalTexturedModel("crate", "crateNormal", 10, 0.5f);
+		TexturedModel boulderModel = entityCreater.createNormalTexturedModel("boulder", "boulderNormal", 10, 0.5f);
 		List<Entity> normalMapEntities = new ArrayList<Entity>();
 		normalMapEntities.add(new Entity(barrelModel, new Vector3f(75, 10, -75), 0, 0, 0, 1f));
 		normalMapEntities.add(new Entity(boulderModel, new Vector3f(85, 10, -75), 0, 0, 0, 1f));
 		normalMapEntities.add(new Entity(crateModel, new Vector3f(65, 10, -75), 0, 0, 0, 0.04f));
 
-		// ************ENTITIES*******************
-		entities = entityCreater.generateObjects(loader, entities, terrain, 0);
+		// ************ ENTITIES *******************
+		entities = entityCreater.generateObjects(entities, terrain, 0);
 
-		// *******************OTHER SETUP***************
+		// ******************* OTHER SETUP ***************
 
 		List<Light> lights = new ArrayList<Light>();
 		Light sun = new Light(new Vector3f(10000, 10000, -10000), new Vector3f(1.3f, 1.3f, 1.3f));
 		lights.add(sun);
 
-		MasterRenderer renderer = new MasterRenderer(loader);
+		MasterRenderer renderer = new MasterRenderer();
 
-		Player player = new EntityCreator().createPlayer(loader, "person", "playerTexture", new Vector3f(30, 5, -90), new Vector3f(0, 100, 0), random.nextInt(3) * 0.6f);
+		Player player = new EntityCreator().createPlayer(new Vector3f(30, 5, -90), new Vector3f(0, 100, 0));
 		entities.add(player);
 		camera = new Camera(player);
+		overheadCamera = new OverheadCamera(player);
 		
+		// *********** ENEMY CREATION *******************************
 		
-		// *********** ENEMY TEST *******************************
-		
-		Enemy[] enemies = new Enemy[15];
+		Enemy[] enemies = new Enemy[5];
 		for (int i = 0; i < enemies.length; i++) {
-			enemies[i] = new EntityCreator().createRandomEnemy(loader, "person", "playerTexture", random.nextInt(3) * 0.6f, 10, move_factor.FACE_TOWARDS, terrain);
+			enemies[i] = new EntityCreator().createRandomEnemy(move_factor.FACE_TOWARDS);
 			entities.add(enemies[i]);
 		}
 		
 		// ******************* EXTRAS ****************
 		
 		List<GuiTexture> guiTextures = new ArrayList<GuiTexture>();
-		GuiRenderer guiRenderer = new GuiRenderer(loader);
-		MousePicker picker = new MousePicker(camera, renderer.getProjectionMatrix(), terrain);
+		GuiRenderer guiRenderer = new GuiRenderer();
+		defaultMouse = new MousePicker(camera, renderer.getProjectionMatrix(), terrain);
+		overheadMouse = new MousePicker(overheadCamera, renderer.getProjectionMatrix(), terrain);
 		
-		// **********Water Renderer Set-up************************
+		// ********** Water Renderer Set-up ************************
 
 		WaterFrameBuffers buffers = new WaterFrameBuffers(DisplayManager.quality);
 		WaterShader waterShader = new WaterShader();
-		WaterRenderer waterRenderer = new WaterRenderer(loader, waterShader, renderer.getProjectionMatrix(), buffers);
+		WaterRenderer waterRenderer = new WaterRenderer(waterShader, renderer.getProjectionMatrix(), buffers);
 		List<WaterTile> waters = new ArrayList<WaterTile>();
 		WaterTile water = new WaterTile(75, -75, 0);
 		waters.add(water);
 
-		// ****************Game Audio Test*********************
+		// **************** Game Audio Test *********************
 		
 		//SoundTest soundTester = new SoundTest();
 		
 		Display.setTitle(NAME + " Release " + RELEASE + " b" + BUILD);
 		
-		// ****************Text Rendering*********************
+		// **************** Text Rendering *********************
 		
-		GUIText[] texts = new GUIText[3];
+		GUIText[] texts = new GUIText[4];
 		
 		texts[0] = new GUIText(Mift.NAME + " Alpha Build " + Mift.RELEASE + "." + Mift.BUILD, 1.25f, fontHolder.getBerlinSans(), new Vector2f(0, 0), 0.25f, ALIGNMENT.LEFT);
 			texts[0].setColor(255, 255, 255);
@@ -165,8 +156,10 @@ public class Mift {
 			texts[1].setColor(255, 223, 0);
 		texts[2] = new GUIText("", 0.75f, fontHolder.getArial(), new Vector2f(0.75f, 0.1f), 0.25f, ALIGNMENT.CENTER);
 			texts[2].setColor(200, 200, 200);
+		texts[3] = new GUIText("Default Entity", 0.75f, fontHolder.getBerlinSans(), new Vector2f(0.38f, 0.95f), 0.25f, ALIGNMENT.CENTER);
+			texts[3].setColor(220, 220, 220);
 		
-		// ****************Game Loop Below*********************
+		// **************** Game Loop Below *********************
 
 		while (!Display.isCloseRequested()) {
 			if (currentMenu == GAMESTATE.MENU) {
@@ -184,10 +177,18 @@ public class Mift {
 					}
 				}
 				player.move(terrain);
-				camera.move();
-				camera.rotate();
-				camera.getClicks();
-				picker.update();
+				if (player.isOverhead()) {
+					overheadCamera.move();
+					overheadCamera.rotate();
+					overheadCamera.getClicks();
+					overheadMouse.update(true);
+				} else {
+					camera.move();
+					camera.rotate();
+					camera.getClicks();
+					defaultMouse.update(false);
+				}
+				
 				
 				for (int i = 0; i < normalMapEntities.size(); i++) {
 					normalMapEntities.get(i).setRotY(normalMapEntities.get(i).getRotY() + 2);
@@ -200,27 +201,49 @@ public class Mift {
 				}
 				
 				GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
-	
-				// render reflection texture
-				buffers.bindReflectionFrameBuffer();
-				float distance = 2 * (camera.getPosition().y - water.getHeight());
-				camera.getPosition().y -= distance;
-				camera.invertPitch();
-				renderer.renderScene(entities, normalMapEntities, terrains, lights, camera,
-						new Vector4f(0, 1, 0, -water.getHeight() + 1));
-				camera.getPosition().y += distance;
-				camera.invertPitch();
-	
-				// render refraction texture
-				buffers.bindRefractionFrameBuffer();
-				renderer.renderScene(entities, normalMapEntities, terrains, lights, camera,
-						new Vector4f(0, -1, 0, water.getHeight()));
-	
-				// render to screen
-				GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
-				buffers.unbindCurrentFrameBuffer();
-				renderer.renderScene(entities, normalMapEntities, terrains, lights, camera, new Vector4f(0, -1, 0, 100000));
-				waterRenderer.render(waters, camera, sun);
+				if (player.isOverhead() == false) {
+					// render reflection texture
+					buffers.bindReflectionFrameBuffer();
+					float distance = 2 * (camera.getPosition().y - water.getHeight());
+					camera.getPosition().y -= distance;
+					camera.invertPitch();
+					renderer.renderScene(entities, normalMapEntities, terrains, lights, camera,
+							new Vector4f(0, 1, 0, -water.getHeight() + 1));
+					camera.getPosition().y += distance;
+					camera.invertPitch();
+		
+					// render refraction texture
+					buffers.bindRefractionFrameBuffer();
+					renderer.renderScene(entities, normalMapEntities, terrains, lights, camera,
+							new Vector4f(0, -1, 0, water.getHeight()));
+		
+					// render to screen
+					GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
+					buffers.unbindCurrentFrameBuffer();
+					renderer.renderScene(entities, normalMapEntities, terrains, lights, camera, new Vector4f(0, -1, 0, 100000));
+					waterRenderer.render(waters, camera, sun);
+				} else {
+					// render reflection texture
+					buffers.bindReflectionFrameBuffer();
+					float distance = 2 * (overheadCamera.getPosition().y - water.getHeight());
+					overheadCamera.getPosition().y -= distance;
+					overheadCamera.invertPitch();
+					renderer.renderScene(entities, normalMapEntities, terrains, lights, overheadCamera,
+							new Vector4f(0, 1, 0, -water.getHeight() + 1));
+					overheadCamera.getPosition().y += distance;
+					overheadCamera.invertPitch();
+		
+					// render refraction texture
+					buffers.bindRefractionFrameBuffer();
+					renderer.renderScene(entities, normalMapEntities, terrains, lights, overheadCamera,
+							new Vector4f(0, -1, 0, water.getHeight()));
+		
+					// render to screen
+					GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
+					buffers.unbindCurrentFrameBuffer();
+					renderer.renderScene(entities, normalMapEntities, terrains, lights, overheadCamera, new Vector4f(0, -1, 0, 100000));
+					waterRenderer.render(waters, overheadCamera, sun);
+				}
 				guiRenderer.render(guiTextures);
 			} else if (currentMenu == GAMESTATE.SETTINGS) {
 				
@@ -228,11 +251,16 @@ public class Mift {
 			fpsCounter.updateCounter();
 			texts[1].setText((int) (fpsCounter.getFPS()) + "");
 			texts[2].setText(updateDebugText(player));
+			if (player.isOverhead()) {
+				texts[3].setText(entityTypeHolder.get(overheadCamera.placerType).getName());
+			} else {
+				texts[3].setText("");
+			}
 			Text.render();
 			DisplayManager.updateDisplay();
 		}
 
-		// *********Clean Up Below**************
+		// ********* Clean Up Below **************
 		
 		Text.cleanUp();
 		buffers.cleanUp();
@@ -249,15 +277,26 @@ public class Mift {
 		//update string
 		StringBuilder sb = new StringBuilder();
 		sb.append(" Developer Mode: " + DisplayManager.debugPolys);
-		sb.append("  ~ Camera Distance: " + (int)camera.distanceFromPlayer);
-		sb.append("  ~ Camera POV: " + (camera.distanceFromPlayer == 0 ?
-				"First Person Perspective" : "Third Person Perspective"));
-		sb.append("  ~ Camera Position: [" + df.format(camera.getPosition().x)
-				+ ", " + df.format(camera.getPosition().y) + ", "
-				+ df.format(camera.getPosition().z) + "]");
-		sb.append("  ~ Camera View Position: [" + df.format(camera.getView().x)
-				+ ", " + df.format(camera.getView().y) + ", "
-				+ df.format(camera.getPosition().z) + "]");
+		if (player.isOverhead()) {
+			sb.append("  ~ Camera Distance: " + (int)overheadCamera.distanceFromPlayer);
+			sb.append("  ~ Camera POV: Over Head Perspective");
+			sb.append("  ~ Camera Position: [" + df.format(overheadCamera.getPosition().x)
+					+ ", " + df.format(overheadCamera.getPosition().y) + ", "
+					+ df.format(overheadCamera.getPosition().z) + "]");
+			sb.append("  ~ Camera View Position: [" + df.format(overheadCamera.getView().x)
+					+ ", " + df.format(overheadCamera.getView().y) + ", "
+					+ df.format(overheadCamera.getPosition().z) + "]");
+		} else {
+			sb.append("  ~ Camera Distance: " + (int)camera.distanceFromPlayer);
+			sb.append("  ~ Camera POV: " + (camera.distanceFromPlayer == 0
+					? "First Person Perspective" : "Third Person Perspective"));
+			sb.append("  ~ Camera Position: [" + df.format(camera.getPosition().x)
+					+ ", " + df.format(camera.getPosition().y) + ", "
+					+ df.format(camera.getPosition().z) + "]");
+			sb.append("  ~ Camera View Position: [" + df.format(camera.getView().x)
+					+ ", " + df.format(camera.getView().y) + ", "
+					+ df.format(camera.getPosition().z) + "]");
+		}
 		sb.append("  ~ Player Position: [" + df.format(player.getPosition().x)
 				+ ", " + df.format(player.getPosition().y) + ", "
 				+ df.format(player.getPosition().z) + "]");
@@ -273,5 +312,21 @@ public class Mift {
 	
 	public static Camera getCamera() {
 		return camera;
+	}
+	
+	public static OverheadCamera getOverheadCamera() {
+		return overheadCamera;
+	}
+	
+	public static MousePicker getMousePicker(boolean isOverhead) {
+		return (isOverhead ? overheadMouse : defaultMouse);
+	}
+	
+	public static Terrain getTerrain() {
+		return terrain;
+	}
+	
+	public static Loader getLoader() {
+		return loader;
 	}
 }

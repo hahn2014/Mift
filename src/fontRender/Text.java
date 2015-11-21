@@ -8,6 +8,7 @@ import java.util.Map;
 import fontCreator.FontType;
 import fontCreator.GUIText;
 import fontCreator.TextData;
+import main.Mift;
 import renderEngine.Loader;
 
 public class Text {
@@ -16,9 +17,9 @@ public class Text {
 	public static Map<FontType, List<GUIText>> texts = new HashMap<FontType, List<GUIText>>();
 	public static FontRenderer renderer;
 	
-	public static void init(Loader ldr) {
+	public static void init() {
 		renderer = new FontRenderer();
-		loader = ldr;
+		loader = Mift.getLoader();
 	}
 	
 	/**

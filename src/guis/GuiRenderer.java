@@ -10,7 +10,7 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
 
-import renderEngine.Loader;
+import main.Mift;
 import toolbox.Maths;
 
 public class GuiRenderer {
@@ -18,9 +18,9 @@ public class GuiRenderer {
 	private final RawModel quad;
 	private GuiShader shader;
 
-	public GuiRenderer(Loader loader) {
+	public GuiRenderer() {
 		float[] positions = { -1, 1, -1, -1, 1, 1, 1, -1 };
-		quad = loader.loadToVAO(positions, 2);
+		quad = Mift.getLoader().loadToVAO(positions, 2);
 		shader = new GuiShader();
 	}
 

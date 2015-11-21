@@ -1,20 +1,20 @@
 package skybox;
 
-import models.RawModel;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
 
+import entities.Camera;
+import entities.OverheadCamera;
+import models.RawModel;
 import renderEngine.DisplayManager;
 import renderEngine.Loader;
-import entities.Camera;
 
 public class SkyboxRenderer {
 	
-private static final float SIZE = 200f;
+private static final float SIZE = 400f;
 	
 	private static final float[] VERTICES = {        
 	    -SIZE,  SIZE, -SIZE,
@@ -82,6 +82,19 @@ private static final float SIZE = 200f;
 	}
 
 	public void render(Camera camera, float r, float g, float b) {
+		shader.start();
+		shader.loadViewMatrix(camera);
+		shader.loadFogColour(r, g, b);
+		GL30.glBindVertexArray(cube.getVaoID());
+		GL20.glEnableVertexAttribArray(0);
+		bindTextures();
+		GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, cube.getVertexCount());
+		GL20.glDisableVertexAttribArray(0);
+		GL30.glBindVertexArray(0);
+		shader.stop();
+	}
+	
+	public void render(OverheadCamera camera, float r, float g, float b) {
 		shader.start();
 		shader.loadViewMatrix(camera);
 		shader.loadFogColour(r, g, b);

@@ -9,6 +9,7 @@ import org.lwjgl.util.vector.Vector4f;
 
 import terrains.Terrain;
 import entities.Camera;
+import entities.OverheadCamera;
 
 public class MousePicker {
 
@@ -20,10 +21,18 @@ public class MousePicker {
 	private Matrix4f projectionMatrix;
 	private Matrix4f viewMatrix;
 	private Camera camera;
+	private OverheadCamera overheadCamera;
 	
 	private Terrain terrain;
 	private Vector3f currentTerrainPoint;
 
+	public MousePicker(OverheadCamera cam, Matrix4f projection, Terrain terrain) {
+		overheadCamera = cam;
+		projectionMatrix = projection;
+		viewMatrix = Maths.createViewMatrix(overheadCamera);
+		this.terrain = terrain;
+	}
+	
 	public MousePicker(Camera cam, Matrix4f projection, Terrain terrain) {
 		camera = cam;
 		projectionMatrix = projection;
@@ -41,11 +50,15 @@ public class MousePicker {
 		return currentRay;
 	}
 
-	public void update() {
-		viewMatrix = Maths.createViewMatrix(camera);
+	public void update(boolean isOverhead) {
+		if (isOverhead == false) {
+			viewMatrix = Maths.createViewMatrix(camera);
+		} else {
+			viewMatrix = Maths.createViewMatrix(overheadCamera);
+		}
 		currentRay = calculateMouseRay();
-		if (intersectionInRange(0, RAY_RANGE, currentRay)) {
-			currentTerrainPoint = binarySearch(0, 0, RAY_RANGE, currentRay);
+		if (intersectionInRange(0, RAY_RANGE, currentRay, isOverhead)) {
+			currentTerrainPoint = binarySearch(0, 0, RAY_RANGE, currentRay, isOverhead);
 		} else {
 			currentTerrainPoint = null;
 		}
@@ -83,17 +96,22 @@ public class MousePicker {
 
 	// **********************************************************
 
-	private Vector3f getPointOnRay(Vector3f ray, float distance) {
-		Vector3f camPos = camera.getPosition();
+	private Vector3f getPointOnRay(Vector3f ray, float distance, boolean isOverhead) {
+		Vector3f camPos;
+		if (isOverhead == false) {
+			camPos = camera.getPosition();
+		} else {
+			camPos = overheadCamera.getPosition();
+		}
 		Vector3f start = new Vector3f(camPos.x, camPos.y, camPos.z);
 		Vector3f scaledRay = new Vector3f(ray.x * distance, ray.y * distance, ray.z * distance);
 		return Vector3f.add(start, scaledRay, null);
 	}
 
-	private Vector3f binarySearch(int count, float start, float finish, Vector3f ray) {
+	private Vector3f binarySearch(int count, float start, float finish, Vector3f ray, boolean isOverhead) {
 		float half = start + ((finish - start) / 2f);
 		if (count >= RECURSION_COUNT) {
-			Vector3f endPoint = getPointOnRay(ray, half);
+			Vector3f endPoint = getPointOnRay(ray, half, isOverhead);
 			Terrain terrain = getTerrain(endPoint.getX(), endPoint.getZ());
 			if (terrain != null) {
 				return endPoint;
@@ -101,16 +119,16 @@ public class MousePicker {
 				return null;
 			}
 		}
-		if (intersectionInRange(start, half, ray)) {
-			return binarySearch(count + 1, start, half, ray);
+		if (intersectionInRange(start, half, ray, isOverhead)) {
+			return binarySearch(count + 1, start, half, ray, isOverhead);
 		} else {
-			return binarySearch(count + 1, half, finish, ray);
+			return binarySearch(count + 1, half, finish, ray, isOverhead);
 		}
 	}
 
-	private boolean intersectionInRange(float start, float finish, Vector3f ray) {
-		Vector3f startPoint = getPointOnRay(ray, start);
-		Vector3f endPoint = getPointOnRay(ray, finish);
+	private boolean intersectionInRange(float start, float finish, Vector3f ray, boolean isOverhead) {
+		Vector3f startPoint = getPointOnRay(ray, start, isOverhead);
+		Vector3f endPoint = getPointOnRay(ray, finish, isOverhead);
 		if (!isUnderGround(startPoint) && isUnderGround(endPoint)) {
 			return true;
 		} else {

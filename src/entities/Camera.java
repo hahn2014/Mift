@@ -4,6 +4,8 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.util.vector.Vector3f;
 
+import main.Mift;
+
 /**
  * Third Person Camera view.
  * Use one camera class object
@@ -14,7 +16,7 @@ import org.lwjgl.util.vector.Vector3f;
  */
 public class Camera {
 	
-	public float distanceFromPlayer = 40, maxDistFromPlayer = 100;
+	public float distanceFromPlayer = 14, maxDistFromPlayer = 50;
 	public int zoomFactor = 120;
 	private float angleAroundPlayer = 0;
 
@@ -49,27 +51,35 @@ public class Camera {
 	}
 
 	public void rotate() {
-		if (Keyboard.isKeyDown(Keyboard.KEY_UP)) { // look up
+		if (Keyboard.isKeyDown(Keyboard.KEY_DOWN)) { // look up
 			if (pitch + 0.75f <= maxPitch) {
 				pitch += 0.75f;
 			}
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_DOWN)) { // look down
+		if (Keyboard.isKeyDown(Keyboard.KEY_UP)) { // look down
 			if (pitch - 0.75f >= minPitch) {
 				pitch -= 0.75f;
 			}
 		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_LEFT)) { // look left
-			yaw -= 0.75f;
+			if (yaw - 2.0f >= 0) {
+				yaw -= 2.0f;
+			} else {
+				yaw = 360;
+			}
 		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) { // look right
-			yaw += 0.75f;
+			if (yaw + 2.0f <= 360) {
+				yaw += 2.0f;
+			} else {
+				yaw = 0;
+			}
 		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) { //close game for now
 			Mouse.setGrabbed(false);
 			System.exit(0);
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_F1)) {
+		if (Keyboard.isKeyDown(Keyboard.KEY_F1)) { //unlock the mouse from the screen
 			Mouse.setGrabbed(false);
 		}
 	}
@@ -125,9 +135,9 @@ public class Camera {
 		float offsetZ = (float) (horizDistance * Math.cos(Math.toRadians(theta)));
 		position.x = player.getPosition().x - offsetX;
 		position.z = player.getPosition().z - offsetZ;
-		position.y = player.getPosition().y + verticDistance + 7;
+		position.y = player.getPosition().y + distanceFromPlayer + 7;
 	}
-
+	
 	private float calculateHorizontalDistance() {
 		return (float) (distanceFromPlayer * Math.cos(Math.toRadians(pitch)));
 	}
@@ -141,8 +151,11 @@ public class Camera {
 		distanceFromPlayer -= change;
 		if (distanceFromPlayer < 0) {
 			distanceFromPlayer = 0;
-		} else if (distanceFromPlayer > maxDistFromPlayer) {
-			distanceFromPlayer = maxDistFromPlayer;
+		} else if (distanceFromPlayer >= maxDistFromPlayer) {
+			distanceFromPlayer = 50;
+			player.setOverhead(true);
+			Mouse.setGrabbed(false);
+			Mift.getOverheadCamera().distanceFromPlayer = 50;
 		}
 	}
 

@@ -13,6 +13,7 @@ import org.lwjgl.util.vector.Vector4f;
 import entities.Camera;
 import entities.Entity;
 import entities.Light;
+import entities.OverheadCamera;
 import models.RawModel;
 import models.TexturedModel;
 import renderEngine.MasterRenderer;
@@ -33,6 +34,22 @@ public class NormalMappingRenderer {
 
 	public void render(Map<TexturedModel, List<Entity>> entities, Vector4f clipPlane, List<Light> lights,
 			Camera camera) {
+		shader.start();
+		prepare(clipPlane, lights, camera);
+		for (TexturedModel model : entities.keySet()) {
+			prepareTexturedModel(model);
+			List<Entity> batch = entities.get(model);
+			for (Entity entity : batch) {
+				prepareInstance(entity);
+				GL11.glDrawElements(GL11.GL_TRIANGLES, model.getRawModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
+			}
+			unbindTexturedModel();
+		}
+		shader.stop();
+	}
+	
+	public void render(Map<TexturedModel, List<Entity>> entities, Vector4f clipPlane, List<Light> lights,
+			OverheadCamera camera) {
 		shader.start();
 		prepare(clipPlane, lights, camera);
 		for (TexturedModel model : entities.keySet()) {
@@ -95,5 +112,14 @@ public class NormalMappingRenderer {
 		shader.loadLights(lights, viewMatrix);
 		shader.loadViewMatrix(viewMatrix);
 	}
+	
+	private void prepare(Vector4f clipPlane, List<Light> lights, OverheadCamera camera) {
+		shader.loadClipPlane(clipPlane);
+		// need to be public variables in MasterRenderer
+		shader.loadSkyColour(MasterRenderer.RED, MasterRenderer.GREEN, MasterRenderer.BLUE);
+		Matrix4f viewMatrix = Maths.createViewMatrix(camera);
 
+		shader.loadLights(lights, viewMatrix);
+		shader.loadViewMatrix(viewMatrix);
+	}
 }

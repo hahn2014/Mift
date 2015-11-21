@@ -3,10 +3,11 @@ package skybox;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
+import entities.Camera;
+import entities.OverheadCamera;
 import renderEngine.DisplayManager;
 import shaders.ShaderProgram;
 import toolbox.Maths;
-import entities.Camera;
 
 public class SkyboxShader extends ShaderProgram {
 
@@ -33,6 +34,16 @@ public class SkyboxShader extends ShaderProgram {
 	}
 
 	public void loadViewMatrix(Camera camera) {
+		Matrix4f matrix = Maths.createViewMatrix(camera);
+		matrix.m30 = 0;
+		matrix.m31 = 0;
+		matrix.m32 = 0;
+		rotation += ROTATE_SPEED * DisplayManager.getFrameTimeSeconds();
+		Matrix4f.rotate((float) Math.toRadians(rotation), new Vector3f(0, 1, 0), matrix, matrix);
+		super.loadMatrix(location_viewMatrix, matrix);
+	}
+	
+	public void loadViewMatrix(OverheadCamera camera) {
 		Matrix4f matrix = Maths.createViewMatrix(camera);
 		matrix.m30 = 0;
 		matrix.m31 = 0;
