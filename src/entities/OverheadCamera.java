@@ -56,6 +56,13 @@ public class OverheadCamera {
 		while (Keyboard.next()) {
 			if (Keyboard.getEventKey() == Keyboard.KEY_1) {
 			    if (Keyboard.getEventKeyState()) {} else {
+			    	//go back one model place
+					placerType = eth.rotateReverse(placerType);
+			    }
+			}
+			if (Keyboard.getEventKey() == Keyboard.KEY_2) {
+				if (Keyboard.getEventKeyState()) {} else {
+					//go forward one model place
 					placerType = eth.rotate(placerType);
 			    }
 			}
@@ -67,9 +74,23 @@ public class OverheadCamera {
 		    if (Mouse.getEventButtonState()) {} else {
 		        if (Mouse.getEventButton() == 0) {
 		            //LEFT BUTTON RELEASED
-		        	EntityCreator e = new EntityCreator();
+		        	EntityCreator e = new EntityCreator(); //spawn a new model of the current model selection
 		        	Mift.entities.add(e.createEnemy(placerType, Mift.getMousePicker(true).getCurrentTerrainPoint(), 
 		        			new Vector3f(0, 0, 0), move_factor.MOVE_CIRCLES));
+		        }
+		        if (Mouse.getEventButton() == 1) {
+		            //RIGHT BUTTON RELEASED
+		        	//we need to check if we are pressing over an entity,
+		        	//and if we are we are going delete it from the list
+		        	Vector3f point = Mift.getMousePicker(true).getCurrentTerrainPoint();
+		        	Entity toRemove = new Entity();
+		        	for (Entity entity : Mift.entities) {
+		        		if (entity.rayOverEntity(point)) {
+		        			//we clicked on an entity, delete it
+		        			toRemove = entity;
+		        		}
+		        	}
+		        	Mift.entities.remove(toRemove);
 		        }
 		    }
 		}

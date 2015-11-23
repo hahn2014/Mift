@@ -14,7 +14,6 @@ public class EntityTypeHolder {
 		entities.add(new EntityType(entityType.TREE, 	"Low Poly Tree", 	"lowPolyTree", 	"lowPolyTree", 	0.75f));
 		entities.add(new EntityType(entityType.BARREL, 	"Barrel", 			"barrel", 		"barrel", 		0.5f));
 		entities.add(new EntityType(entityType.PINE, 	"Pine Tree", 		"pine", 		"pine1024", 	1.3f));
-		
 	}
 	
 	public EntityType get(int id) {
@@ -41,5 +40,16 @@ public class EntityTypeHolder {
 			}
 		}
 		return null;
+	}
+	
+	public entityType rotateReverse(entityType current) {
+		for (int i = entities.size() - 1; i > 0; i--) {
+			if (entities.get(i).getID() == current) {
+				if (i - 1 >= 0) { //we can keep going down in the list of models
+					return entities.get(i - 1).getID();
+				}
+			}
+		}
+		return entities.get(entities.size() - 1).getID(); //set the last model here
 	}
 }

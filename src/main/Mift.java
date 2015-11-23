@@ -252,7 +252,9 @@ public class Mift {
 			texts[1].setText((int) (fpsCounter.getFPS()) + "");
 			texts[2].setText(updateDebugText(player));
 			if (player.isOverhead()) {
-				texts[3].setText(entityTypeHolder.get(overheadCamera.placerType).getName());
+				texts[3].setText(entityTypeHolder.get(entityTypeHolder.rotateReverse(overheadCamera.placerType)).getName()
+						+ " <--1-- [" + entityTypeHolder.get(overheadCamera.placerType).getName() + "] --2--> "
+						+ entityTypeHolder.get(entityTypeHolder.rotate(overheadCamera.placerType)).getName());
 			} else {
 				texts[3].setText("");
 			}

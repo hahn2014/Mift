@@ -1,8 +1,8 @@
 package entities;
 
-import models.TexturedModel;
-
 import org.lwjgl.util.vector.Vector3f;
+
+import models.TexturedModel;
 
 public class Entity {
 
@@ -31,6 +31,8 @@ public class Entity {
 		this.rotZ = rotZ;
 		this.scale = scale;
 	}
+
+	public Entity() {}
 
 	public float getTextureXOffset() {
 		int column = textureIndex % model.getTexture().getNumberOfRows();
@@ -130,5 +132,13 @@ public class Entity {
 	public void setScale(float scale) {
 		this.scale = scale;
 	}
-
+	
+	public boolean rayOverEntity(Vector3f ray) {
+		if (this.getPosition().getX() >= ray.getX() - 10 && this.getPosition().getX() <= ray.getX() + 10
+				&& this.getPosition().getY() >= ray.getY() - 5 && this.getPosition().getY() <= ray.getY() + 5
+				&& this.getPosition().getZ() >= ray.getZ() - 10 && this.getPosition().getZ() <= ray.getZ() + 10) {
+			return true;
+		}
+		return false;
+	}
 }
