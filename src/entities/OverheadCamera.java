@@ -4,7 +4,7 @@ import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.util.vector.Vector3f;
 
-import entities.Enemy.move_factor;
+import entities.MoveType.move_factor;
 import entities.EntityType.entityType;
 import main.Mift;
 
@@ -28,7 +28,9 @@ public class OverheadCamera {
 	
 	private Player player;
 	private EntityTypeHolder eth = new EntityTypeHolder();
+	private MoveTypeHolder mth = new MoveTypeHolder();
 	public entityType placerType = entityType.PLAYER;
+	public move_factor move_type = move_factor.NOTHING;
 	
 	public OverheadCamera(Player player) {
 		this.player = player;
@@ -66,6 +68,18 @@ public class OverheadCamera {
 					placerType = eth.rotate(placerType);
 			    }
 			}
+			if (Keyboard.getEventKey() == Keyboard.KEY_3) {
+				if (Keyboard.getEventKeyState()) {} else {
+					//go back one move type place
+					move_type = mth.rotateReverse(move_type);
+				}
+			}
+			if (Keyboard.getEventKey() == Keyboard.KEY_4) {
+				if (Keyboard.getEventKeyState()) {} else {
+					//go forward one move type place
+					move_type = mth.rotate(move_type);
+				}
+			}
 		}
 	}
 	
@@ -75,8 +89,8 @@ public class OverheadCamera {
 		        if (Mouse.getEventButton() == 0) {
 		            //LEFT BUTTON RELEASED
 		        	EntityCreator e = new EntityCreator(); //spawn a new model of the current model selection
-		        	Mift.entities.add(e.createEnemy(placerType, Mift.getMousePicker(true).getCurrentTerrainPoint(), 
-		        			new Vector3f(0, 0, 0), move_factor.MOVE_CIRCLES));
+		        	Mift.addEnemy(e.createEnemy(placerType, Mift.getMousePicker(true).getCurrentTerrainPoint(), 
+		        			player.getRotation(), move_type));
 		        }
 		        if (Mouse.getEventButton() == 1) {
 		            //RIGHT BUTTON RELEASED
@@ -88,6 +102,7 @@ public class OverheadCamera {
 		        		if (entity.rayOverEntity(point)) {
 		        			//we clicked on an entity, delete it
 		        			toRemove = entity;
+		        			break;
 		        		}
 		        	}
 		        	Mift.entities.remove(toRemove);

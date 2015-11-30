@@ -57,9 +57,7 @@ public class Entity {
 	}
 	
 	public void increaseRotation(Vector3f rotation) {
-		this.rotX += rotation.x;
-		this.rotY += rotation.y;
-		this.rotZ += rotation.z;
+		increaseRotation(rotation.x, rotation.y, rotation.z);
 	}
 
 	public TexturedModel getModel() {
@@ -91,13 +89,19 @@ public class Entity {
 	}
 
 	public void setRotY(float rotY) {
+		while (rotY < 0 || rotY > 360) {
+			if (rotY < 0) {
+				rotY = 359 + rotY;
+			} else if (rotY > 360) {
+				rotY = rotY - 360;
+			}
+		}
 		this.rotY = rotY;
 	}
 
 	public float getRotZ() {
 		return rotZ;
 	}
-	
 
 	public void setRotZ(float rotZ) {
 		this.rotZ = rotZ;
@@ -134,10 +138,16 @@ public class Entity {
 	}
 	
 	public boolean rayOverEntity(Vector3f ray) {
-		if (this.getPosition().getX() >= ray.getX() - 10 && this.getPosition().getX() <= ray.getX() + 10
-				&& this.getPosition().getY() >= ray.getY() - 5 && this.getPosition().getY() <= ray.getY() + 5
-				&& this.getPosition().getZ() >= ray.getZ() - 10 && this.getPosition().getZ() <= ray.getZ() + 10) {
-			return true;
+		float buffer = 3 * scale; //getModelBuffer();
+		Vector3f bufferStart = new Vector3f(this.getPosition().getX() - buffer, this.getPosition().getY() - buffer, this.getPosition().getZ() - buffer);
+		Vector3f bufferEnd = new Vector3f(this.getPosition().getX() + buffer, this.getPosition().getY() + buffer, this.getPosition().getZ() + buffer);
+		
+		if (ray.getX() >= bufferStart.getX() && ray.getX() <= bufferEnd.getX()) {
+			if (ray.getY() >= bufferStart.getY() && ray.getY() <= bufferEnd.getY()) {
+				if (ray.getZ() >= bufferStart.getZ() && ray.getZ() <= bufferEnd.getZ()) {
+					return true;
+				}
+			}
 		}
 		return false;
 	}

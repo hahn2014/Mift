@@ -6,7 +6,7 @@ import java.util.Random;
 import org.lwjgl.Sys;
 import org.lwjgl.util.vector.Vector3f;
 
-import entities.Enemy.move_factor;
+import entities.MoveType.move_factor;
 import entities.EntityType.entityType;
 import main.Mift;
 import models.RawModel;

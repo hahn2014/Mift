@@ -33,7 +33,6 @@ public class OBJLoader {
 		float[] textureArray = null;
 		int[] indicesArray = null;
 		try {
-
 			while (true) {
 				line = reader.readLine();
 				String[] currentLine = line.split(" ");
@@ -105,5 +104,4 @@ public class OBJLoader {
 		normalsArray[currentVertexPointer * 3 + 1] = currentNorm.y;
 		normalsArray[currentVertexPointer * 3 + 2] = currentNorm.z;
 	}
-
 }

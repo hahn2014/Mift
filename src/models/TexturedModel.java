@@ -19,5 +19,4 @@ public class TexturedModel {
 	public ModelTexture getTexture() {
 		return texture;
 	}
-
 }

@@ -3,6 +3,7 @@ package entities;
 import org.lwjgl.Sys;
 import org.lwjgl.util.vector.Vector3f;
 
+import entities.MoveType.move_factor;
 import models.TexturedModel;
 import paths.Path;
 import paths.PathCreator;
@@ -11,15 +12,8 @@ import terrains.Terrain;
 import toolbox.Maths;
 
 public class Enemy extends Entity {
-	private static float RUN_SPEED = 20.0f;
+	private static float RUN_SPEED = 15.0f;
 	
-	public static enum move_factor {
-		MOVE_TOWARDS,
-		FACE_TOWARDS,
-		FACE_AWAY,
-		MOVE_CIRCLES,
-		FOLLOW_PATH
-	}
 	private move_factor _move_factor = move_factor.FACE_TOWARDS;
 	private Terrain terrain;
 	private PathCreator pathCreator = new PathCreator();
@@ -47,6 +41,8 @@ public class Enemy extends Entity {
 			moveInCircles(60);
 		} else if (_move_factor == move_factor.FOLLOW_PATH) {
 			followPath(path1);
+		} else if (_move_factor == move_factor.FOLLOW_NOT_LOOKING) {
+			followWhenNotLooking(player);
 		}
 	}
 	
@@ -58,6 +54,22 @@ public class Enemy extends Entity {
 		float dx = (float) 	(speed * Math.sin(Math.toRadians(super.getRotY())));
 		float dz = (float) 	(speed * Math.cos(Math.toRadians(super.getRotY())));
 		super.increasePosition(dx, 0, dz);
+		
+		float terrainHeight = terrain.getHeightOfTerrain(super.getPosition().x, super.getPosition().z);
+		super.getPosition().y = terrainHeight;
+	}
+	
+	private void followWhenNotLooking(Player player) {
+		//rotate enemy to face player menacingly
+		super.setRotation(Maths.getRotationFromPoint(this, player));
+		
+		//check if player rotation is away from entity
+		if (Maths.isWithinScreen(player.getRotation(), this.getRotation())) {
+			float speed = (RUN_SPEED) * DisplayManager.getFrameTimeSeconds();
+			float dx = (float) 	(speed * Math.sin(Math.toRadians(super.getRotY())));
+			float dz = (float) 	(speed * Math.cos(Math.toRadians(super.getRotY())));
+			super.increasePosition(dx, 0, dz);
+		}
 		
 		float terrainHeight = terrain.getHeightOfTerrain(super.getPosition().x, super.getPosition().z);
 		super.getPosition().y = terrainHeight;

@@ -14,28 +14,48 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
-import entities.*;
-import entities.Enemy.move_factor;
-import fontCreator.*;
+import entities.Camera;
+import entities.Enemy;
+import entities.Entity;
+import entities.EntityCreator;
+import entities.EntityTypeHolder;
+import entities.Light;
+import entities.MoveType.move_factor;
+import entities.MoveTypeHolder;
+import entities.OverheadCamera;
+import entities.Player;
+import fontCreator.FontHolder;
+import fontCreator.GUIText;
 import fontCreator.GUIText.ALIGNMENT;
 import fontRender.Text;
-import guis.*;
+import guis.GuiRenderer;
+import guis.GuiTexture;
 import models.TexturedModel;
-import renderEngine.*;
+import particles.ParticleEmitter;
+import particles.ParticleHolder;
+import renderEngine.DisplayManager;
 import renderEngine.DisplayManager.QUALITY;
-import terrains.*;
-import toolbox.*;
-import water.*;
+import renderEngine.Loader;
+import renderEngine.MasterRenderer;
+import terrains.Terrain;
+import terrains.TerrainCreator;
+import toolbox.FPSCounter;
+import toolbox.MemoryData;
+import toolbox.MousePicker;
+import water.WaterFrameBuffers;
+import water.WaterRenderer;
+import water.WaterShader;
+import water.WaterTile;
 
 /**
  * Already surpassed 4k lines of code while trending currently at 4670! Keep up
- * the good work - Mift Build 39
+ * the good work - Mift Build 40
  * 
  * @author Bryce Hahn, Mason Cluff
  * @since 1.0
  */
 public class Mift {
-	public static final String BUILD = "39";
+	public static final String BUILD = "40";
 	public static final String RELEASE = "1";
 	public static final String RELEASE_TITLE = "Alpha";
 	public static final String NAME = "Mift";
@@ -50,6 +70,7 @@ public class Mift {
 	private static MousePicker defaultMouse;
 	private static MousePicker overheadMouse;
 	public static List<Entity> entities = new ArrayList<Entity>();
+	public static List<Enemy> enemies = new ArrayList<Enemy>();
 	private static Terrain terrain;
 	private static Loader loader = new Loader();
 	
@@ -83,6 +104,7 @@ public class Mift {
 		Text.init();
 		FontHolder fontHolder = new FontHolder();
 		EntityTypeHolder entityTypeHolder = new EntityTypeHolder();
+		MoveTypeHolder moveTypeHolder = new MoveTypeHolder();
 		
 		// ********* TERRAIN TEXTURE STUFF **********
 
@@ -118,10 +140,9 @@ public class Mift {
 		
 		// *********** ENEMY CREATION *******************************
 		
-		Enemy[] enemies = new Enemy[5];
-		for (int i = 0; i < enemies.length; i++) {
-			enemies[i] = new EntityCreator().createRandomEnemy(move_factor.FACE_TOWARDS);
-			entities.add(enemies[i]);
+		for (int i = 0; i < 5; i++) {
+			enemies.add(new EntityCreator().createRandomEnemy(move_factor.MOVE_CIRCLES));
+			entities.add(enemies.get(i));
 		}
 		
 		// ******************* EXTRAS ****************
@@ -156,8 +177,17 @@ public class Mift {
 			texts[1].setColor(255, 223, 0);
 		texts[2] = new GUIText("", 0.75f, fontHolder.getArial(), new Vector2f(0.75f, 0.1f), 0.25f, ALIGNMENT.CENTER);
 			texts[2].setColor(200, 200, 200);
-		texts[3] = new GUIText("Default Entity", 0.75f, fontHolder.getBerlinSans(), new Vector2f(0.38f, 0.95f), 0.25f, ALIGNMENT.CENTER);
+		texts[3] = new GUIText("Default Entity", 0.75f, fontHolder.getBerlinSans(), new Vector2f(0.27f, 0.93f), 0.5f, ALIGNMENT.CENTER);
 			texts[3].setColor(220, 220, 220);
+		
+		// **************** PARTICLE SYSTEM *********************
+		ParticleHolder.init(loader, renderer.getProjectionMatrix());
+		ParticleEmitter particleEmitter = new ParticleEmitter(50, 35, 0.45f, 5, 0.4f);
+		particleEmitter.randomizeRotation();
+		particleEmitter.setDirection(new Vector3f(0, 1, 0),  0.1f);
+		particleEmitter.setLifeError(0.1f);
+		particleEmitter.setSpeedError(0.4f);
+		particleEmitter.setScaleError(0.4f);
 		
 		// **************** Game Loop Below *********************
 
@@ -188,6 +218,8 @@ public class Mift {
 					camera.getClicks();
 					defaultMouse.update(false);
 				}
+				particleEmitter.generateParticles(new Vector3f(player.getPosition().x, player.getPosition().y + 7, player.getPosition().z));
+				ParticleHolder.update();
 				
 				
 				for (int i = 0; i < normalMapEntities.size(); i++) {
@@ -197,6 +229,7 @@ public class Mift {
 				for (Enemy e : enemies) {
 					if (e != null) {
 						e.move(player);
+						particleEmitter.generateParticles(new Vector3f(e.getPosition().x, e.getPosition().y + 6, e.getPosition().z));
 					}
 				}
 				
@@ -244,6 +277,7 @@ public class Mift {
 					renderer.renderScene(entities, normalMapEntities, terrains, lights, overheadCamera, new Vector4f(0, -1, 0, 100000));
 					waterRenderer.render(waters, overheadCamera, sun);
 				}
+				ParticleHolder.renderParticles(player.isOverhead());
 				guiRenderer.render(guiTextures);
 			} else if (currentMenu == GAMESTATE.SETTINGS) {
 				
@@ -252,9 +286,22 @@ public class Mift {
 			texts[1].setText((int) (fpsCounter.getFPS()) + "");
 			texts[2].setText(updateDebugText(player));
 			if (player.isOverhead()) {
-				texts[3].setText(entityTypeHolder.get(entityTypeHolder.rotateReverse(overheadCamera.placerType)).getName()
-						+ " <--1-- [" + entityTypeHolder.get(overheadCamera.placerType).getName() + "] --2--> "
-						+ entityTypeHolder.get(entityTypeHolder.rotate(overheadCamera.placerType)).getName());
+				StringBuilder sb = new StringBuilder();
+				sb.append(entityTypeHolder.get(entityTypeHolder.rotateReverse(overheadCamera.placerType)).getName());
+				sb.append(" <--1-- [");
+				sb.append(entityTypeHolder.get(overheadCamera.placerType).getName());
+				sb.append("] --2--> ");
+				sb.append(entityTypeHolder.get(entityTypeHolder.rotate(overheadCamera.placerType)).getName());
+				sb.append(" ~ ");
+				sb.append(moveTypeHolder.get(moveTypeHolder.rotateReverse(overheadCamera.move_type)).getName());
+				sb.append(" <--3-- [");
+				sb.append(moveTypeHolder.get(overheadCamera.move_type).getName());
+				sb.append("] --4--> ");
+				sb.append(moveTypeHolder.get(moveTypeHolder.rotate(overheadCamera.move_type)).getName());
+				sb.append(" ~ (");
+				sb.append(moveTypeHolder.get(overheadCamera.move_type).getDescription());
+				sb.append(")");
+				texts[3].setText(sb.toString());
 			} else {
 				texts[3].setText("");
 			}
@@ -264,6 +311,7 @@ public class Mift {
 
 		// ********* Clean Up Below **************
 		
+		ParticleHolder.cleanUp();
 		Text.cleanUp();
 		buffers.cleanUp();
 		waterShader.cleanUp();
@@ -302,6 +350,9 @@ public class Mift {
 		sb.append("  ~ Player Position: [" + df.format(player.getPosition().x)
 				+ ", " + df.format(player.getPosition().y) + ", "
 				+ df.format(player.getPosition().z) + "]");
+		sb.append(" ~ Player Rotation: [" + df.format(player.getRotX())
+				+ ", " + df.format(player.getRotY()) + ", "
+				+ df.format(player.getRotZ()) + "]");
 		sb.append("  ~ Used Memory: " + (MemoryData.getFreeMemory() / MemoryData.getUsedMemory())
 				+ "% (" + MemoryData.getUsedMemory() + "MB) of " + MemoryData.getFreeMemory() + "MB");
 		sb.append("  ~ Allocated Memory: " + (MemoryData.getMaxMemory() / MemoryData.getTotalMemory())
@@ -330,5 +381,10 @@ public class Mift {
 	
 	public static Loader getLoader() {
 		return loader;
+	}
+	
+	public static void addEnemy(Enemy e) {
+		enemies.add(e);
+		entities.add(e);
 	}
 }

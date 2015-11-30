@@ -73,6 +73,9 @@ public class Maths {
 	    if (angle < 0) {
 	        return new Vector3f(0, (float)(360 + angle), 0);
 	    } else {
+	    	if (angle > 360) {
+	    		angle -= 360;
+	    	}
 	        return new Vector3f(0, (float)(angle), 0);
 	    }
 	}
@@ -102,5 +105,12 @@ public class Maths {
 	    } else {
 	        return new Vector3f(0, (float) (angle), 0);
 	    }
+	}
+	
+	public static boolean isWithinScreen(Vector3f view, Vector3f enemy) {
+		if (view.getY() - 90 >= enemy.getY() || view.getY() + 90 <= enemy.getY()) {
+			return false;
+		}
+		return true;
 	}
 }
