@@ -15,7 +15,7 @@ public class DisplayManager {
 
 	private static final int WIDTH = 1280;
 	private static final int HEIGHT = 720;
-	private static final double FPS_CAP = 119.99999999;
+	private static final double FPS_CAP = 119.999;
 	
 	public static enum QUALITY {
 		LIGHT,

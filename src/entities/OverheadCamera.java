@@ -1,11 +1,14 @@
 package entities;
 
+import java.util.Random;
+
+import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.util.vector.Vector3f;
 
-import entities.MoveType.move_factor;
 import entities.EntityType.entityType;
+import entities.MoveType.move_factor;
 import main.Mift;
 
 /**
@@ -25,7 +28,7 @@ public class OverheadCamera {
 	private float pitch = 90, yaw;
 	private float horizontalDistance;
 	private float verticalDistance;
-	
+	private Random random = new Random();
 	private Player player;
 	private EntityTypeHolder eth = new EntityTypeHolder();
 	private MoveTypeHolder mth = new MoveTypeHolder();
@@ -35,6 +38,7 @@ public class OverheadCamera {
 	public OverheadCamera(Player player) {
 		this.player = player;
 		Mouse.setGrabbed(true);
+		random.setSeed(Sys.getTime());
 	}
 	
 	public void move() {
@@ -88,9 +92,10 @@ public class OverheadCamera {
 		    if (Mouse.getEventButtonState()) {} else {
 		        if (Mouse.getEventButton() == 0) {
 		            //LEFT BUTTON RELEASED
+		        	random.setSeed(Sys.getTime());
 		        	EntityCreator e = new EntityCreator(); //spawn a new model of the current model selection
 		        	Mift.addEnemy(e.createEnemy(placerType, Mift.getMousePicker(true).getCurrentTerrainPoint(), 
-		        			player.getRotation(), move_type));
+		        			player.getRotation(), move_type, random.nextInt(99999999)));
 		        }
 		        if (Mouse.getEventButton() == 1) {
 		            //RIGHT BUTTON RELEASED
@@ -117,6 +122,7 @@ public class OverheadCamera {
 		if (distanceFromPlayer < 50) {
 			distanceFromPlayer = 49;
 			Mift.getCamera().distanceFromPlayer = 49;
+			Mift.getCamera().setFPS(true);
 			player.setOverhead(false);
 			Mouse.setGrabbed(true);
 		} else {

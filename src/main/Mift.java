@@ -12,8 +12,9 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
-import org.lwjgl.util.vector.Vector4f;
 
+import attacks.AttackHolder;
+import attacks.fireball.FireballHolder;
 import entities.Camera;
 import entities.Enemy;
 import entities.Entity;
@@ -33,6 +34,7 @@ import guis.GuiTexture;
 import models.TexturedModel;
 import particles.ParticleEmitter;
 import particles.ParticleHolder;
+import particles.ParticleTexture;
 import renderEngine.DisplayManager;
 import renderEngine.DisplayManager.QUALITY;
 import renderEngine.Loader;
@@ -49,13 +51,13 @@ import water.WaterTile;
 
 /**
  * Already surpassed 4k lines of code while trending currently at 4670! Keep up
- * the good work - Mift Build 40
+ * the good work - Mift Build 41
  * 
  * @author Bryce Hahn, Mason Cluff
  * @since 1.0
  */
 public class Mift {
-	public static final String BUILD = "40";
+	public static final String BUILD = "41";
 	public static final String RELEASE = "1";
 	public static final String RELEASE_TITLE = "Alpha";
 	public static final String NAME = "Mift";
@@ -71,8 +73,15 @@ public class Mift {
 	private static MousePicker overheadMouse;
 	public static List<Entity> entities = new ArrayList<Entity>();
 	public static List<Enemy> enemies = new ArrayList<Enemy>();
+	public static ParticleEmitter particleEmitter;
 	private static Terrain terrain;
 	private static Loader loader = new Loader();
+
+	public static FontHolder fontHolder;
+	public static EntityTypeHolder entityTypeHolder;
+	public static MoveTypeHolder moveTypeHolder;
+	public static AttackHolder attackHolder;
+	public static FireballHolder fireballHolder;
 	
 	public static enum GAMESTATE {
 		MENU,
@@ -99,12 +108,14 @@ public class Mift {
 		//test graphics import
 		MemoryData.sendGraphicsInformationToFile();
 		//init main objects
-		EntityCreator entityCreater = new EntityCreator();
+		EntityCreator entityCreator = new EntityCreator();
 		FPSCounter fpsCounter = new FPSCounter();
 		Text.init();
-		FontHolder fontHolder = new FontHolder();
-		EntityTypeHolder entityTypeHolder = new EntityTypeHolder();
-		MoveTypeHolder moveTypeHolder = new MoveTypeHolder();
+		fontHolder = new FontHolder();
+		entityTypeHolder = new EntityTypeHolder();
+		moveTypeHolder = new MoveTypeHolder();
+		attackHolder = new AttackHolder();
+		fireballHolder = new FireballHolder();
 		
 		// ********* TERRAIN TEXTURE STUFF **********
 
@@ -114,16 +125,16 @@ public class Mift {
 
 		// ****************** NORMAL MAP MODELS ************************
 
-		TexturedModel barrelModel = entityCreater.createNormalTexturedModel("barrel", "barrelNormal", 10, 0.5f);
-		TexturedModel crateModel = entityCreater.createNormalTexturedModel("crate", "crateNormal", 10, 0.5f);
-		TexturedModel boulderModel = entityCreater.createNormalTexturedModel("boulder", "boulderNormal", 10, 0.5f);
+		TexturedModel barrelModel = entityCreator.createNormalTexturedModel("barrel", "barrelNormal", 10, 0.5f);
+		TexturedModel crateModel = entityCreator.createNormalTexturedModel("crate", "crateNormal", 10, 0.5f);
+		TexturedModel boulderModel = entityCreator.createNormalTexturedModel("boulder", "boulderNormal", 10, 0.5f);
 		List<Entity> normalMapEntities = new ArrayList<Entity>();
 		normalMapEntities.add(new Entity(barrelModel, new Vector3f(75, 10, -75), 0, 0, 0, 1f));
 		normalMapEntities.add(new Entity(boulderModel, new Vector3f(85, 10, -75), 0, 0, 0, 1f));
 		normalMapEntities.add(new Entity(crateModel, new Vector3f(65, 10, -75), 0, 0, 0, 0.04f));
 
 		// ************ ENTITIES *******************
-		entities = entityCreater.generateObjects(entities, terrain, 0);
+		entities = entityCreator.generateObjects(entities, terrain, 0);
 
 		// ******************* OTHER SETUP ***************
 
@@ -133,7 +144,7 @@ public class Mift {
 
 		MasterRenderer renderer = new MasterRenderer();
 
-		Player player = new EntityCreator().createPlayer(new Vector3f(30, 5, -90), new Vector3f(0, 100, 0));
+		Player player = new EntityCreator().createPlayer(new Vector3f(30, 5, -90), new Vector3f(0, 100, 0), loader);
 		entities.add(player);
 		camera = new Camera(player);
 		overheadCamera = new OverheadCamera(player);
@@ -141,7 +152,7 @@ public class Mift {
 		// *********** ENEMY CREATION *******************************
 		
 		for (int i = 0; i < 5; i++) {
-			enemies.add(new EntityCreator().createRandomEnemy(move_factor.MOVE_CIRCLES));
+			enemies.add(new EntityCreator().createRandomEnemy(move_factor.FACE_TOWARDS, i));
 			entities.add(enemies.get(i));
 		}
 		
@@ -169,7 +180,7 @@ public class Mift {
 		
 		// **************** Text Rendering *********************
 		
-		GUIText[] texts = new GUIText[4];
+		GUIText[] texts = new GUIText[5];
 		
 		texts[0] = new GUIText(Mift.NAME + " Alpha Build " + Mift.RELEASE + "." + Mift.BUILD, 1.25f, fontHolder.getBerlinSans(), new Vector2f(0, 0), 0.25f, ALIGNMENT.LEFT);
 			texts[0].setColor(255, 255, 255);
@@ -179,132 +190,52 @@ public class Mift {
 			texts[2].setColor(200, 200, 200);
 		texts[3] = new GUIText("Default Entity", 0.75f, fontHolder.getBerlinSans(), new Vector2f(0.27f, 0.93f), 0.5f, ALIGNMENT.CENTER);
 			texts[3].setColor(220, 220, 220);
+		texts[4] = new GUIText("Default Attack", 0.75f, fontHolder.getBerlinSans(), new Vector2f(0.27f, 0.93f), 0.5f, ALIGNMENT.CENTER);
+			texts[4].setColor(220, 220, 220);
 		
 		// **************** PARTICLE SYSTEM *********************
 		ParticleHolder.init(loader, renderer.getProjectionMatrix());
-		ParticleEmitter particleEmitter = new ParticleEmitter(50, 35, 0.45f, 5, 0.4f);
-		particleEmitter.randomizeRotation();
-		particleEmitter.setDirection(new Vector3f(0, 1, 0),  0.1f);
-		particleEmitter.setLifeError(0.1f);
-		particleEmitter.setSpeedError(0.4f);
-		particleEmitter.setScaleError(0.4f);
+		
+		ParticleTexture pt = new ParticleTexture(loader.loadParticleTexture("star"), 4, true);
+		ParticleEmitter pe = new ParticleEmitter(pt, 40,10, 0.1f, 1, 1.6f);
+		pe.setLifeError(0.1f);
+		pe.setSpeedError(0.25f);
+		pe.setScaleError(0.5f);
+		pe.randomizeRotation();
 		
 		// **************** Game Loop Below *********************
 
 		while (!Display.isCloseRequested()) {
-			if (currentMenu == GAMESTATE.MENU) {
-				
-			} else if (currentMenu == GAMESTATE.INGAME) {
-				// If we're drawing close to the camera, or the top of the player's head,
-				// remove the player so it doesn't get drawn and we can see it in first person view
-				if (camera.distanceFromPlayer < 1) {
-					if (entities.contains(player)) {
-						entities.remove(player);
-					}
-				} else {
-					if (!entities.contains(player)) {
-						entities.add(player);
-					}
-				}
-				player.move(terrain);
-				if (player.isOverhead()) {
-					overheadCamera.move();
-					overheadCamera.rotate();
-					overheadCamera.getClicks();
-					overheadMouse.update(true);
-				} else {
-					camera.move();
-					camera.rotate();
-					camera.getClicks();
-					defaultMouse.update(false);
-				}
-				particleEmitter.generateParticles(new Vector3f(player.getPosition().x, player.getPosition().y + 7, player.getPosition().z));
-				ParticleHolder.update();
-				
-				
-				for (int i = 0; i < normalMapEntities.size(); i++) {
-					normalMapEntities.get(i).setRotY(normalMapEntities.get(i).getRotY() + 2);
-				}
-				
-				for (Enemy e : enemies) {
-					if (e != null) {
-						e.move(player);
-						particleEmitter.generateParticles(new Vector3f(e.getPosition().x, e.getPosition().y + 6, e.getPosition().z));
-					}
-				}
-				
-				GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
-				if (player.isOverhead() == false) {
-					// render reflection texture
-					buffers.bindReflectionFrameBuffer();
-					float distance = 2 * (camera.getPosition().y - water.getHeight());
-					camera.getPosition().y -= distance;
-					camera.invertPitch();
-					renderer.renderScene(entities, normalMapEntities, terrains, lights, camera,
-							new Vector4f(0, 1, 0, -water.getHeight() + 1));
-					camera.getPosition().y += distance;
-					camera.invertPitch();
-		
-					// render refraction texture
-					buffers.bindRefractionFrameBuffer();
-					renderer.renderScene(entities, normalMapEntities, terrains, lights, camera,
-							new Vector4f(0, -1, 0, water.getHeight()));
-		
-					// render to screen
-					GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
-					buffers.unbindCurrentFrameBuffer();
-					renderer.renderScene(entities, normalMapEntities, terrains, lights, camera, new Vector4f(0, -1, 0, 100000));
-					waterRenderer.render(waters, camera, sun);
-				} else {
-					// render reflection texture
-					buffers.bindReflectionFrameBuffer();
-					float distance = 2 * (overheadCamera.getPosition().y - water.getHeight());
-					overheadCamera.getPosition().y -= distance;
-					overheadCamera.invertPitch();
-					renderer.renderScene(entities, normalMapEntities, terrains, lights, overheadCamera,
-							new Vector4f(0, 1, 0, -water.getHeight() + 1));
-					overheadCamera.getPosition().y += distance;
-					overheadCamera.invertPitch();
-		
-					// render refraction texture
-					buffers.bindRefractionFrameBuffer();
-					renderer.renderScene(entities, normalMapEntities, terrains, lights, overheadCamera,
-							new Vector4f(0, -1, 0, water.getHeight()));
-		
-					// render to screen
-					GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
-					buffers.unbindCurrentFrameBuffer();
-					renderer.renderScene(entities, normalMapEntities, terrains, lights, overheadCamera, new Vector4f(0, -1, 0, 100000));
-					waterRenderer.render(waters, overheadCamera, sun);
-				}
-				ParticleHolder.renderParticles(player.isOverhead());
-				guiRenderer.render(guiTextures);
-			} else if (currentMenu == GAMESTATE.SETTINGS) {
-				
+			player.move(terrain);
+							
+			//fireballHolder.update();
+			
+			pe.generateParticles(new Vector3f(10, 20, 30));
+			//rotate 3 objs in middle of map cuz why not
+			for (int i = 0; i < normalMapEntities.size(); i++) {
+				normalMapEntities.get(i).setRotY(normalMapEntities.get(i).getRotY() + 2);
 			}
+			//have all enemies in the map move around, even the ones spawned by player
+			for (Enemy e : enemies) {
+				if (e != null) {
+					e.move(player);
+				}
+			}
+			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
+			if (player.isOverhead() == false) {
+				ParticleHolder.update(camera);
+				renderer.renderCallStandardView(buffers, camera, defaultMouse, waterRenderer, water, lights, entities, normalMapEntities, terrains, waters, sun, player);
+			} else {
+				ParticleHolder.update(overheadCamera);
+				renderer.renderCallOverheadView(buffers, overheadCamera, overheadMouse, waterRenderer, water, lights, entities, normalMapEntities, terrains, waters, sun);
+			}
+			ParticleHolder.renderParticles(player.isOverhead());
+			guiRenderer.render(guiTextures);
 			fpsCounter.updateCounter();
 			texts[1].setText((int) (fpsCounter.getFPS()) + "");
 			texts[2].setText(updateDebugText(player));
-			if (player.isOverhead()) {
-				StringBuilder sb = new StringBuilder();
-				sb.append(entityTypeHolder.get(entityTypeHolder.rotateReverse(overheadCamera.placerType)).getName());
-				sb.append(" <--1-- [");
-				sb.append(entityTypeHolder.get(overheadCamera.placerType).getName());
-				sb.append("] --2--> ");
-				sb.append(entityTypeHolder.get(entityTypeHolder.rotate(overheadCamera.placerType)).getName());
-				sb.append(" ~ ");
-				sb.append(moveTypeHolder.get(moveTypeHolder.rotateReverse(overheadCamera.move_type)).getName());
-				sb.append(" <--3-- [");
-				sb.append(moveTypeHolder.get(overheadCamera.move_type).getName());
-				sb.append("] --4--> ");
-				sb.append(moveTypeHolder.get(moveTypeHolder.rotate(overheadCamera.move_type)).getName());
-				sb.append(" ~ (");
-				sb.append(moveTypeHolder.get(overheadCamera.move_type).getDescription());
-				sb.append(")");
-				texts[3].setText(sb.toString());
-			} else {
-				texts[3].setText("");
-			}
+			texts[3].setText(updateModelPlacerText(entityTypeHolder, moveTypeHolder, player));
+			texts[4].setText(updateAttackText(attackHolder, player));
 			Text.render();
 			DisplayManager.updateDisplay();
 		}
@@ -363,6 +294,45 @@ public class Mift {
 		return sb.toString();
 	}
 	
+	private static String updateAttackText(AttackHolder at, Player player) {
+		if (getCamera().isFPS()) {
+			StringBuilder sb = new StringBuilder();
+			sb.append(at.get(at.rotateReverse(player.attackType)).getName());
+			sb.append(" <--Q-- [");
+			sb.append(at.get(player.attackType).getName());
+			sb.append("] --E--> ");
+			sb.append(at.get(at.rotate(player.attackType)).getName());
+			sb.append(" ~ ");
+			sb.append(at.get(player.attackType).getDefinition());
+			return sb.toString();
+		} else {
+			return "";
+		}
+	}
+	
+	private static String updateModelPlacerText(EntityTypeHolder eth, MoveTypeHolder mth, Player player) {
+		if (player.isOverhead()) {
+			StringBuilder sb = new StringBuilder();
+			sb.append(eth.get(eth.rotateReverse(overheadCamera.placerType)).getName());
+			sb.append(" <--1-- [");
+			sb.append(eth.get(overheadCamera.placerType).getName());
+			sb.append("] --2--> ");
+			sb.append(eth.get(eth.rotate(overheadCamera.placerType)).getName());
+			sb.append(" ~ ");
+			sb.append(mth.get(mth.rotateReverse(overheadCamera.move_type)).getName());
+			sb.append(" <--3-- [");
+			sb.append(mth.get(overheadCamera.move_type).getName());
+			sb.append("] --4--> ");
+			sb.append(mth.get(mth.rotate(overheadCamera.move_type)).getName());
+			sb.append(" ~ (");
+			sb.append(mth.get(overheadCamera.move_type).getDescription());
+			sb.append(")");
+			return sb.toString();
+		} else {
+			return "";
+		}
+	}
+	
 	public static Camera getCamera() {
 		return camera;
 	}
@@ -386,5 +356,19 @@ public class Mift {
 	public static void addEnemy(Enemy e) {
 		enemies.add(e);
 		entities.add(e);
+	}
+	
+	public static void updateEntities(Player player) {
+		// If we're drawing close to the camera, or the top of the player's head,
+		// remove the player so it doesn't get drawn and we can see it in first person view
+		if (camera.distanceFromPlayer < 1) {
+			if (entities.contains(player)) {
+				entities.remove(player);
+			}
+		} else {
+			if (!entities.contains(player)) {
+				entities.add(player);
+			}
+		}
 	}
 }

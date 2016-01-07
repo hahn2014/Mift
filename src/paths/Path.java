@@ -18,7 +18,11 @@ public class Path {
 	}
 	
 	public Point getPoint(int index) {
-		return points.get(index);
+		if (index < points.size() - 1 && index > -1) {
+			return points.get(index);
+		} else {
+			return points.get(points.size() - 1);
+		}
 	}
 	
 	public int getID() {
@@ -33,8 +37,12 @@ public class Path {
 		return getPoint(currentPoint).getZ();
 	}
 	
-	public int getCurrentPoint() {
+	public int getCurrentPointID() {
 		return currentPoint;
+	}
+	
+	public Point getCurrentPoint() {
+		return getPoint(currentPoint);
 	}
 	
 	public boolean increaseCurrentPoint() {

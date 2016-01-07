@@ -18,16 +18,22 @@ public class Enemy extends Entity {
 	private Terrain terrain;
 	private PathCreator pathCreator = new PathCreator();
 	private Path path1;
+	private int id;
 	
-	public Enemy(TexturedModel model, Vector3f position, Vector3f rotation, float scale, move_factor move, Terrain terrain) {
+	public Enemy(TexturedModel model, Vector3f position, Vector3f rotation, float scale, move_factor move, Terrain terrain, int id) {
 		super(model, position, rotation.getX(), rotation.getY(), rotation.getZ(), scale);
 		_move_factor = move;
 		this.terrain = terrain;
+		this.id = id;
 		if (_move_factor == move_factor.FOLLOW_PATH) {
-			path1 = pathCreator.createRandomPath(Sys.getTime());
+			path1 = pathCreator.createRandomPath(Sys.getTime(), this);
 		} else {
 			path1 = null;
 		}
+	}
+	
+	public int getID() {
+		return id;
 	}
 	
 	public void move(Player player) {
@@ -104,21 +110,30 @@ public class Enemy extends Entity {
 	
 	private void followPath(Path path) {
 		//rotate enemy to face player menacingly
-		super.setRotation(Maths.getRotationFromPoint(this, path1.getPoint(path1.getCurrentPoint())));
+		super.setRotation(Maths.getRotationFromPoint(this, path1.getCurrentPoint()));
 		
-		float deltaMove = (RUN_SPEED) * DisplayManager.getFrameTimeSeconds();
-		
-		if (this.getPosition().getX() < path1.getX()) {
-			super.increasePosition(deltaMove, 0, 0);
-		} else if (this.getPosition().getZ() < path1.getZ()) {
-			super.increasePosition(0, 0, deltaMove);
-		} else if (this.getPosition().getX() >= path1.getX() && this.getPosition().getZ() >= path1.getZ()) {
-			if (path1.increaseCurrentPoint() == false) {
-				System.out.println("end of path " + path1.getID() + " :P");
-			}
-		}
-		
+		Vector3f goingTo = getGoingToVec(new Vector3f(path1.getCurrentPoint().getPosition3f()), this.getPosition());
+		goingTo.normalise();
+		float deltaMove = (float)2 * (DisplayManager.getFrameTimeSeconds() * 1000);
 		float terrainHeight = terrain.getHeightOfTerrain(super.getPosition().x, super.getPosition().z);
-		super.getPosition().y = terrainHeight;
+		Vector3f newpos = new Vector3f(goingTo.x * deltaMove, terrainHeight, goingTo.z * deltaMove);
+		System.out.println("DEBUG: " + super.getPosition().toString() + path1.getCurrentPoint().getPosition3f().toString()
+				+ newpos.toString() + "[" + (goingTo.x * deltaMove) + " " + (goingTo.z * deltaMove) + "]");
+		
+		if (Maths.distanceFormula3D(newpos, path1.getCurrentPoint().getPosition3f()) < RUN_SPEED * deltaMove) {
+			path1.increaseCurrentPoint();
+		} else {
+			System.out.println("Moving " + getID() + " from " + super.getPosition().toString() + " to " + path1.getCurrentPoint().getPosition3f().toString());
+			super.setPosition(newpos);
+		}
+		try {
+			Thread.sleep(1000);
+		} catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public Vector3f getGoingToVec(Vector3f gotoPosition, Vector3f currentPosition) {
+		return new Vector3f(gotoPosition.getX() - currentPosition.getX(), gotoPosition.getY() - currentPosition.getY(), gotoPosition.getZ() - currentPosition.getZ());
 	}
 }

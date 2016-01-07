@@ -16,15 +16,17 @@ public class ParticleEmitter {
 	private boolean randomRotation = false;
 	private Vector3f direction;
 	private float directionDeviation = 0;
-
+	private boolean rotate = false;
 	private Random random = new Random();
+	private ParticleTexture texture;
 
-	public ParticleEmitter(float pps, float speed, float gravityComplient, float lifeLength, float scale) {
+	public ParticleEmitter(ParticleTexture texture, float pps, float speed, float gravityComplient, float lifeLength, float scale) {
 		this.particlesPerSecond = pps;
 		this.averageSpeed = speed;
 		this.gravityComplient = gravityComplient;
 		this.averageLifeLength = lifeLength;
 		this.averageScale = scale;
+		this.texture = texture;
 	}
 
 	public void setDirection(Vector3f direction, float deviation) {
@@ -34,6 +36,10 @@ public class ParticleEmitter {
 
 	public void randomizeRotation() {
 		randomRotation = true;
+	}
+	
+	public void randomizeDirection() {
+		rotate = true;
 	}
 
 	public void setSpeedError(float error) {
@@ -47,7 +53,7 @@ public class ParticleEmitter {
 	public void setScaleError(float error) {
 		this.scaleError = error * averageScale;
 	}
-
+	
 	public void generateParticles(Vector3f systemCenter) {
 		float delta = DisplayManager.getFrameTimeSeconds();
 		float particlesToCreate = particlesPerSecond * delta;
@@ -60,10 +66,26 @@ public class ParticleEmitter {
 			emitParticle(systemCenter);
 		}
 	}
+	
+	public void generateAttackParticles(Vector3f systemCenter) {
+		float delta = DisplayManager.getFrameTimeSeconds();
+		float particlesToCreate = (particlesPerSecond / 4) * delta;
+		int count = (int) Math.floor(particlesToCreate);
+		float partialParticle = particlesToCreate % 1;
+		for (int i = 0; i < count; i++) {
+			emitAttackParticle(systemCenter);
+		}
+		if (Math.random() < partialParticle) {
+			emitAttackParticle(systemCenter);
+		}
+	}
 
 	private void emitParticle(Vector3f center) {
 		Vector3f velocity = null;
 		if (direction != null) {
+			if (rotate) {
+				rotateDirection();
+			}
 			velocity = generateRandomUnitVectorWithinCone(direction, directionDeviation);
 		} else {
 			velocity = generateRandomUnitVector();
@@ -72,7 +94,14 @@ public class ParticleEmitter {
 		velocity.scale(generateValue(averageSpeed, speedError));
 		float scale = generateValue(averageScale, scaleError);
 		float lifeLength = generateValue(averageLifeLength, lifeError);
-		new Particle(new Vector3f(center), velocity, gravityComplient, lifeLength, generateRotation(), scale);
+		new Particle(texture, new Vector3f(center), velocity, gravityComplient, lifeLength, generateRotation(), scale);
+	}
+	
+	private void emitAttackParticle(Vector3f center) {
+		Vector3f velocity = new Vector3f(0, 0, 0);
+		float scale = generateValue(averageScale, scaleError);
+		float lifeLength = generateValue(averageLifeLength, lifeError);
+		new Particle(texture, center, velocity, 0, lifeLength / 2, generateRotation(), scale);
 	}
 
 	private float generateValue(float average, float errorMargin) {
@@ -86,6 +115,10 @@ public class ParticleEmitter {
 		} else {
 			return 0;
 		}
+	}
+	
+	private void rotateDirection() {
+		direction = new Vector3f(direction.x, direction.y + 2, direction.z);
 	}
 
 	private static Vector3f generateRandomUnitVectorWithinCone(Vector3f coneDirection, float angle) {
@@ -118,5 +151,13 @@ public class ParticleEmitter {
 		float x = (float) (rootOneMinusZSquared * Math.cos(theta));
 		float y = (float) (rootOneMinusZSquared * Math.sin(theta));
 		return new Vector3f(x, y, z);
+	}
+	
+	public Vector3f generateColor() {
+		return RGBtoFloat(new Vector3f((float)random.nextInt(255) + 1, (float)random.nextInt(255) + 1, (float)random.nextInt(255) + 1));
+	}
+	
+	public Vector3f RGBtoFloat(Vector3f rgb) {
+		return new Vector3f(rgb.getX() / 255, rgb.getY() / 255, rgb.getZ() / 255);
 	}
 }

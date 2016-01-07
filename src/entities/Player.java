@@ -1,12 +1,19 @@
 package entities;
 
-import models.TexturedModel;
+import java.util.Random;
 
+import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector3f;
 
+import attacks.Attack.AttackType;
+import attacks.AttackHolder;
 import main.Mift;
+import models.TexturedModel;
+import particles.ParticleEmitter;
+import particles.ParticleTexture;
 import renderEngine.DisplayManager;
+import renderEngine.Loader;
 import terrains.Terrain;
 
 public class Player extends Entity {
@@ -20,11 +27,19 @@ public class Player extends Entity {
 
 	private boolean isInAir = false;
 	private boolean isOverhead = false;
-	
+	public AttackType attackType = AttackType.fireball;
+	public AttackHolder at;
+	private Random random;
 	private Camera camera;
+	public ParticleEmitter particleEmitter;
 
-	public Player(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
+	public Player(Loader loader, TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
 		super(model, position, rotX, rotY, rotZ, scale);
+		at = Mift.attackHolder;
+		random = new Random();
+		random.setSeed(Sys.getTime());
+		ParticleTexture particleTexture = new ParticleTexture(loader.loadTexture("particles/particleTest"), 1, false);
+		particleEmitter = new ParticleEmitter(particleTexture, 100, 25, 0.35f, 4, 0.2f);
 	}
 
 	public void move(Terrain terrain) {
@@ -89,6 +104,33 @@ public class Player extends Entity {
 
 		if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
 			jump();
+		}
+		while (Keyboard.next()) {
+			if (camera.isFPS()) {
+				if (Keyboard.isKeyDown(Keyboard.KEY_E)) {
+					if (Keyboard.getEventKeyState() == false) {} else {
+				    	//go back one attack place
+						attackType = at.rotate(attackType);
+				    }
+				}
+				if (Keyboard.isKeyDown(Keyboard.KEY_Q)) {
+					if (Keyboard.getEventKeyState() == false) {} else {
+				    	//go back one attack place
+						attackType = at.rotateReverse(attackType);
+				    }
+				}
+				if (Keyboard.isKeyDown(Keyboard.KEY_RETURN)) {
+					if (Keyboard.getEventKeyState() == false) {} else {
+						if (attackType == AttackType.fireball) {
+							for (int i = 0; i < 400; i ++) {
+								particleEmitter.generateParticles(super.getPosition());
+							}
+							
+							//Mift.fireballHolder.createFireball(super.getPosition(), super.getPosition(), 0);
+						}
+					}
+				}
+			}
 		}
 	}
 	

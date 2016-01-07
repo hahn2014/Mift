@@ -96,6 +96,10 @@ public class Camera {
 		        	if (Mouse.isGrabbed() == false) {
 		        		Mouse.setGrabbed(true);
 		        	}
+		        	if (isFPS()) {
+		        		//attack with the current selected
+		        		
+		        	}
 		        }
 		    }
 		}
@@ -173,5 +177,9 @@ public class Camera {
 
 	public boolean isFPS() {
 		return (distanceFromPlayer < 1);
+	}
+	
+	public void setFPS(boolean fps) {
+		distanceFromPlayer = (fps ? 50 : 48);
 	}
 }

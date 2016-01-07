@@ -6,14 +6,15 @@ import java.util.Random;
 import org.lwjgl.Sys;
 import org.lwjgl.util.vector.Vector3f;
 
-import entities.MoveType.move_factor;
 import entities.EntityType.entityType;
+import entities.MoveType.move_factor;
 import main.Mift;
 import models.RawModel;
 import models.TexturedModel;
 import normalMappingObjConverter.NormalMappedObjLoader;
 import objConverter.OBJFileLoader;
 import renderEngine.DisplayManager;
+import renderEngine.Loader;
 import renderEngine.OBJLoader;
 import terrains.Terrain;
 import textures.ModelTexture;
@@ -105,11 +106,11 @@ public class EntityCreator {
 	 * @param scale
 	 * @return TexturedModel
 	 */
-	public Player createPlayer(Vector3f location, Vector3f rotation) {
+	public Player createPlayer(Vector3f location, Vector3f rotation, Loader loader) {
 		EntityType p = eth.get(entityType.PLAYER);
 		texturedModel = new TexturedModel(OBJLoader.loadObjModel("models/" + p.getObjName(), Mift.getLoader()),
 				new ModelTexture(Mift.getLoader().loadTexture(p.getTextureName())));
-		return new Player(texturedModel, location, rotation.getX(), rotation.getY(), rotation.getZ(), p.getScale());
+		return new Player(loader, texturedModel, location, rotation.getX(), rotation.getY(), rotation.getZ(), p.getScale());
 	}
 	
 	/**
@@ -122,18 +123,18 @@ public class EntityCreator {
 	 * @param move
 	 * @return TexturedModel
 	 */
-	public Enemy createEnemy(Vector3f location, Vector3f rotation, move_factor move) {
+	public Enemy createEnemy(Vector3f location, Vector3f rotation, move_factor move, int id) {
 		EntityType e = eth.get(entityType.ENEMY);
 		texturedModel = new TexturedModel(OBJLoader.loadObjModel("models/" + e.getObjName(), Mift.getLoader()),
 				new ModelTexture(Mift.getLoader().loadTexture(e.getTextureName())));
-		return new Enemy(texturedModel, location, rotation, e.getScale(), move, Mift.getTerrain());
+		return new Enemy(texturedModel, location, rotation, e.getScale(), move, Mift.getTerrain(), id);
 	}
 	
-	public Enemy createEnemy(entityType type, Vector3f location, Vector3f rotation, move_factor move) {
+	public Enemy createEnemy(entityType type, Vector3f location, Vector3f rotation, move_factor move, int id) {
 		EntityType e = eth.get(type);
 		texturedModel = new TexturedModel(OBJLoader.loadObjModel("models/" + e.getObjName(), Mift.getLoader()),
 				new ModelTexture(Mift.getLoader().loadTexture(e.getTextureName())));
-		return new Enemy(texturedModel, location, rotation, e.getScale(), move, Mift.getTerrain());
+		return new Enemy(texturedModel, location, rotation, e.getScale(), move, Mift.getTerrain(), id);
 	}
 	
 	/**
@@ -151,13 +152,22 @@ public class EntityCreator {
 	 * @param move
 	 * @return Textured Model
 	 */
-	public Enemy createRandomEnemy(move_factor move) {
+	public Enemy createRandomEnemy(move_factor move, int id) {
 		EntityType e = eth.get(entityType.ENEMY);
 		random.setSeed(Sys.getTime());
 		texturedModel = new TexturedModel(OBJLoader.loadObjModel("models/" + e.getObjName(), Mift.getLoader()),
 				new ModelTexture(Mift.getLoader().loadTexture(e.getTextureName())));
 		return new Enemy(texturedModel, new Vector3f(random.nextInt(120) + 30, random.nextInt(5) + 2, random.nextInt(100) - 100),
-				new Vector3f(0, random.nextInt(360), 0), e.getScale(), move, Mift.getTerrain());
+				new Vector3f(0, random.nextInt(360), 0), e.getScale(), move, Mift.getTerrain(), id);
+	}
+	
+	public Enemy createRandomEnemy(int id) {
+		EntityType e = eth.get(entityType.ENEMY);
+		random.setSeed(Sys.getTime());
+		texturedModel = new TexturedModel(OBJLoader.loadObjModel("models/" + e.getObjName(), Mift.getLoader()),
+				new ModelTexture(Mift.getLoader().loadTexture(e.getTextureName())));
+		return new Enemy(texturedModel, new Vector3f(random.nextInt(120) + 30, random.nextInt(5) + 2, random.nextInt(100) - 100),
+				new Vector3f(0, random.nextInt(360), 0), e.getScale(), MoveType.randomEnum(move_factor.class), Mift.getTerrain(), id);
 	}
 	
 	private int getRes() {

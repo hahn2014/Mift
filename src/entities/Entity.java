@@ -128,6 +128,18 @@ public class Entity {
 	public void setZPos(float z) {
 		this.position.z = z;
 	}
+	
+	public String getPositionDebug() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		sb.append(this.getPosition().getX());
+		sb.append(", ");
+		sb.append(this.getPosition().getY());
+		sb.append(", ");
+		sb.append(this.getPosition().getZ());
+		sb.append("]");
+		return sb.toString();
+	}
 
 	public float getScale() {
 		return scale;
