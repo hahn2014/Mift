@@ -24,6 +24,7 @@ public class ParticleHolder {
 	public static void update(Camera camera) {
 		Iterator<Entry<ParticleTexture, List<Particle>>> mapIterator = particles.entrySet().iterator();
 		while (mapIterator.hasNext()) {
+			Entry<ParticleTexture, List<Particle>> entry = mapIterator.next();
 			List<Particle> list = mapIterator.next().getValue();
 			Iterator<Particle> iterator = list.iterator();
 			while (iterator.hasNext()) {
@@ -36,7 +37,9 @@ public class ParticleHolder {
 					}
 				}
 			}
-			InsertionSort.sortHighToLow(list);
+			if (!entry.getKey().getAdditive()) {
+				InsertionSort.sortHighToLow(list);
+			}
 		}
 	}
 	

@@ -197,7 +197,7 @@ public class Mift {
 		ParticleHolder.init(loader, renderer.getProjectionMatrix());
 		
 		ParticleTexture pt = new ParticleTexture(loader.loadParticleTexture("star"), 4, true);
-		ParticleEmitter pe = new ParticleEmitter(pt, 40,10, 0.1f, 1, 1.6f);
+		ParticleEmitter pe = new ParticleEmitter(pt, 120, 10, 0.1f, 1, 1.6f);
 		pe.setLifeError(0.1f);
 		pe.setSpeedError(0.25f);
 		pe.setScaleError(0.5f);
