@@ -184,7 +184,6 @@ public class EntityCreator {
 	public List<Entity> generateObjects(List<Entity> entities, Terrain terrain, int generationLuck) {
 		TexturedModel fern = createAtlasTexturedModel("fern", 2);
 		TexturedModel bobble = createTexturedModel("pine", 0f, 0f);
-		TexturedModel rocks = createTexturedModel("rocks", 10f, 0.5f);
 		bobble.getTexture().setHasTransparency(true);
 		fern.getTexture().setHasTransparency(true);
 		
@@ -212,7 +211,6 @@ public class EntityCreator {
 				}
 			}
 		}
-		entities.add(new Entity(rocks, new Vector3f(75, 4.6f, -75), 0, 0, 0, 75));
 		return entities;
 	}
 }

@@ -18,7 +18,7 @@ public class TerrainCreator {
 	private int moderate = 512;
 	private int ultra = 1024;
 	
-	public TerrainCreator(int gridX, int gridY, String background, String r, String g, String b, String blend, String heightmap) {
+	public TerrainCreator(int gridX, int gridY, String background, String r, String g, String b, String blend) {
 		int res = getRes();
 		backgroundTex = new TerrainTexture(Mift.getLoader().loadTexture("terrain/" + background + res));
 		rTex = new TerrainTexture(Mift.getLoader().loadTexture("terrain/" + r + res));
@@ -26,7 +26,7 @@ public class TerrainCreator {
 		bTex = new TerrainTexture(Mift.getLoader().loadTexture("terrain/" + b + res));
 		blendmapTex = new TerrainTexture(Mift.getLoader().loadTexture(blend));
 		texturePack = new TerrainTexturePack(backgroundTex, rTex, gTex, bTex);
-		terrain = new Terrain(0, -1, Mift.getLoader(), texturePack, blendmapTex, heightmap);
+		terrain = new Terrain(0, -1, Mift.getLoader(), texturePack, blendmapTex);
 	}
 	
 	public Terrain getTerrain() {

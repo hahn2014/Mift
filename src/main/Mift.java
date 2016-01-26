@@ -31,7 +31,6 @@ import fontCreator.GUIText.ALIGNMENT;
 import fontRender.Text;
 import guis.GuiRenderer;
 import guis.GuiTexture;
-import models.TexturedModel;
 import particles.ParticleEmitter;
 import particles.ParticleHolder;
 import particles.ParticleTexture;
@@ -51,13 +50,13 @@ import water.WaterTile;
 
 /**
  * Already surpassed 4k lines of code while trending currently at 4670! Keep up
- * the good work - Mift Build 41
+ * the good work - Mift Build 46
  * 
  * @author Bryce Hahn, Mason Cluff
  * @since 1.0
  */
 public class Mift {
-	public static final String BUILD = "41";
+	public static final String BUILD = "46";
 	public static final String RELEASE = "1";
 	public static final String RELEASE_TITLE = "Alpha";
 	public static final String NAME = "Mift";
@@ -119,19 +118,19 @@ public class Mift {
 		
 		// ********* TERRAIN TEXTURE STUFF **********
 
-		terrain = new TerrainCreator(0, -1, "lunar_surface", "dirt", "lunar_surface", "path", "blendMap", "heightmap").getTerrain();
+		terrain = new TerrainCreator(0, -1, "lunar_surface", "dirt", "lunar_surface", "path", "blendMap").getTerrain();
 		List<Terrain> terrains = new ArrayList<Terrain>();
 		terrains.add(terrain);
 
 		// ****************** NORMAL MAP MODELS ************************
 
-		TexturedModel barrelModel = entityCreator.createNormalTexturedModel("barrel", "barrelNormal", 10, 0.5f);
-		TexturedModel crateModel = entityCreator.createNormalTexturedModel("crate", "crateNormal", 10, 0.5f);
-		TexturedModel boulderModel = entityCreator.createNormalTexturedModel("boulder", "boulderNormal", 10, 0.5f);
+//		TexturedModel barrelModel = entityCreator.createNormalTexturedModel("barrel", "barrelNormal", 10, 0.5f);
+//		TexturedModel crateModel = entityCreator.createNormalTexturedModel("crate", "crateNormal", 10, 0.5f);
+//		TexturedModel boulderModel = entityCreator.createNormalTexturedModel("boulder", "boulderNormal", 10, 0.5f);
 		List<Entity> normalMapEntities = new ArrayList<Entity>();
-		normalMapEntities.add(new Entity(barrelModel, new Vector3f(75, 10, -75), 0, 0, 0, 1f));
-		normalMapEntities.add(new Entity(boulderModel, new Vector3f(85, 10, -75), 0, 0, 0, 1f));
-		normalMapEntities.add(new Entity(crateModel, new Vector3f(65, 10, -75), 0, 0, 0, 0.04f));
+//		normalMapEntities.add(new Entity(barrelModel, new Vector3f(75, 10, -75), 0, 0, 0, 1f));
+//		normalMapEntities.add(new Entity(boulderModel, new Vector3f(85, 10, -75), 0, 0, 0, 1f));
+//		normalMapEntities.add(new Entity(crateModel, new Vector3f(65, 10, -75), 0, 0, 0, 0.04f));
 
 		// ************ ENTITIES *******************
 		entities = entityCreator.generateObjects(entities, terrain, 0);
@@ -169,12 +168,8 @@ public class Mift {
 		WaterShader waterShader = new WaterShader();
 		WaterRenderer waterRenderer = new WaterRenderer(waterShader, renderer.getProjectionMatrix(), buffers);
 		List<WaterTile> waters = new ArrayList<WaterTile>();
-		WaterTile water = new WaterTile(75, -75, 0);
+		WaterTile water = new WaterTile(0, 0, -10);
 		waters.add(water);
-
-		// **************** Game Audio Test *********************
-		
-		//SoundTest soundTester = new SoundTest();
 		
 		Display.setTitle(NAME + " Release " + RELEASE + " b" + BUILD);
 		
@@ -208,13 +203,11 @@ public class Mift {
 		while (!Display.isCloseRequested()) {
 			player.move(terrain);
 							
-			//fireballHolder.update();
-			
 			pe.generateParticles(new Vector3f(10, 20, 30));
 			//rotate 3 objs in middle of map cuz why not
-			for (int i = 0; i < normalMapEntities.size(); i++) {
-				normalMapEntities.get(i).setRotY(normalMapEntities.get(i).getRotY() + 2);
-			}
+//			for (int i = 0; i < normalMapEntities.size(); i++) {
+//				normalMapEntities.get(i).setRotY(normalMapEntities.get(i).getRotY() + 2);
+//			}
 			//have all enemies in the map move around, even the ones spawned by player
 			for (Enemy e : enemies) {
 				if (e != null) {
@@ -223,7 +216,7 @@ public class Mift {
 			}
 			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
 			if (player.isOverhead() == false) {
-				ParticleHolder.update(camera);
+				//ParticleHolder.update(camera);
 				renderer.renderCallStandardView(buffers, camera, defaultMouse, waterRenderer, water, lights, entities, normalMapEntities, terrains, waters, sun, player);
 			} else {
 				ParticleHolder.update(overheadCamera);

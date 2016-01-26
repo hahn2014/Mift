@@ -27,6 +27,9 @@ public class Player extends Entity {
 
 	private boolean isInAir = false;
 	private boolean isOverhead = false;
+	private boolean isCrouched = false;
+	private boolean isProned = false;
+	
 	public AttackType attackType = AttackType.fireball;
 	public AttackHolder at;
 	private Random random;
@@ -38,7 +41,7 @@ public class Player extends Entity {
 		at = Mift.attackHolder;
 		random = new Random();
 		random.setSeed(Sys.getTime());
-		ParticleTexture particleTexture = new ParticleTexture(loader.loadTexture("particles/particleTest"), 1, false);
+		ParticleTexture particleTexture = new ParticleTexture(loader.loadTexture("particles/star"), 1, false);
 		particleEmitter = new ParticleEmitter(particleTexture, 100, 25, 0.35f, 4, 0.2f);
 	}
 
@@ -66,7 +69,7 @@ public class Player extends Entity {
 			isInAir = true;
 		}
 	}
-
+	
 	private void checkInputs() {
 		if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
 			if (!Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
@@ -106,6 +109,32 @@ public class Player extends Entity {
 			jump();
 		}
 		while (Keyboard.next()) {
+			if (Keyboard.isKeyDown(Keyboard.KEY_C)) {
+				if (Keyboard.getEventKeyState() == false) {} else {
+					if (!isProned) {
+						if (isCrouched) {
+							isCrouched = false;
+						} else {
+							isCrouched = true;
+						}
+						isProned = false;
+					} else {
+						isProned = false;
+						isCrouched = true;
+					}
+				}
+			}
+			if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL)) {
+				if (Keyboard.getEventKeyState() == false) {} else {
+					if (isProned) {
+						isProned = false;
+						isCrouched = true;
+					} else {
+						isProned = true;
+						isCrouched = false;
+					}
+				}
+			}
 			if (camera.isFPS()) {
 				if (Keyboard.isKeyDown(Keyboard.KEY_E)) {
 					if (Keyboard.getEventKeyState() == false) {} else {
