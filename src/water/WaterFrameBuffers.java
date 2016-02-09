@@ -8,12 +8,10 @@ import org.lwjgl.opengl.GL14;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL32;
 
-import renderEngine.DisplayManager;
-
 public class WaterFrameBuffers {
 
-	protected static int REFLECTION_WIDTH = 320;
-	private static int REFLECTION_HEIGHT = 180;
+	protected static int REFLECTION_WIDTH = 1280;
+	private static int REFLECTION_HEIGHT = 720;
 
 	protected static int REFRACTION_WIDTH = 1280;
 	private static int REFRACTION_HEIGHT = 720;
@@ -26,16 +24,10 @@ public class WaterFrameBuffers {
 	private int refractionTexture;
 	private int refractionDepthTexture;
 
-	public WaterFrameBuffers(DisplayManager.QUALITY quality) {// call when loading the game
+	public WaterFrameBuffers(int quality) {// call when loading the game, takes in a number 1-4 for quality
+		getWaterQuality(quality);
 		initialiseReflectionFrameBuffer();
 		initialiseRefractionFrameBuffer();
-		
-		if (quality == DisplayManager.QUALITY.LIGHT) {
-			REFLECTION_WIDTH = 320;
-			REFLECTION_HEIGHT = 180;
-			REFRACTION_WIDTH = 1280;
-			REFRACTION_HEIGHT = 720;
-		}
 	}
 
 	public void cleanUp() {// call when closing the game
@@ -45,6 +37,36 @@ public class WaterFrameBuffers {
 		GL30.glDeleteFramebuffers(refractionFrameBuffer);
 		GL11.glDeleteTextures(refractionTexture);
 		GL11.glDeleteTextures(refractionDepthTexture);
+	}
+	
+	private void getWaterQuality(int quality) {
+		if (quality == 1) {
+			REFLECTION_WIDTH = 426;
+			REFLECTION_HEIGHT = 240;
+			
+			REFRACTION_WIDTH = 426;
+			REFRACTION_HEIGHT = 240;
+		} else if (quality == 2) {
+			REFLECTION_WIDTH = 480;
+			REFLECTION_HEIGHT = 360;
+			
+			REFRACTION_WIDTH = 480;
+			REFRACTION_HEIGHT = 360;
+		} else if (quality == 3) {
+			REFLECTION_WIDTH = 1280;
+			REFLECTION_HEIGHT = 720;
+			
+			REFRACTION_WIDTH = 1280;
+			REFRACTION_HEIGHT = 720;
+		} else if (quality == 4) {
+			REFLECTION_WIDTH = 1920;
+			REFLECTION_HEIGHT = 1080;
+			
+			REFRACTION_WIDTH = 1920;
+			REFRACTION_HEIGHT = 1080;
+		} else { //unknown number, just use default quality
+			getWaterQuality(1);
+		}
 	}
 
 	public void bindReflectionFrameBuffer() {// call before rendering to this

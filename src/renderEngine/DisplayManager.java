@@ -17,20 +17,12 @@ public class DisplayManager {
 	private static final int HEIGHT = 720;
 	private static final double FPS_CAP = 119.999;
 	
-	public static enum QUALITY {
-		LIGHT,
-		MODERATE,
-		ULTRA
-	};
-	
-	public static QUALITY quality;
 	public static boolean debugPolys = false;
 	
 	private static long lastFrameTime;
 	private static float delta;
 
-	public static void createDisplay(QUALITY q) {
-		quality = q;
+	public static void createDisplay() {
 		ContextAttribs attribs = new ContextAttribs(3, 3).withForwardCompatible(true).withProfileCore(true);
 		try {
 			Display.setDisplayMode(new DisplayMode(WIDTH, HEIGHT));

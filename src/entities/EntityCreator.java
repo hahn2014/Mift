@@ -1,5 +1,6 @@
 package entities;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -13,7 +14,6 @@ import models.RawModel;
 import models.TexturedModel;
 import normalMappingObjConverter.NormalMappedObjLoader;
 import objConverter.OBJFileLoader;
-import renderEngine.DisplayManager;
 import renderEngine.Loader;
 import renderEngine.OBJLoader;
 import terrains.Terrain;
@@ -26,12 +26,11 @@ public class EntityCreator {
 	Entity entity;
 	EntityTypeHolder eth;
 
-	private int light = 256;
-	private int moderate = 512;
-	private int ultra = 1024;
 	private Random random = new Random();
+	List<Terrain> terrains = new ArrayList<Terrain>();
 
-	public EntityCreator() {
+	public EntityCreator(List<Terrain> terrains) {
+		this.terrains = terrains;
 		eth = new EntityTypeHolder();
 	}
 
@@ -70,7 +69,7 @@ public class EntityCreator {
 	 */
 	public TexturedModel createTexturedModel(String objName, float shineDamper, float reflectivity) {
 		texturedModel = new TexturedModel(OBJFileLoader.loadOBJ(objName, Mift.getLoader()),
-				new ModelTexture(Mift.getLoader().loadTexture(objName + getRes())));
+				new ModelTexture(Mift.getLoader().loadTexture(objName)));
 		texturedModel.getTexture().setShineDamper(shineDamper);
 		texturedModel.getTexture().setReflectivity(reflectivity);
 		return texturedModel;
@@ -110,13 +109,16 @@ public class EntityCreator {
 		EntityType p = eth.get(entityType.PLAYER);
 		texturedModel = new TexturedModel(OBJLoader.loadObjModel("models/" + p.getObjName(), Mift.getLoader()),
 				new ModelTexture(Mift.getLoader().loadTexture(p.getTextureName())));
-		return new Player(loader, texturedModel, location, rotation.getX(), rotation.getY(), rotation.getZ(), p.getScale());
+		Mift.instance_count++;
+		return new Player(loader, texturedModel, location, rotation.getX(), rotation.getY(), rotation.getZ(),
+				p.getScale());
 	}
-	
+
 	/**
 	 * Create an entity to be used in game efficiently and in one line of code!
 	 * Created an enemy to be returned and used as either the an enemy or
 	 * another player online!
+	 * 
 	 * @param location
 	 * @param rotation
 	 * @param runSpeed
@@ -127,23 +129,26 @@ public class EntityCreator {
 		EntityType e = eth.get(entityType.ENEMY);
 		texturedModel = new TexturedModel(OBJLoader.loadObjModel("models/" + e.getObjName(), Mift.getLoader()),
 				new ModelTexture(Mift.getLoader().loadTexture(e.getTextureName())));
+		Mift.instance_count++;
 		return new Enemy(texturedModel, location, rotation, e.getScale(), move, Mift.getTerrain(), id);
 	}
-	
+
 	public Enemy createEnemy(entityType type, Vector3f location, Vector3f rotation, move_factor move, int id) {
 		EntityType e = eth.get(type);
 		texturedModel = new TexturedModel(OBJLoader.loadObjModel("models/" + e.getObjName(), Mift.getLoader()),
 				new ModelTexture(Mift.getLoader().loadTexture(e.getTextureName())));
+		Mift.instance_count++;
 		return new Enemy(texturedModel, location, rotation, e.getScale(), move, Mift.getTerrain(), id);
 	}
-	
+
 	/**
 	 * Create an entity to be used in game efficiently and in one line of code!
 	 * Created an enemy to be returned and used as either the an enemy or
 	 * another player online! This method is the exact same as it's predecessor,
-	 * but instead of setting parameters for the enemy location and rotation,
-	 * it is all randomly chosen within the call method.
-	 * No need for all the pesky random calls.
+	 * but instead of setting parameters for the enemy location and rotation, it
+	 * is all randomly chosen within the call method. No need for all the pesky
+	 * random calls.
+	 * 
 	 * @param loader
 	 * @param objName
 	 * @param textureName
@@ -157,57 +162,55 @@ public class EntityCreator {
 		random.setSeed(Sys.getTime());
 		texturedModel = new TexturedModel(OBJLoader.loadObjModel("models/" + e.getObjName(), Mift.getLoader()),
 				new ModelTexture(Mift.getLoader().loadTexture(e.getTextureName())));
-		return new Enemy(texturedModel, new Vector3f(random.nextInt(120) + 30, random.nextInt(5) + 2, random.nextInt(100) - 100),
+		int x = random.nextInt(1000);
+		int z = random.nextInt(1000);
+		Mift.instance_count++;
+		return new Enemy(texturedModel, new Vector3f(x, terrains.get(0).getHeightOfTerrain(x, z), z),
 				new Vector3f(0, random.nextInt(360), 0), e.getScale(), move, Mift.getTerrain(), id);
 	}
-	
+
 	public Enemy createRandomEnemy(int id) {
 		EntityType e = eth.get(entityType.ENEMY);
 		random.setSeed(Sys.getTime());
 		texturedModel = new TexturedModel(OBJLoader.loadObjModel("models/" + e.getObjName(), Mift.getLoader()),
 				new ModelTexture(Mift.getLoader().loadTexture(e.getTextureName())));
-		return new Enemy(texturedModel, new Vector3f(random.nextInt(120) + 30, random.nextInt(5) + 2, random.nextInt(100) - 100),
+		int x = random.nextInt(1000);
+		int z = random.nextInt(1000);
+		Mift.instance_count++;
+		return new Enemy(texturedModel, new Vector3f(x, terrains.get(0).getHeightOfTerrain(x, z), z),
 				new Vector3f(0, random.nextInt(360), 0), e.getScale(), MoveType.randomEnum(move_factor.class), Mift.getTerrain(), id);
 	}
-	
-	private int getRes() {
-		if (DisplayManager.quality == DisplayManager.QUALITY.LIGHT) {
-			return light;
-		} else if (DisplayManager.quality == DisplayManager.QUALITY.MODERATE) {
-			return moderate;
-		} else if (DisplayManager.quality == DisplayManager.QUALITY.ULTRA) {
-			return ultra;
-		}
-		return light;
-	}
-	
-	public List<Entity> generateObjects(List<Entity> entities, Terrain terrain, int generationLuck) {
+
+	public List<Entity> generateObjects(List<Entity> entities, int generationLuck) {
 		TexturedModel fern = createAtlasTexturedModel("fern", 2);
-		TexturedModel bobble = createTexturedModel("pine", 0f, 0f);
-		bobble.getTexture().setHasTransparency(true);
+		TexturedModel pine = createTexturedModel("pine", 0f, 0f);
+		pine.getTexture().setHasTransparency(true);
 		fern.getTexture().setHasTransparency(true);
-		
-		Random random = new Random(5666778);
+
+		Random random = new Random();
+		random.setSeed(System.currentTimeMillis());
 		for (int i = 0; i < generationLuck; i++) {
 			if (i % 3 == 0) {
-				float x = random.nextFloat() * 150;
-				float z = random.nextFloat() * -150;
-				if ((x > 50 && x < 100) || (z < -50 && z > -100)) {
+				float x = random.nextInt(1000);
+				float z = random.nextInt(1000);
+				float y = terrains.get(0).getHeightOfTerrain(x, z);
+				if (y > -9f) {
+					Entity e = new Entity(fern, 3, new Vector3f(x, y, z), 0, random.nextFloat() * 360, 0, 0.9f, entityType.FERN);
+					e.getModel().getTexture().setHasTransparency(false);
+					entities.add(e);
+					Mift.instance_count++;
 				} else {
-					float y = terrain.getHeightOfTerrain(x, z);
-
-					entities.add(new Entity(fern, 3, new Vector3f(x, y, z), 0, random.nextFloat() * 360, 0, 0.9f));
 				}
 			}
 			if (i % 2 == 0) {
-				float x = random.nextFloat() * 150;
-				float z = random.nextFloat() * -150;
-				if ((x > 50 && x < 100) || (z < -50 && z > -100)) {
-
+				float x = random.nextInt(1000);
+				float z = random.nextInt(1000);
+				float y = terrains.get(0).getHeightOfTerrain(x, z);
+				if (y >= -10f) {
+					entities.add(new Entity(pine, 1, new Vector3f(x, y, z), 0, random.nextFloat() * 360, 0,
+							random.nextFloat() * 0.6f + 0.8f, entityType.PINE));
+					Mift.instance_count++;
 				} else {
-					float y = terrain.getHeightOfTerrain(x, z);
-					entities.add(new Entity(bobble, 1, new Vector3f(x, y, z), 0, random.nextFloat() * 360, 0,
-							random.nextFloat() * 0.6f + 0.8f));
 				}
 			}
 		}

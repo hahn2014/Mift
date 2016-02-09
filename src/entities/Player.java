@@ -8,6 +8,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 import attacks.Attack.AttackType;
 import attacks.AttackHolder;
+import entities.EntityType.entityType;
 import main.Mift;
 import models.TexturedModel;
 import particles.ParticleEmitter;
@@ -19,16 +20,22 @@ import terrains.Terrain;
 public class Player extends Entity {
 
 	private static final float RUN_SPEED = 15.0f;
+	private static final float MAX_RUN_TIME = 200.0f;
+	private static final float RUN_COOLDOWN = 400f;
 	private static final float GRAVITY = -50;
 	private static final float JUMP_POWER = 20;
 
 	private float currentSpeed = 0f;
 	private float upwardsSpeed = 0f;
+	private float currentRunTime = 0f;
+	private float currentRunCooldown = RUN_COOLDOWN;
 
 	private boolean isInAir = false;
 	private boolean isOverhead = false;
+	private boolean isRunning = false;
 	private boolean isCrouched = false;
 	private boolean isProned = false;
+	private boolean isRunCooldown = false;
 	
 	public AttackType attackType = AttackType.fireball;
 	public AttackHolder at;
@@ -37,7 +44,7 @@ public class Player extends Entity {
 	public ParticleEmitter particleEmitter;
 
 	public Player(Loader loader, TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
-		super(model, position, rotX, rotY, rotZ, scale);
+		super(model, position, rotX, rotY, rotZ, scale, entityType.PLAYER);
 		at = Mift.attackHolder;
 		random = new Random();
 		random.setSeed(Sys.getTime());
@@ -48,6 +55,9 @@ public class Player extends Entity {
 	public void move(Terrain terrain) {
 		camera = Mift.getCamera();
 		checkInputs();
+		if (isRunCooldown) {
+			checkRunCooldown();
+		}
 		float distance = currentSpeed * DisplayManager.getFrameTimeSeconds();
 		float dx = (float) (distance * Math.sin(Math.toRadians(super.getRotY())));
 		float dz = (float) (distance * Math.cos(Math.toRadians(super.getRotY())));
@@ -70,17 +80,42 @@ public class Player extends Entity {
 		}
 	}
 	
+	private void checkRunCooldown() {
+		if (currentRunCooldown >= RUN_COOLDOWN) {
+			this.isRunning = true;
+			currentRunTime = 0f;
+			this.isRunCooldown = false;
+		} else {
+			this.isRunCooldown = true;
+			currentRunCooldown++;
+		}
+	}
+	
 	private void checkInputs() {
 		if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
-			if (!Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
-				this.currentSpeed = RUN_SPEED;
+			if (this.isRunning == false) {
+				this.currentSpeed = RUN_SPEED; //not running
 			} else {
-				this.currentSpeed = RUN_SPEED * 2;
+				if (currentRunTime >= MAX_RUN_TIME) { //weve ran for the max time, we need to cool down
+					this.currentSpeed = RUN_SPEED;
+					this.isRunning = false;
+					this.isRunCooldown = true;
+					currentRunCooldown = 0f;
+				} else {
+					this.currentSpeed = RUN_SPEED * 2; //running
+					currentRunTime++;
+				}
 			}
 		} else if (Keyboard.isKeyDown(Keyboard.KEY_S)) {
 			this.currentSpeed = -RUN_SPEED;
 		} else {
 			this.currentSpeed = 0;
+		}
+		
+		if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
+			if (!isRunning) {
+				checkRunCooldown();
+			}
 		}
 
 		if (Keyboard.isKeyDown(Keyboard.KEY_D)) {

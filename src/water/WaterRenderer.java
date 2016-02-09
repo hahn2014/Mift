@@ -22,7 +22,7 @@ public class WaterRenderer {
 
 	private static final String DUDV_MAP = "normals/waterDUDV";
 	private static final String NORMAL_MAP = "normals/normal";
-	private static final float WAVE_SPEED = 0.03f;
+	private static final float WAVE_SPEED = 0.05f;
 
 	private RawModel quad;
 	private WaterShader shader;
@@ -49,7 +49,7 @@ public class WaterRenderer {
 		prepareRender(camera, sun);
 		for (WaterTile tile : water) {
 			Matrix4f modelMatrix = Maths.createTransformationMatrix(
-					new Vector3f(tile.getX(), tile.getHeight(), tile.getZ()), 0, 0, 0, WaterTile.TILE_SIZE);
+					new Vector3f(tile.getX(), tile.getHeight(), tile.getZ()), 0, 0, 0, WaterTile.SIZE);
 			shader.loadModelMatrix(modelMatrix);
 			GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, quad.getVertexCount());
 		}
@@ -60,7 +60,7 @@ public class WaterRenderer {
 		prepareRender(camera, sun);
 		for (WaterTile tile : water) {
 			Matrix4f modelMatrix = Maths.createTransformationMatrix(
-					new Vector3f(tile.getX(), tile.getHeight(), tile.getZ()), 0, 0, 0, WaterTile.TILE_SIZE);
+					new Vector3f(tile.getX(), tile.getHeight(), tile.getZ()), 0, 0, 0, WaterTile.SIZE);
 			shader.loadModelMatrix(modelMatrix);
 			GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, quad.getVertexCount());
 		}

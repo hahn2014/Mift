@@ -2,6 +2,7 @@ package entities;
 
 import org.lwjgl.util.vector.Vector3f;
 
+import entities.EntityType.entityType;
 import models.TexturedModel;
 
 public class Entity {
@@ -10,19 +11,21 @@ public class Entity {
 	private Vector3f position;
 	private float rotX, rotY, rotZ;
 	private float scale;
+	private entityType type = entityType.DEFAULT;
 
 	private int textureIndex = 0;
 
-	public Entity(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
+	public Entity(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale, entityType type) {
 		this.model = model;
 		this.position = position;
 		this.rotX = rotX;
 		this.rotY = rotY;
 		this.rotZ = rotZ;
 		this.scale = scale;
+		this.type = type;
 	}
 
-	public Entity(TexturedModel model, int index, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
+	public Entity(TexturedModel model, int index, Vector3f position, float rotX, float rotY, float rotZ, float scale, entityType type) {
 		this.textureIndex = index;
 		this.model = model;
 		this.position = position;
@@ -30,6 +33,7 @@ public class Entity {
 		this.rotY = rotY;
 		this.rotZ = rotZ;
 		this.scale = scale;
+		this.type = type;
 	}
 
 	public Entity() {}
@@ -162,5 +166,9 @@ public class Entity {
 			}
 		}
 		return false;
+	}
+	
+	public entityType getType() {
+		return type;
 	}
 }

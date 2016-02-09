@@ -21,21 +21,22 @@ import entities.Entity;
 import entities.EntityCreator;
 import entities.EntityTypeHolder;
 import entities.Light;
-import entities.MoveType.move_factor;
 import entities.MoveTypeHolder;
 import entities.OverheadCamera;
 import entities.Player;
+import entities.MoveType.move_factor;
 import fontCreator.FontHolder;
 import fontCreator.GUIText;
 import fontCreator.GUIText.ALIGNMENT;
 import fontRender.Text;
 import guis.GuiRenderer;
 import guis.GuiTexture;
+import guis.hud.HUDCreator;
+import guis.hud.HUDRenderer;
 import particles.ParticleEmitter;
 import particles.ParticleHolder;
 import particles.ParticleTexture;
 import renderEngine.DisplayManager;
-import renderEngine.DisplayManager.QUALITY;
 import renderEngine.Loader;
 import renderEngine.MasterRenderer;
 import terrains.Terrain;
@@ -49,21 +50,24 @@ import water.WaterShader;
 import water.WaterTile;
 
 /**
- * Already surpassed 4k lines of code while trending currently at 4670! Keep up
- * the good work - Mift Build 46
+ * Already surpassed 10k lines of
+ * cumulative code! Keep up the
+ * good work - Mift Build 48
  * 
  * @author Bryce Hahn, Mason Cluff
  * @since 1.0
  */
 public class Mift {
-	public static final String BUILD = "46";
+	public static final String BUILD = "48";
 	public static final String RELEASE = "1";
 	public static final String RELEASE_TITLE = "Alpha";
 	public static final String NAME = "Mift";
 	
 	public static final Boolean fps = false;
+	private static final boolean isNight = false;
 	private static Random random;
 	
+	public static int instance_count = 0;
 	//camera stuff
 	public static Camera camera;
 	public static OverheadCamera overheadCamera;
@@ -72,42 +76,30 @@ public class Mift {
 	private static MousePicker overheadMouse;
 	public static List<Entity> entities = new ArrayList<Entity>();
 	public static List<Enemy> enemies = new ArrayList<Enemy>();
+	public static List<GuiTexture> guiTextures = new ArrayList<GuiTexture>();
 	public static ParticleEmitter particleEmitter;
 	private static Terrain terrain;
 	private static Loader loader = new Loader();
+	private static HUDCreator hudCreator;
 
 	public static FontHolder fontHolder;
 	public static EntityTypeHolder entityTypeHolder;
 	public static MoveTypeHolder moveTypeHolder;
 	public static AttackHolder attackHolder;
 	public static FireballHolder fireballHolder;
-	
-	public static enum GAMESTATE {
-		MENU,
-		INGAME,
-		SETTINGS
-	};
-	public static GAMESTATE currentMenu = GAMESTATE.INGAME;
+	public static Player player;
 	
 	public static void main(String[] args) {
 		new ImportLibs(); //link the natives for lwjgl
 		random = new Random();
 		random.setSeed(Sys.getTime());
 		//initialize the quality of the game while loading
-		DisplayManager.createDisplay(QUALITY.ULTRA); // default quality value
+		DisplayManager.createDisplay();
 		List<String> arg = Arrays.asList(args);
 		DisplayManager.debugPolys =  arg.contains("-d"); //draw quality from arguments from startup command
-		if (arg.contains("-Qlight")) {
-			DisplayManager.quality = QUALITY.LIGHT;
-		} else if (arg.contains("-Qmoderate")) {
-			DisplayManager.quality = QUALITY.MODERATE;
-		} else if (arg.contains("-Qultra")) {
-			DisplayManager.quality = QUALITY.ULTRA;
-		}
 		//test graphics import
 		MemoryData.sendGraphicsInformationToFile();
 		//init main objects
-		EntityCreator entityCreator = new EntityCreator();
 		FPSCounter fpsCounter = new FPSCounter();
 		Text.init();
 		fontHolder = new FontHolder();
@@ -118,7 +110,7 @@ public class Mift {
 		
 		// ********* TERRAIN TEXTURE STUFF **********
 
-		terrain = new TerrainCreator(0, -1, "lunar_surface", "dirt", "lunar_surface", "path", "blendMap").getTerrain();
+		terrain = new TerrainCreator(0, 0, "deadGrass1", "grassy2", "deadGrass2", "path", "blendMap").getTerrain();
 		List<Terrain> terrains = new ArrayList<Terrain>();
 		terrains.add(terrain);
 
@@ -133,42 +125,44 @@ public class Mift {
 //		normalMapEntities.add(new Entity(crateModel, new Vector3f(65, 10, -75), 0, 0, 0, 0.04f));
 
 		// ************ ENTITIES *******************
-		entities = entityCreator.generateObjects(entities, terrain, 0);
+		entities = new EntityCreator(terrains).generateObjects(entities, 600);
 
 		// ******************* OTHER SETUP ***************
 
 		List<Light> lights = new ArrayList<Light>();
-		Light sun = new Light(new Vector3f(10000, 10000, -10000), new Vector3f(1.3f, 1.3f, 1.3f));
+		Light sun = new Light(new Vector3f(1000000, 1000000, -1000000), new Vector3f(1.3f, 1.3f, 1.3f));
+		Mift.instance_count++;
 		lights.add(sun);
 
-		MasterRenderer renderer = new MasterRenderer();
 
-		Player player = new EntityCreator().createPlayer(new Vector3f(30, 5, -90), new Vector3f(0, 100, 0), loader);
+		player = new EntityCreator(terrains).createPlayer(new Vector3f(200, terrains.get(0).getHeightOfTerrain(200,  200), 200), new Vector3f(0, 100, 0), loader);
 		entities.add(player);
 		camera = new Camera(player);
-		overheadCamera = new OverheadCamera(player);
+		overheadCamera = new OverheadCamera(player, terrains);
+
+		MasterRenderer renderer = new MasterRenderer(1);
 		
 		// *********** ENEMY CREATION *******************************
 		
-		for (int i = 0; i < 5; i++) {
-			enemies.add(new EntityCreator().createRandomEnemy(move_factor.FACE_TOWARDS, i));
+		for (int i = 0; i < 200; i++) {
+			enemies.add(new EntityCreator(terrains).createRandomEnemy(move_factor.NOTHING, i));
 			entities.add(enemies.get(i));
 		}
 		
 		// ******************* EXTRAS ****************
 		
-		List<GuiTexture> guiTextures = new ArrayList<GuiTexture>();
 		GuiRenderer guiRenderer = new GuiRenderer();
 		defaultMouse = new MousePicker(camera, renderer.getProjectionMatrix(), terrain);
 		overheadMouse = new MousePicker(overheadCamera, renderer.getProjectionMatrix(), terrain);
 		
 		// ********** Water Renderer Set-up ************************
 
-		WaterFrameBuffers buffers = new WaterFrameBuffers(DisplayManager.quality);
+		WaterFrameBuffers buffers = new WaterFrameBuffers(4);
 		WaterShader waterShader = new WaterShader();
 		WaterRenderer waterRenderer = new WaterRenderer(waterShader, renderer.getProjectionMatrix(), buffers);
 		List<WaterTile> waters = new ArrayList<WaterTile>();
-		WaterTile water = new WaterTile(0, 0, -10);
+		WaterTile water = new WaterTile(500, 500, -9);
+		Mift.instance_count++;
 		waters.add(water);
 		
 		Display.setTitle(NAME + " Release " + RELEASE + " b" + BUILD);
@@ -198,16 +192,19 @@ public class Mift {
 		pe.setScaleError(0.5f);
 		pe.randomizeRotation();
 		
+		// **************** SHADOW MAPPING **********************
+		
+		// **************** HUD *********************************
+		HUDRenderer hudRenderer = new HUDRenderer();
+		hudCreator = new HUDCreator(loader, false);
+		
 		// **************** Game Loop Below *********************
 
 		while (!Display.isCloseRequested()) {
 			player.move(terrain);
 							
 			pe.generateParticles(new Vector3f(10, 20, 30));
-			//rotate 3 objs in middle of map cuz why not
-//			for (int i = 0; i < normalMapEntities.size(); i++) {
-//				normalMapEntities.get(i).setRotY(normalMapEntities.get(i).getRotY() + 2);
-//			}
+
 			//have all enemies in the map move around, even the ones spawned by player
 			for (Enemy e : enemies) {
 				if (e != null) {
@@ -217,13 +214,16 @@ public class Mift {
 			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
 			if (player.isOverhead() == false) {
 				//ParticleHolder.update(camera);
-				renderer.renderCallStandardView(buffers, camera, defaultMouse, waterRenderer, water, lights, entities, normalMapEntities, terrains, waters, sun, player);
+				renderer.renderCallStandardView(buffers, camera, defaultMouse, waterRenderer, water, lights, entities, normalMapEntities, terrains, waters, sun, player, isNight);
+				//hudCreator.update(camera);
 			} else {
-				ParticleHolder.update(overheadCamera);
-				renderer.renderCallOverheadView(buffers, overheadCamera, overheadMouse, waterRenderer, water, lights, entities, normalMapEntities, terrains, waters, sun);
+				//ParticleHolder.update(overheadCamera);
+				renderer.renderCallOverheadView(buffers, overheadCamera, overheadMouse, waterRenderer, water, lights, entities, normalMapEntities, terrains, waters, sun, isNight);
+				//hudCreator.update(overheadCamera);
 			}
-			ParticleHolder.renderParticles(player.isOverhead());
+			//ParticleHolder.renderParticles(player.isOverhead());
 			guiRenderer.render(guiTextures);
+			hudRenderer.render(hudCreator.getTextures(), hudCreator.getCompass());
 			fpsCounter.updateCounter();
 			texts[1].setText((int) (fpsCounter.getFPS()) + "");
 			texts[2].setText(updateDebugText(player));
@@ -284,6 +284,8 @@ public class Mift {
 		sb.append("  ~ Graphics Card: " + MemoryData.getGraphicsCard());
 		sb.append("  ~ Graphics Memory: " + MemoryData.getGraphicsMemory());
 		sb.append("  ~ Native Resolution: " + MemoryData.getNativeResolution());
+		sb.append("  ~ Instances Within World: " + instance_count);
+		sb.append("  ~ Compas Rotation: " + hudCreator.getCompass().compassTexture.getRotation());
 		return sb.toString();
 	}
 	
@@ -348,7 +350,6 @@ public class Mift {
 	
 	public static void addEnemy(Enemy e) {
 		enemies.add(e);
-		entities.add(e);
 	}
 	
 	public static void updateEntities(Player player) {

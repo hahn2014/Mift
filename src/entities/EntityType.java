@@ -7,7 +7,8 @@ public class EntityType {
 		ENEMY,
 		TREE,
 		BARREL,
-		PINE
+		PINE,
+		FERN
 	};
 	
 	private entityType id = entityType.DEFAULT;

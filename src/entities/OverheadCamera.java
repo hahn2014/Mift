@@ -1,5 +1,7 @@
 package entities;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 import org.lwjgl.Sys;
@@ -10,6 +12,7 @@ import org.lwjgl.util.vector.Vector3f;
 import entities.EntityType.entityType;
 import entities.MoveType.move_factor;
 import main.Mift;
+import terrains.Terrain;
 
 /**
  * Third Person Camera view.
@@ -35,9 +38,12 @@ public class OverheadCamera {
 	public entityType placerType = entityType.PLAYER;
 	public move_factor move_type = move_factor.NOTHING;
 	
-	public OverheadCamera(Player player) {
+	List<Terrain> terrains = new ArrayList<Terrain>();
+	
+	public OverheadCamera(Player player, List<Terrain> terrains) {
 		this.player = player;
 		Mouse.setGrabbed(true);
+		this.terrains = terrains;
 		random.setSeed(Sys.getTime());
 	}
 	
@@ -61,26 +67,31 @@ public class OverheadCamera {
 		}
 		while (Keyboard.next()) {
 			if (Keyboard.getEventKey() == Keyboard.KEY_1) {
+		    	System.out.println("called 1");
 			    if (Keyboard.getEventKeyState()) {} else {
 			    	//go back one model place
+			    	System.out.println("called 1");
 					placerType = eth.rotateReverse(placerType);
 			    }
 			}
 			if (Keyboard.getEventKey() == Keyboard.KEY_2) {
 				if (Keyboard.getEventKeyState()) {} else {
 					//go forward one model place
+			    	System.out.println("called 2");
 					placerType = eth.rotate(placerType);
 			    }
 			}
 			if (Keyboard.getEventKey() == Keyboard.KEY_3) {
 				if (Keyboard.getEventKeyState()) {} else {
 					//go back one move type place
+			    	System.out.println("called 3");
 					move_type = mth.rotateReverse(move_type);
 				}
 			}
 			if (Keyboard.getEventKey() == Keyboard.KEY_4) {
 				if (Keyboard.getEventKeyState()) {} else {
 					//go forward one move type place
+			    	System.out.println("called 4");
 					move_type = mth.rotate(move_type);
 				}
 			}
@@ -93,7 +104,7 @@ public class OverheadCamera {
 		        if (Mouse.getEventButton() == 0) {
 		            //LEFT BUTTON RELEASED
 		        	random.setSeed(Sys.getTime());
-		        	EntityCreator e = new EntityCreator(); //spawn a new model of the current model selection
+		        	EntityCreator e = new EntityCreator(terrains); //spawn a new model of the current model selection
 		        	Mift.addEnemy(e.createEnemy(placerType, Mift.getMousePicker(true).getCurrentTerrainPoint(), 
 		        			player.getRotation(), move_type, random.nextInt(99999999)));
 		        }
@@ -102,15 +113,18 @@ public class OverheadCamera {
 		        	//we need to check if we are pressing over an entity,
 		        	//and if we are we are going delete it from the list
 		        	Vector3f point = Mift.getMousePicker(true).getCurrentTerrainPoint();
-		        	Entity toRemove = new Entity();
+		        	Entity toRemove = null;
 		        	for (Entity entity : Mift.entities) {
-		        		if (entity.rayOverEntity(point)) {
+		        		if (entity.rayOverEntity(point) && !entity.getType().equals(entityType.PLAYER)) {
 		        			//we clicked on an entity, delete it
 		        			toRemove = entity;
 		        			break;
 		        		}
 		        	}
-		        	Mift.entities.remove(toRemove);
+		        	if (toRemove != null) {
+			        	Mift.entities.remove(toRemove);
+			    		Mift.instance_count--;
+		        	}
 		        }
 		    }
 		}

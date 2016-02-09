@@ -6,7 +6,7 @@ import org.lwjgl.Sys;
 
 public class MoveType {
 	public enum move_factor {
-		NOTHING, MOVE_TOWARDS, FACE_TOWARDS, FACE_AWAY, MOVE_CIRCLES, FOLLOW_PATH, FOLLOW_NOT_LOOKING
+		NOTHING, MOVE_TOWARDS, FACE_TOWARDS, FACE_AWAY, MOVE_CIRCLES, FOLLOW_NOT_LOOKING
 	}
 
 	private static Random random = new Random();

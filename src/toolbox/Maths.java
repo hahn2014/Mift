@@ -8,7 +8,7 @@ import entities.Camera;
 import entities.Enemy;
 import entities.OverheadCamera;
 import entities.Player;
-import paths.Point;
+import toolbox.Point;
 
 public class Maths {
 
@@ -58,6 +58,13 @@ public class Maths {
 		Vector3f cameraPos = camera.getPosition();
 		Vector3f negativeCameraPos = new Vector3f(-cameraPos.x, -cameraPos.y, -cameraPos.z);
 		Matrix4f.translate(negativeCameraPos, viewMatrix, viewMatrix);
+		return viewMatrix;
+	}
+	
+	public static Matrix4f createProjectionMatrix(float rotation) {
+		Matrix4f viewMatrix = new Matrix4f();
+		viewMatrix.setIdentity();
+		Matrix4f.rotate((float)(Math.toRadians(rotation)), new Vector3f(1, 0, 0), viewMatrix, viewMatrix);
 		return viewMatrix;
 	}
 	
