@@ -38,5 +38,4 @@ public class Light {
 	public void setColour(Vector3f colour) {
 		this.colour = colour;
 	}
-
 }

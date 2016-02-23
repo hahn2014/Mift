@@ -14,17 +14,19 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 import attacks.AttackHolder;
+import attacks.AttacksRenderer;
 import attacks.fireball.FireballHolder;
+import attacks.waterball.WaterballHolder;
 import entities.Camera;
 import entities.Enemy;
 import entities.Entity;
 import entities.EntityCreator;
 import entities.EntityTypeHolder;
 import entities.Light;
+import entities.MoveType.move_factor;
 import entities.MoveTypeHolder;
 import entities.OverheadCamera;
 import entities.Player;
-import entities.MoveType.move_factor;
 import fontCreator.FontHolder;
 import fontCreator.GUIText;
 import fontCreator.GUIText.ALIGNMENT;
@@ -52,13 +54,13 @@ import water.WaterTile;
 /**
  * Already surpassed 10k lines of
  * cumulative code! Keep up the
- * good work - Mift Build 48
+ * good work - Mift Build 50
  * 
  * @author Bryce Hahn, Mason Cluff
  * @since 1.0
  */
 public class Mift {
-	public static final String BUILD = "48";
+	public static final String BUILD = "50";
 	public static final String RELEASE = "1";
 	public static final String RELEASE_TITLE = "Alpha";
 	public static final String NAME = "Mift";
@@ -87,8 +89,10 @@ public class Mift {
 	public static MoveTypeHolder moveTypeHolder;
 	public static AttackHolder attackHolder;
 	public static FireballHolder fireballHolder;
+	public static WaterballHolder waterballHolder;
 	public static Player player;
 	
+	@SuppressWarnings("static-access")
 	public static void main(String[] args) {
 		new ImportLibs(); //link the natives for lwjgl
 		random = new Random();
@@ -107,6 +111,7 @@ public class Mift {
 		moveTypeHolder = new MoveTypeHolder();
 		attackHolder = new AttackHolder();
 		fireballHolder = new FireballHolder();
+		waterballHolder = new WaterballHolder();
 		
 		// ********* TERRAIN TEXTURE STUFF **********
 
@@ -192,7 +197,8 @@ public class Mift {
 		pe.setScaleError(0.5f);
 		pe.randomizeRotation();
 		
-		// **************** SHADOW MAPPING **********************
+		// ********************* ATTACKS ************************\
+		AttacksRenderer attackRenderer = new AttacksRenderer();
 		
 		// **************** HUD *********************************
 		HUDRenderer hudRenderer = new HUDRenderer();
@@ -203,7 +209,7 @@ public class Mift {
 		while (!Display.isCloseRequested()) {
 			player.move(terrain);
 							
-			pe.generateParticles(new Vector3f(10, 20, 30));
+			//pe.generateParticles(new Vector3f(10, 20, 30));
 
 			//have all enemies in the map move around, even the ones spawned by player
 			for (Enemy e : enemies) {
@@ -221,6 +227,7 @@ public class Mift {
 				renderer.renderCallOverheadView(buffers, overheadCamera, overheadMouse, waterRenderer, water, lights, entities, normalMapEntities, terrains, waters, sun, isNight);
 				//hudCreator.update(overheadCamera);
 			}
+			attackRenderer.render(fireballHolder.getAll(), waterballHolder.getAll());
 			//ParticleHolder.renderParticles(player.isOverhead());
 			guiRenderer.render(guiTextures);
 			hudRenderer.render(hudCreator.getTextures(), hudCreator.getCompass());
@@ -235,7 +242,7 @@ public class Mift {
 
 		// ********* Clean Up Below **************
 		
-		ParticleHolder.cleanUp();
+		//ParticleHolder.cleanUp();
 		Text.cleanUp();
 		buffers.cleanUp();
 		waterShader.cleanUp();
@@ -349,6 +356,7 @@ public class Mift {
 	}
 	
 	public static void addEnemy(Enemy e) {
+		entities.add(e);
 		enemies.add(e);
 	}
 	
@@ -356,13 +364,9 @@ public class Mift {
 		// If we're drawing close to the camera, or the top of the player's head,
 		// remove the player so it doesn't get drawn and we can see it in first person view
 		if (camera.distanceFromPlayer < 1) {
-			if (entities.contains(player)) {
-				entities.remove(player);
-			}
+			player.setRenderable(false);
 		} else {
-			if (!entities.contains(player)) {
-				entities.add(player);
-			}
+			player.setRenderable(true);
 		}
 	}
 }

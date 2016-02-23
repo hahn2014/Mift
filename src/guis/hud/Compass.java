@@ -21,7 +21,6 @@ public class Compass {
 	public Compass(Loader loader) {
 		compassTexture = new GuiTexture(loader.loadTexture("compass"), new Vector2f(-0.75f, -0.75f), new Vector2f(0.18f, 0.30f));
 		//compassTexture = new GuiTexture(loader.loadTexture("compass"), new Vector2f(-0.25f, -0.25f), new Vector2f(0.18f, 0.30f));
-		//Mift.guiTextures.add(compassTexture);
 	}
 	
 	public void update(Camera camera, boolean enemiesOnly) {

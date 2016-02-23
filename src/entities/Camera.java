@@ -161,6 +161,7 @@ public class Camera {
 			Mouse.setGrabbed(false);
 			Mift.getOverheadCamera().distanceFromPlayer = 50;
 		}
+		Mift.updateEntities(player);
 	}
 
 	private void calculatePitch() {

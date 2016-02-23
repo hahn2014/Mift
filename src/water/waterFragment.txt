@@ -34,7 +34,7 @@ void main(void) {
 	
 	depth = gl_FragCoord.z;
 	float waterDistance = 2.0 * near * far / (far + near - (2.0 * depth - 1.0) * (far - near));	
-	float waterDepth = floorDistance - waterDistance;	
+	float waterDepth = floorDistance - waterDistance;
 	
 	vec2 distortedTexCoords = texture(dudvMap, vec2(textureCoords.x + moveFactor, textureCoords.y)).rg*0.1;
 	distortedTexCoords = textureCoords + vec2(distortedTexCoords.x, distortedTexCoords.y+moveFactor);
@@ -66,5 +66,5 @@ void main(void) {
 
 	out_Color = mix(reflectColour, refractColour, refractiveFactor);
 	out_Color = mix(out_Color, vec4(0.0, 0.35, 0.4, 1.0), 0.2) + vec4(specularHighlights, 0.0);
-	out_Color.a = clamp(waterDepth/5.0, 0.0, 1.0);
+	out_Color.a = clamp(waterDepth/6.0, 0.0, 1.0);
 }

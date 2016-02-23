@@ -33,14 +33,13 @@ public class Player extends Entity {
 	private boolean isInAir = false;
 	private boolean isOverhead = false;
 	private boolean isRunning = false;
-	private boolean isCrouched = false;
-	private boolean isProned = false;
 	private boolean isRunCooldown = false;
 	
 	public AttackType attackType = AttackType.fireball;
 	public AttackHolder at;
 	private Random random;
 	private Camera camera;
+	private OverheadCamera overheadCamera;
 	public ParticleEmitter particleEmitter;
 
 	public Player(Loader loader, TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
@@ -54,6 +53,7 @@ public class Player extends Entity {
 
 	public void move(Terrain terrain) {
 		camera = Mift.getCamera();
+		overheadCamera = Mift.getOverheadCamera();
 		checkInputs();
 		if (isRunCooldown) {
 			checkRunCooldown();
@@ -144,53 +144,43 @@ public class Player extends Entity {
 			jump();
 		}
 		while (Keyboard.next()) {
-			if (Keyboard.isKeyDown(Keyboard.KEY_C)) {
-				if (Keyboard.getEventKeyState() == false) {} else {
-					if (!isProned) {
-						if (isCrouched) {
-							isCrouched = false;
-						} else {
-							isCrouched = true;
-						}
-						isProned = false;
-					} else {
-						isProned = false;
-						isCrouched = true;
+			if (Keyboard.getEventKeyState()) { //pressed
+			} else { //released
+				if (isOverhead == true) {
+					if (Keyboard.getEventKey() == Keyboard.KEY_1) {
+				    	//go back one model place
+				    	System.out.println("called 1");
+						overheadCamera.placerType = overheadCamera.getETH().rotateReverse(overheadCamera.placerType);
+					} else if (Keyboard.getEventKey() == Keyboard.KEY_2) {
+						//go forward one model place
+				    	System.out.println("called 2");
+				    	overheadCamera.placerType = overheadCamera.getETH().rotate(overheadCamera.placerType);
+					} else if (Keyboard.getEventKey() == Keyboard.KEY_3) {
+						//go back one move type place
+				    	System.out.println("called 3");
+				    	overheadCamera.move_type = overheadCamera.getMTH().rotateReverse(overheadCamera.move_type);
+					} else if (Keyboard.getEventKey() == Keyboard.KEY_4) {
+						//go forward one move type place
+				    	System.out.println("called 4");
+				    	overheadCamera.move_type = overheadCamera.getMTH().rotate(overheadCamera.move_type);
 					}
 				}
-			}
-			if (Keyboard.isKeyDown(Keyboard.KEY_LCONTROL)) {
-				if (Keyboard.getEventKeyState() == false) {} else {
-					if (isProned) {
-						isProned = false;
-						isCrouched = true;
-					} else {
-						isProned = true;
-						isCrouched = false;
-					}
-				}
-			}
-			if (camera.isFPS()) {
-				if (Keyboard.isKeyDown(Keyboard.KEY_E)) {
-					if (Keyboard.getEventKeyState() == false) {} else {
+				if (camera.isFPS()) {
+					if (Keyboard.getEventKey() == Keyboard.KEY_E) {
 				    	//go back one attack place
 						attackType = at.rotate(attackType);
-				    }
-				}
-				if (Keyboard.isKeyDown(Keyboard.KEY_Q)) {
-					if (Keyboard.getEventKeyState() == false) {} else {
+					}
+					if (Keyboard.getEventKey() == Keyboard.KEY_Q) {
 				    	//go back one attack place
 						attackType = at.rotateReverse(attackType);
-				    }
-				}
-				if (Keyboard.isKeyDown(Keyboard.KEY_RETURN)) {
-					if (Keyboard.getEventKeyState() == false) {} else {
+					}
+					if (Keyboard.getEventKey() == Keyboard.KEY_RETURN) {
 						if (attackType == AttackType.fireball) {
-							for (int i = 0; i < 400; i ++) {
-								particleEmitter.generateParticles(super.getPosition());
-							}
-							
-							//Mift.fireballHolder.createFireball(super.getPosition(), super.getPosition(), 0);
+							Mift.fireballHolder.createFireball(super.getPosition());
+							System.out.println("Firing a fireball!");
+						} else if (attackType == AttackType.waterball) {
+							Mift.waterballHolder.createWaterball(super.getPosition());
+							System.out.println("Firing a waterball!");
 						}
 					}
 				}

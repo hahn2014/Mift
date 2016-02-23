@@ -40,7 +40,7 @@ public class MasterRenderer {
 	public static final float GREEN = 0.4f;
 	public static final float BLUE = 0.2f;
 
-	private Matrix4f projectionMatrix;
+	private static Matrix4f projectionMatrix;
 
 	private StaticShader shader = new StaticShader();
 	private EntityRenderer renderer;
@@ -59,16 +59,16 @@ public class MasterRenderer {
 
 	public MasterRenderer(int quality) {
 		enableCulling();
-		createProjectionMatrix();
+		projectionMatrix = createProjectionMatrix();
 		renderer = new EntityRenderer(shader, projectionMatrix);
-		terrainRenderer = new TerrainRenderer(terrainShader, projectionMatrix);
+		terrainRenderer = new TerrainRenderer(terrainShader, projectionMatrix, quality);
 		skyboxRenderer = new SkyboxRenderer(Mift.getLoader(), projectionMatrix);
 		normalMapRenderer = new NormalMappingRenderer(projectionMatrix);
 		this.shadowRenderer = new ShadowMapMasterRenderer(quality);
 	}
 
-	public Matrix4f getProjectionMatrix() {
-		return this.projectionMatrix;
+	public static Matrix4f getProjectionMatrix() {
+		return projectionMatrix;
 	}
 
 	public void renderCallOverheadView(WaterFrameBuffers buffers, OverheadCamera camera, MousePicker mouse,
@@ -89,13 +89,13 @@ public class MasterRenderer {
 		camera.getPosition().y -= distance;
 		camera.invertPitch();
 		renderScene(entities, normalMapEntities, terrains, lights, camera,
-				new Vector4f(0, 1, 0, -water.getHeight() + 1), isNight);
+				new Vector4f(0, 1, 0, -water.getHeight() + 2.0f), isNight);
 		camera.getPosition().y += distance;
 		camera.invertPitch();
 
 		// render refraction texture
 		buffers.bindRefractionFrameBuffer();
-		renderScene(entities, normalMapEntities, terrains, lights, camera, new Vector4f(0, -1, 0, water.getHeight()), isNight);
+		renderScene(entities, normalMapEntities, terrains, lights, camera, new Vector4f(0, -1, 0, water.getHeight() + 1.0f), isNight);
 
 		// render to screen
 		GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
@@ -113,7 +113,6 @@ public class MasterRenderer {
 		camera.getClicks();
 		mouse.update(false);
 
-		Mift.updateEntities(player);
 		//render the shadows
 		renderShadowMap(entities, sun, camera);
 
@@ -123,13 +122,13 @@ public class MasterRenderer {
 		camera.getPosition().y -= distance;
 		camera.invertPitch();
 		renderScene(entities, normalMapEntities, terrains, lights, camera,
-				new Vector4f(0, 1, 0, -water.getHeight() + 1), isNight);
+				new Vector4f(0, 1, 0, -water.getHeight() + 2.0f), isNight);
 		camera.getPosition().y += distance;
 		camera.invertPitch();
 
 		// render refraction texture
 		buffers.bindRefractionFrameBuffer();
-		renderScene(entities, normalMapEntities, terrains, lights, camera, new Vector4f(0, -1, 0, water.getHeight()), isNight);
+		renderScene(entities, normalMapEntities, terrains, lights, camera, new Vector4f(0, -1, 0, water.getHeight() + 1.0f), isNight);
 
 		// render to screen
 		GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
@@ -173,7 +172,7 @@ public class MasterRenderer {
 		shader.loadSkyColour(RED, GREEN, BLUE);
 		shader.loadLights(lights);
 		shader.loadViewMatrix(camera);
-		renderer.render(entities);
+		renderer.render(entities, shadowRenderer.getToShadowMapSpaceMatrix());
 		shader.stop();
 		normalMapRenderer.render(normalMapEntities, clipPlane, lights, camera);
 		terrainShader.start();
@@ -196,7 +195,7 @@ public class MasterRenderer {
 		shader.loadSkyColour(RED, GREEN, BLUE);
 		shader.loadLights(lights);
 		shader.loadViewMatrix(camera);
-		renderer.render(entities);
+		renderer.render(entities, shadowRenderer.getToShadowMapSpaceMatrix());
 		shader.stop();
 		normalMapRenderer.render(normalMapEntities, clipPlane, lights, camera);
 		terrainShader.start();
@@ -284,18 +283,19 @@ public class MasterRenderer {
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, getShadowMapTexture());
 	}
 
-	private void createProjectionMatrix() {
-		projectionMatrix = new Matrix4f();
+	public static Matrix4f createProjectionMatrix() {
+		Matrix4f matrix = new Matrix4f();
 		float aspectRatio = (float) Display.getWidth() / (float) Display.getHeight();
 		float y_scale = (float) ((1f / Math.tan(Math.toRadians(FOV / 2f))));
 		float x_scale = y_scale / aspectRatio;
 		float frustum_length = FAR_PLANE - NEAR_PLANE;
 
-		projectionMatrix.m00 = x_scale;
-		projectionMatrix.m11 = y_scale;
-		projectionMatrix.m22 = -((FAR_PLANE + NEAR_PLANE) / frustum_length);
-		projectionMatrix.m23 = -1;
-		projectionMatrix.m32 = -((2 * NEAR_PLANE * FAR_PLANE) / frustum_length);
-		projectionMatrix.m33 = 0;
+		matrix.m00 = x_scale;
+		matrix.m11 = y_scale;
+		matrix.m22 = -((FAR_PLANE + NEAR_PLANE) / frustum_length);
+		matrix.m23 = -1;
+		matrix.m32 = -((2 * NEAR_PLANE * FAR_PLANE) / frustum_length);
+		matrix.m33 = 0;
+		return matrix;
 	}
 }

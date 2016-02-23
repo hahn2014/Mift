@@ -1,4 +1,4 @@
-package attacks.fireball;
+package attacks.waterball;
 
 import org.lwjgl.util.vector.Vector3f;
 
@@ -7,7 +7,7 @@ import models.TexturedModel;
 import objConverter.OBJFileLoader;
 import textures.ModelTexture;
 
-public class Fireball {
+public class Waterball {
 	private Vector3f rotation = new Vector3f(0, 0, 0);
 	private Vector3f currentPosition;
 	private Vector3f gotoPosition;
@@ -19,7 +19,7 @@ public class Fireball {
 	
 	private TexturedModel model;
 	
-	public Fireball(Vector3f pos) {
+	public Waterball(Vector3f pos) {
 		this.isRenderable = true;
 		this.currentPosition = pos;
 		this.model = new TexturedModel(OBJFileLoader.loadOBJ("sphere", Mift.getLoader()),
@@ -33,7 +33,7 @@ public class Fireball {
 		} else {
 			//lived long enough, time to die ball
 			this.isRenderable = false;
-			System.out.println("fireball has died");
+			System.out.println("waterball has died");
 		}
 	}
 	

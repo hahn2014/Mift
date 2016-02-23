@@ -12,6 +12,7 @@ public class Entity {
 	private float rotX, rotY, rotZ;
 	private float scale;
 	private entityType type = entityType.DEFAULT;
+	private boolean renderable = true;
 
 	private int textureIndex = 0;
 
@@ -68,6 +69,14 @@ public class Entity {
 		return model;
 	}
 
+	public void setRenderable(boolean r) {
+		this.renderable = r;
+	}
+	
+	public boolean isRenderable() {
+		return renderable;
+	}
+	
 	public void setModel(TexturedModel model) {
 		this.model = model;
 	}
@@ -154,7 +163,7 @@ public class Entity {
 	}
 	
 	public boolean rayOverEntity(Vector3f ray) {
-		float buffer = 3 * scale; //getModelBuffer();
+		float buffer = 3 * scale;
 		Vector3f bufferStart = new Vector3f(this.getPosition().getX() - buffer, this.getPosition().getY() - buffer, this.getPosition().getZ() - buffer);
 		Vector3f bufferEnd = new Vector3f(this.getPosition().getX() + buffer, this.getPosition().getY() + buffer, this.getPosition().getZ() + buffer);
 		

@@ -65,42 +65,12 @@ public class OverheadCamera {
 		if (Keyboard.isKeyDown(Keyboard.KEY_F1)) { //unlock the mouse from the screen
 			Mouse.setGrabbed(false);
 		}
-		while (Keyboard.next()) {
-			if (Keyboard.getEventKey() == Keyboard.KEY_1) {
-		    	System.out.println("called 1");
-			    if (Keyboard.getEventKeyState()) {} else {
-			    	//go back one model place
-			    	System.out.println("called 1");
-					placerType = eth.rotateReverse(placerType);
-			    }
-			}
-			if (Keyboard.getEventKey() == Keyboard.KEY_2) {
-				if (Keyboard.getEventKeyState()) {} else {
-					//go forward one model place
-			    	System.out.println("called 2");
-					placerType = eth.rotate(placerType);
-			    }
-			}
-			if (Keyboard.getEventKey() == Keyboard.KEY_3) {
-				if (Keyboard.getEventKeyState()) {} else {
-					//go back one move type place
-			    	System.out.println("called 3");
-					move_type = mth.rotateReverse(move_type);
-				}
-			}
-			if (Keyboard.getEventKey() == Keyboard.KEY_4) {
-				if (Keyboard.getEventKeyState()) {} else {
-					//go forward one move type place
-			    	System.out.println("called 4");
-					move_type = mth.rotate(move_type);
-				}
-			}
-		}
 	}
 	
 	public void getClicks() {
 		while (Mouse.next()){
-		    if (Mouse.getEventButtonState()) {} else {
+		    if (Mouse.getEventButtonState()) { //pressed
+		    } else { //released
 		        if (Mouse.getEventButton() == 0) {
 		            //LEFT BUTTON RELEASED
 		        	random.setSeed(Sys.getTime());
@@ -166,6 +136,14 @@ public class OverheadCamera {
 
 	public float getYaw() {
 		return yaw;
+	}
+	
+	public EntityTypeHolder getETH() {
+		return eth;
+	}
+	
+	public MoveTypeHolder getMTH() {
+		return mth;
 	}
 
 	private void calculateCameraPosition(float horizDistance, float verticDistance) {

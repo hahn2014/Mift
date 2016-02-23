@@ -19,9 +19,11 @@ import toolbox.Maths;
 public class TerrainRenderer {
 
 	private TerrainShader shader;
+	private int quality = 4;
 
-	public TerrainRenderer(TerrainShader shader, Matrix4f projectionMatrix) {
+	public TerrainRenderer(TerrainShader shader, Matrix4f projectionMatrix, int quality) {
 		this.shader = shader;
+		this.quality = quality;
 		shader.start();
 		shader.loadProjectionMatrix(projectionMatrix);
 		shader.connectTextureUnits();
@@ -30,6 +32,8 @@ public class TerrainRenderer {
 
 	public void render(List<Terrain> terrains, Matrix4f toShadowSpace) {
 		shader.loadToShadowSpaceMatrix(toShadowSpace);
+		shader.loadPFCCount(quality);
+		shader.loadShadowMapSize(4100 * quality);
 		for (Terrain terrain : terrains) {
 			prepareTerrain(terrain);
 			loadModelMatrix(terrain);

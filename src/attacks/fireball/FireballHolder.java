@@ -15,17 +15,15 @@ public class FireballHolder {
 		return fireballs.get(index);
 	}
 	
-	public void createFireball(Vector3f pos, Vector3f topos, float speed) {
-		add(new Fireball(pos, topos, speed));
+	public void createFireball(Vector3f pos) {
+		add(new Fireball(pos));
 	}
 	
 	private void add(Fireball fb) {
 		fireballs.add(fb);
 	}
 	
-	public void update() {
-		for (Fireball fireball : fireballs) {
-			fireball.update();
-		}
+	public void remove(Fireball ball) {
+		fireballs.remove(ball);
 	}
 }
