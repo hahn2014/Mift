@@ -5,8 +5,8 @@ import org.lwjgl.util.vector.Matrix4f;
 import shaders.ShaderProgram;
 
 public class AttackShader extends ShaderProgram {
-	private static final String VERTEX_FILE = "src/attacks/attackVertexShader.txt";
-	private static final String FRAGMENT_FILE = "src/attacks/attackFragmentShader.txt";
+	private static final String VERTEX_FILE = "src/attacks/attackVertexShader.glsl";
+	private static final String FRAGMENT_FILE = "src/attacks/attackFragmentShader.glsl";
 	
 	private int location_numberOfRows;
 	private int location_projectionMatrix;

@@ -19,11 +19,9 @@ import toolbox.Maths;
 public class TerrainRenderer {
 
 	private TerrainShader shader;
-	private int quality = 4;
 
-	public TerrainRenderer(TerrainShader shader, Matrix4f projectionMatrix, int quality) {
+	public TerrainRenderer(TerrainShader shader, Matrix4f projectionMatrix) {
 		this.shader = shader;
-		this.quality = quality;
 		shader.start();
 		shader.loadProjectionMatrix(projectionMatrix);
 		shader.connectTextureUnits();
@@ -32,8 +30,6 @@ public class TerrainRenderer {
 
 	public void render(List<Terrain> terrains, Matrix4f toShadowSpace) {
 		shader.loadToShadowSpaceMatrix(toShadowSpace);
-		shader.loadPFCCount(quality);
-		shader.loadShadowMapSize(4100 * quality);
 		for (Terrain terrain : terrains) {
 			prepareTerrain(terrain);
 			loadModelMatrix(terrain);
@@ -57,11 +53,11 @@ public class TerrainRenderer {
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, texturePack.getBackgroundTexture().getTextureID());
 		GL13.glActiveTexture(GL13.GL_TEXTURE1);
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, texturePack.getrTexture().getTextureID());
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, texturePack.getTexture1().getTextureID());
 		GL13.glActiveTexture(GL13.GL_TEXTURE2);
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, texturePack.getgTexture().getTextureID());
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, texturePack.getTexture2().getTextureID());
 		GL13.glActiveTexture(GL13.GL_TEXTURE3);
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, texturePack.getbTexture().getTextureID());
+		GL11.glBindTexture(GL11.GL_TEXTURE_2D, texturePack.getTexture3().getTextureID());
 		GL13.glActiveTexture(GL13.GL_TEXTURE4);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, terrain.getBlendMap().getTextureID());
 	}

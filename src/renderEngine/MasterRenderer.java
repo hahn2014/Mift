@@ -61,7 +61,7 @@ public class MasterRenderer {
 		enableCulling();
 		projectionMatrix = createProjectionMatrix();
 		renderer = new EntityRenderer(shader, projectionMatrix);
-		terrainRenderer = new TerrainRenderer(terrainShader, projectionMatrix, quality);
+		terrainRenderer = new TerrainRenderer(terrainShader, projectionMatrix);
 		skyboxRenderer = new SkyboxRenderer(Mift.getLoader(), projectionMatrix);
 		normalMapRenderer = new NormalMappingRenderer(projectionMatrix);
 		this.shadowRenderer = new ShadowMapMasterRenderer(quality);
@@ -85,17 +85,17 @@ public class MasterRenderer {
 
 		// render reflection texture
 		buffers.bindReflectionFrameBuffer();
-		float distance = 2 * (camera.getPosition().y - water.getHeight());
+		float distance = 2 * (camera.getPosition().y - WaterTile.height);
 		camera.getPosition().y -= distance;
 		camera.invertPitch();
 		renderScene(entities, normalMapEntities, terrains, lights, camera,
-				new Vector4f(0, 1, 0, -water.getHeight() + 2.0f), isNight);
+				new Vector4f(0, 1, 0, -WaterTile.height + 2.0f), isNight);
 		camera.getPosition().y += distance;
 		camera.invertPitch();
 
 		// render refraction texture
 		buffers.bindRefractionFrameBuffer();
-		renderScene(entities, normalMapEntities, terrains, lights, camera, new Vector4f(0, -1, 0, water.getHeight() + 1.0f), isNight);
+		renderScene(entities, normalMapEntities, terrains, lights, camera, new Vector4f(0, -1, 0, WaterTile.height + 1.0f), isNight);
 
 		// render to screen
 		GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
@@ -118,17 +118,17 @@ public class MasterRenderer {
 
 		// render reflection texture
 		buffers.bindReflectionFrameBuffer();
-		float distance = 2 * (camera.getPosition().y - water.getHeight());
+		float distance = 2 * (camera.getPosition().y - WaterTile.height);
 		camera.getPosition().y -= distance;
 		camera.invertPitch();
 		renderScene(entities, normalMapEntities, terrains, lights, camera,
-				new Vector4f(0, 1, 0, -water.getHeight() + 2.0f), isNight);
+				new Vector4f(0, 1, 0, -WaterTile.height + 2.0f), isNight);
 		camera.getPosition().y += distance;
 		camera.invertPitch();
 
 		// render refraction texture
 		buffers.bindRefractionFrameBuffer();
-		renderScene(entities, normalMapEntities, terrains, lights, camera, new Vector4f(0, -1, 0, water.getHeight() + 1.0f), isNight);
+		renderScene(entities, normalMapEntities, terrains, lights, camera, new Vector4f(0, -1, 0, WaterTile.height + 1.0f), isNight);
 
 		// render to screen
 		GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
@@ -142,11 +142,15 @@ public class MasterRenderer {
 		for (Terrain terrain : terrains) {
 			processTerrain(terrain);
 		}
-		for (Entity entity : entities) {
-			processEntity(entity);
+		if (entities != null) {
+			for (Entity entity : entities) {
+				processEntity(entity);
+			}
 		}
-		for (Entity entity : normalEntities) {
-			processNormalMapEntity(entity);
+		if (normalEntities != null) {
+			for (Entity entity : normalEntities) {
+				processNormalMapEntity(entity);
+			}
 		}
 		render(lights, camera, clipPlane, isNight);
 	}
@@ -156,11 +160,15 @@ public class MasterRenderer {
 		for (Terrain terrain : terrains) {
 			processTerrain(terrain);
 		}
-		for (Entity entity : entities) {
-			processEntity(entity);
+		if (entities != null) {
+			for (Entity entity : entities) {
+				processEntity(entity);
+			}
 		}
-		for (Entity entity : normalEntities) {
-			processNormalMapEntity(entity);
+		if (normalEntities != null) {
+			for (Entity entity : normalEntities) {
+				processNormalMapEntity(entity);
+			}
 		}
 		render(lights, camera, clipPlane, isNight);
 	}

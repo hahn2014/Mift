@@ -76,7 +76,7 @@ public class OverheadCamera {
 		        	random.setSeed(Sys.getTime());
 		        	EntityCreator e = new EntityCreator(terrains); //spawn a new model of the current model selection
 		        	Mift.addEnemy(e.createEnemy(placerType, Mift.getMousePicker(true).getCurrentTerrainPoint(), 
-		        			player.getRotation(), move_type, random.nextInt(99999999)));
+		        			player.getRotation(), move_type, random.nextInt(99999999), (int)player.getGridPos().x, (int)player.getGridPos().y));
 		        }
 		        if (Mouse.getEventButton() == 1) {
 		            //RIGHT BUTTON RELEASED

@@ -8,7 +8,8 @@ public class EntityType {
 		TREE,
 		BARREL,
 		PINE,
-		FERN
+		FERN,
+		GRASS
 	};
 	
 	private entityType id = entityType.DEFAULT;

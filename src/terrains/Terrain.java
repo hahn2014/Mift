@@ -1,10 +1,15 @@
 package terrains;
 
-import models.RawModel;
+import java.util.List;
 
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
+import entities.Entity;
+import entities.EntityCreator;
+import entities.MoveType.move_factor;
+import main.Mift;
+import models.RawModel;
 import renderEngine.Loader;
 import textures.TerrainTexture;
 import textures.TerrainTexturePack;
@@ -12,7 +17,7 @@ import toolbox.Maths;
 
 public class Terrain {
 
-	private static final float SIZE = 1000;
+	public static final float SIZE = 1000;
 
 	private float x;
 	private float z;
@@ -49,20 +54,31 @@ public class Terrain {
 	public TerrainTexture getBlendMap() {
 		return blendMap;
 	}
+	
+	public Vector2f getGridPos(float x, float y) {
+		Vector2f gridPos = new Vector2f(0, 0);
+		
+		return gridPos;
+	}
 
 	public float getHeightOfTerrain(float worldX, float worldZ) {
 		float terrainX = worldX - this.x;
 		float terrainZ = worldZ - this.z;
-		float gridSquareSize = SIZE / ((float) heights.length - 1);
-		int gridX = (int) Math.floor(terrainX / gridSquareSize);
-		int gridZ = (int) Math.floor(terrainZ / gridSquareSize);
+		int gridX = (int) Math.floor(terrainX / SIZE);
+		int gridZ = (int) Math.floor(terrainZ / SIZE);
+		if (gridX < 0) {
+			gridX *= -1;
+		}
+		if (gridZ < 0) {
+			gridZ *= -1;
+		}
 
-		if (gridX >= heights.length - 1 || gridZ >= heights.length - 1 || gridX < 0 || gridZ < 0) {
+		if (gridX >= heights.length - 1 || gridZ >= heights.length - 1) {
 			return 0;
 		}
 
-		float xCoord = (terrainX % gridSquareSize) / gridSquareSize;
-		float zCoord = (terrainZ % gridSquareSize) / gridSquareSize;
+		float xCoord = (terrainX % SIZE) / SIZE;
+		float zCoord = (terrainZ % SIZE) / SIZE;
 		float answer;
 
 		if (xCoord <= (1 - zCoord)) {
@@ -77,9 +93,21 @@ public class Terrain {
 
 		return answer;
 	}
+	
+	public List<Entity> generateEntities(List<Terrain> terrains, List<Entity> entities) {
+		entities = new EntityCreator(terrains).generateObjects(entities, 600, this, (int)(this.x), (int)(this.z));
+		return entities;
+	}
+	
+	public List<Entity> generateEnemies(List<Terrain> terrains, List<Entity> entities, int game_quality) {
+		for (int i = 0; i < 50 * game_quality; i++) {
+			Mift.enemies.add(new EntityCreator(terrains).createRandomEnemyInGrid(move_factor.FACE_TOWARDS, i, this, (int)(this.x), (int)(this.z)));
+			entities.add(Mift.enemies.get(i));
+		}
+		return entities;
+	}
 
 	private RawModel generateTerrain(Loader loader) {
-		
 		HeightsGenerator generator = new HeightsGenerator();
 		
 		int VERTEX_COUNT = 128;
@@ -138,5 +166,12 @@ public class Terrain {
 	private float getHeight(int x, int z, HeightsGenerator generator) {
 		return generator.generateHeight(x, z);
 	}
-
+	
+	public float getTerrainAngle(float x1, float z1, float x2, float z2) {
+		float height1 = getHeightOfTerrain(x1, z1);
+		float height2 = getHeightOfTerrain(x2, z2);
+		
+		float angle = (float) Math.toDegrees(Math.atan2(height1 - height2, x1 - x2));
+		return (float)(Math.tan(angle));
+	}
 }

@@ -13,9 +13,9 @@ const int pcfCount = 3;
 const float totalTexels = (pcfCount * 2.0 + 1.0) * (pcfCount * 2.0 + 1.0);
 
 uniform sampler2D backgroundTexture;
-uniform sampler2D rTexture;
-uniform sampler2D gTexture;
-uniform sampler2D bTexture;
+uniform sampler2D texture1;
+uniform sampler2D texture2;
+uniform sampler2D texture3;
 uniform sampler2D blendMap;
 uniform sampler2D shadowMap;
 
@@ -48,9 +48,9 @@ void main(void) {
 	float backTextureAmount = 1 - (blendMapColour.r + blendMapColour.g + blendMapColour.b);
 	vec2 tiledCoords = pass_textureCoordinates * 30.0;
 	vec4 backgroundTextureColour = texture(backgroundTexture, tiledCoords) * backTextureAmount;
-	vec4 rTextureColour = texture(rTexture,tiledCoords) * blendMapColour.r;
-	vec4 gTextureColour = texture(gTexture,tiledCoords) * blendMapColour.g;
-	vec4 bTextureColour = texture(bTexture,tiledCoords) * blendMapColour.b;
+	vec4 rTextureColour = texture(texture1,tiledCoords) * blendMapColour.r;
+	vec4 gTextureColour = texture(texture2,tiledCoords) * blendMapColour.g;
+	vec4 bTextureColour = texture(texture3,tiledCoords) * blendMapColour.b;
 	
 	vec4 totalColour = backgroundTextureColour + rTextureColour + gTextureColour + bTextureColour;
 

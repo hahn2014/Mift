@@ -69,13 +69,11 @@ public class WaterFrameBuffers {
 		}
 	}
 
-	public void bindReflectionFrameBuffer() {// call before rendering to this
-												// FBO
+	public void bindReflectionFrameBuffer() {// call before rendering to this FBO
 		bindFrameBuffer(reflectionFrameBuffer, REFLECTION_WIDTH, REFLECTION_HEIGHT);
 	}
 
-	public void bindRefractionFrameBuffer() {// call before rendering to this
-												// FBO
+	public void bindRefractionFrameBuffer() {// call before rendering to this FBO
 		bindFrameBuffer(refractionFrameBuffer, REFRACTION_WIDTH, REFRACTION_HEIGHT);
 	}
 
@@ -156,5 +154,4 @@ public class WaterFrameBuffers {
 				depthBuffer);
 		return depthBuffer;
 	}
-
 }

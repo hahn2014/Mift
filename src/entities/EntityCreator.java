@@ -18,6 +18,7 @@ import renderEngine.Loader;
 import renderEngine.OBJLoader;
 import terrains.Terrain;
 import textures.ModelTexture;
+import water.WaterTile;
 
 public class EntityCreator {
 	TexturedModel texturedModel;
@@ -110,7 +111,7 @@ public class EntityCreator {
 		texturedModel = new TexturedModel(OBJLoader.loadObjModel("models/" + p.getObjName(), Mift.getLoader()),
 				new ModelTexture(Mift.getLoader().loadTexture(p.getTextureName())));
 		Mift.instance_count++;
-		return new Player(loader, texturedModel, location, rotation.getX(), rotation.getY(), rotation.getZ(),
+		return new Player(loader, texturedModel, location, rotation.getX(), rotation.getY() + 180, rotation.getZ(),
 				p.getScale());
 	}
 
@@ -125,20 +126,12 @@ public class EntityCreator {
 	 * @param move
 	 * @return TexturedModel
 	 */
-	public Enemy createEnemy(Vector3f location, Vector3f rotation, move_factor move, int id) {
-		EntityType e = eth.get(entityType.ENEMY);
-		texturedModel = new TexturedModel(OBJLoader.loadObjModel("models/" + e.getObjName(), Mift.getLoader()),
-				new ModelTexture(Mift.getLoader().loadTexture(e.getTextureName())));
-		Mift.instance_count++;
-		return new Enemy(texturedModel, location, rotation, e.getScale(), move, Mift.getTerrain(), id);
-	}
-
-	public Enemy createEnemy(entityType type, Vector3f location, Vector3f rotation, move_factor move, int id) {
+	public Enemy createEnemy(entityType type, Vector3f location, Vector3f rotation, move_factor move, int id, int gridX, int gridZ) {
 		EntityType e = eth.get(type);
 		texturedModel = new TexturedModel(OBJLoader.loadObjModel("models/" + e.getObjName(), Mift.getLoader()),
 				new ModelTexture(Mift.getLoader().loadTexture(e.getTextureName())));
 		Mift.instance_count++;
-		return new Enemy(texturedModel, location, rotation, e.getScale(), move, Mift.getTerrain(), id);
+		return new Enemy(texturedModel, location, rotation, e.getScale(), move, Mift.getTerrain(gridX, gridZ), id);
 	}
 
 	/**
@@ -157,7 +150,7 @@ public class EntityCreator {
 	 * @param move
 	 * @return Textured Model
 	 */
-	public Enemy createRandomEnemy(move_factor move, int id) {
+	public Enemy createRandomEnemy(move_factor move, int id, int gridX, int gridZ) {
 		EntityType e = eth.get(entityType.ENEMY);
 		random.setSeed(Sys.getTime());
 		texturedModel = new TexturedModel(OBJLoader.loadObjModel("models/" + e.getObjName(), Mift.getLoader()),
@@ -166,51 +159,51 @@ public class EntityCreator {
 		int z = random.nextInt(1000);
 		Mift.instance_count++;
 		return new Enemy(texturedModel, new Vector3f(x, terrains.get(0).getHeightOfTerrain(x, z), z),
-				new Vector3f(0, random.nextInt(360), 0), e.getScale(), move, Mift.getTerrain(), id);
+				new Vector3f(0, random.nextInt(360), 0), e.getScale(), move, Mift.getTerrain(gridX, gridZ), id);
 	}
-
-	public Enemy createRandomEnemy(int id) {
+	
+	public Enemy createRandomEnemyInGrid(move_factor move, int id, Terrain terrain, int gridX, int gridZ) {
 		EntityType e = eth.get(entityType.ENEMY);
 		random.setSeed(Sys.getTime());
 		texturedModel = new TexturedModel(OBJLoader.loadObjModel("models/" + e.getObjName(), Mift.getLoader()),
 				new ModelTexture(Mift.getLoader().loadTexture(e.getTextureName())));
-		int x = random.nextInt(1000);
-		int z = random.nextInt(1000);
+		int x = random.nextInt(1000) + gridX;
+		int z = random.nextInt(1000) + gridZ;
 		Mift.instance_count++;
-		return new Enemy(texturedModel, new Vector3f(x, terrains.get(0).getHeightOfTerrain(x, z), z),
-				new Vector3f(0, random.nextInt(360), 0), e.getScale(), MoveType.randomEnum(move_factor.class), Mift.getTerrain(), id);
+		return new Enemy(texturedModel, new Vector3f(x, terrain.getHeightOfTerrain(x, z), z),
+				new Vector3f(0, random.nextInt(360), 0), e.getScale(), move, terrain, id);
 	}
 
-	public List<Entity> generateObjects(List<Entity> entities, int generationLuck) {
+	public List<Entity> generateObjects(List<Entity> entities, int generationLuck, Terrain terrain, int gridX, int gridZ) {
 		TexturedModel fern = createAtlasTexturedModel("fern", 2);
 		TexturedModel pine = createTexturedModel("pine", 0f, 0f);
+		TexturedModel grassPatch = createTexturedModel("grassPatch", 0f, 0f);
 		pine.getTexture().setHasTransparency(true);
 		fern.getTexture().setHasTransparency(true);
+		grassPatch.getTexture().setHasTransparency(false);
 
 		Random random = new Random();
 		random.setSeed(System.currentTimeMillis());
 		for (int i = 0; i < generationLuck; i++) {
 			if (i % 3 == 0) {
-				float x = random.nextInt(1000);
-				float z = random.nextInt(1000);
-				float y = terrains.get(0).getHeightOfTerrain(x, z);
-				if (y > -9f) {
+				float x = random.nextInt(1000) + gridX;
+				float z = random.nextInt(1000) + gridZ;
+				float y = terrain.getHeightOfTerrain(x, z);
+				if (y > WaterTile.height) {
 					Entity e = new Entity(fern, 3, new Vector3f(x, y, z), 0, random.nextFloat() * 360, 0, 0.9f, entityType.FERN);
 					e.getModel().getTexture().setHasTransparency(false);
 					entities.add(e);
 					Mift.instance_count++;
-				} else {
 				}
 			}
 			if (i % 2 == 0) {
-				float x = random.nextInt(1000);
-				float z = random.nextInt(1000);
-				float y = terrains.get(0).getHeightOfTerrain(x, z);
-				if (y >= -10f) {
+				float x = random.nextInt(1000) + gridX;
+				float z = random.nextInt(1000) + gridZ;
+				float y = terrain.getHeightOfTerrain(x, z);
+				if (y >= WaterTile.height) {
 					entities.add(new Entity(pine, 1, new Vector3f(x, y, z), 0, random.nextFloat() * 360, 0,
 							random.nextFloat() * 0.6f + 0.8f, entityType.PINE));
 					Mift.instance_count++;
-				} else {
 				}
 			}
 		}

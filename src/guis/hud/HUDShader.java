@@ -6,8 +6,8 @@ import shaders.ShaderProgram;
 
 public class HUDShader extends ShaderProgram {
 	
-	private static final String VERTEX_FILE = "src/guis/hud/hudVertexShader.txt";
-	private static final String FRAGMENT_FILE = "src/guis/hud/hudFragmentShader.txt";
+	private static final String VERTEX_FILE = "src/guis/hud/hudVertexShader.glsl";
+	private static final String FRAGMENT_FILE = "src/guis/hud/hudFragmentShader.glsl";
 
 	private int location_transformationMatrix;
 	private int location_projectionMatrix;

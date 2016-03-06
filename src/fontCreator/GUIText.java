@@ -6,7 +6,7 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 import fontRender.Text;
-import renderEngine.Loader;
+import main.Mift;
 
 public class GUIText {
 	
@@ -34,7 +34,7 @@ public class GUIText {
 	public GUIText() {
 		this.textString = "";
 		this.fontSize = 1.0f;
-		this.font = new FontType(new Loader().loadFontTexture("sans"), new File("res/fonts/sans.fnt"));
+		this.font = new FontType(Mift.getLoader().loadFontTexture("sans"), new File("res/fonts/sans.fnt"));
 		this.position = new Vector2f(0.0f, 0.0f);
 		this.lineMaxSize = 1.0f;
 		this.alignment = ALIGNMENT.CENTER;

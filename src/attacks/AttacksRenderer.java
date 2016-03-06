@@ -34,7 +34,7 @@ public class AttacksRenderer {
 			}
 		}
 //************WATERBALL ATTACK********************
-		for (Waterball water : waterballs) {
+		for (@SuppressWarnings("unused") Waterball water : waterballs) {
 			//render
 		}
 		//check for deletables

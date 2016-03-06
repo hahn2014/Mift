@@ -9,12 +9,13 @@ public class EntityTypeHolder {
 	private List<EntityType> entities = new ArrayList<EntityType>();
 	
 	public EntityTypeHolder() {
-		entities.add(new EntityType(entityType.PLAYER, 	"Player", 			"player", 		"player", 		0.6f));
-		entities.add(new EntityType(entityType.ENEMY, 	"Enemy", 			"player", 		"enemy", 		0.6f));
+		entities.add(new EntityType(entityType.PLAYER, 	"Player", 			"player", 		"player", 		3.0f));
+		entities.add(new EntityType(entityType.ENEMY, 	"Enemy", 			"dino", 		"dino", 		3.8f));
 		entities.add(new EntityType(entityType.TREE, 	"Low Poly Tree", 	"lowPolyTree", 	"lowPolyTree", 	0.75f));
 		entities.add(new EntityType(entityType.BARREL, 	"Barrel", 			"barrel", 		"barrel", 		0.5f));
-		entities.add(new EntityType(entityType.PINE, 	"Pine Tree", 		"pine", 		"pine", 	1.3f));
-		entities.add(new EntityType(entityType.FERN, 	"Fern", 			"fern", 		"fern", 	1.0f));
+		entities.add(new EntityType(entityType.PINE, 	"Pine Tree", 		"pine", 		"pine", 		1.3f));
+		entities.add(new EntityType(entityType.FERN, 	"Fern", 			"fern", 		"fern", 		1.0f));
+		entities.add(new EntityType(entityType.GRASS, 	"Grass Patch", 		"grassPatch", 	"grassPatch",	10.0f));
 	}
 	
 	public EntityType get(int id) {

@@ -23,7 +23,6 @@ import entities.Entity;
 import entities.EntityCreator;
 import entities.EntityTypeHolder;
 import entities.Light;
-import entities.MoveType.move_factor;
 import entities.MoveTypeHolder;
 import entities.OverheadCamera;
 import entities.Player;
@@ -35,6 +34,7 @@ import guis.GuiRenderer;
 import guis.GuiTexture;
 import guis.hud.HUDCreator;
 import guis.hud.HUDRenderer;
+import guis.menu.MenuRenderer;
 import particles.ParticleEmitter;
 import particles.ParticleHolder;
 import particles.ParticleTexture;
@@ -54,22 +54,24 @@ import water.WaterTile;
 /**
  * Already surpassed 10k lines of
  * cumulative code! Keep up the
- * good work - Mift Build 50
+ * good work - Mift Build 53
  * 
  * @author Bryce Hahn, Mason Cluff
  * @since 1.0
  */
 public class Mift {
-	public static final String BUILD = "50";
+	public static final String BUILD = "53";
 	public static final String RELEASE = "1";
 	public static final String RELEASE_TITLE = "Alpha";
 	public static final String NAME = "Mift";
 	
 	public static final Boolean fps = false;
 	private static final boolean isNight = false;
+	private static boolean isPaused = false;
 	private static Random random;
 	
 	public static int instance_count = 0;
+	public static int game_quality = 1;
 	//camera stuff
 	public static Camera camera;
 	public static OverheadCamera overheadCamera;
@@ -79,8 +81,8 @@ public class Mift {
 	public static List<Entity> entities = new ArrayList<Entity>();
 	public static List<Enemy> enemies = new ArrayList<Enemy>();
 	public static List<GuiTexture> guiTextures = new ArrayList<GuiTexture>();
+	public static List<Terrain> terrains = new ArrayList<Terrain>();
 	public static ParticleEmitter particleEmitter;
-	private static Terrain terrain;
 	private static Loader loader = new Loader();
 	private static HUDCreator hudCreator;
 
@@ -98,7 +100,7 @@ public class Mift {
 		random = new Random();
 		random.setSeed(Sys.getTime());
 		//initialize the quality of the game while loading
-		DisplayManager.createDisplay();
+		DisplayManager.createDisplay(game_quality);
 		List<String> arg = Arrays.asList(args);
 		DisplayManager.debugPolys =  arg.contains("-d"); //draw quality from arguments from startup command
 		//test graphics import
@@ -114,23 +116,15 @@ public class Mift {
 		waterballHolder = new WaterballHolder();
 		
 		// ********* TERRAIN TEXTURE STUFF **********
-
-		terrain = new TerrainCreator(0, 0, "deadGrass1", "grassy2", "deadGrass2", "path", "blendMap").getTerrain();
-		List<Terrain> terrains = new ArrayList<Terrain>();
-		terrains.add(terrain);
-
-		// ****************** NORMAL MAP MODELS ************************
-
-//		TexturedModel barrelModel = entityCreator.createNormalTexturedModel("barrel", "barrelNormal", 10, 0.5f);
-//		TexturedModel crateModel = entityCreator.createNormalTexturedModel("crate", "crateNormal", 10, 0.5f);
-//		TexturedModel boulderModel = entityCreator.createNormalTexturedModel("boulder", "boulderNormal", 10, 0.5f);
-		List<Entity> normalMapEntities = new ArrayList<Entity>();
-//		normalMapEntities.add(new Entity(barrelModel, new Vector3f(75, 10, -75), 0, 0, 0, 1f));
-//		normalMapEntities.add(new Entity(boulderModel, new Vector3f(85, 10, -75), 0, 0, 0, 1f));
-//		normalMapEntities.add(new Entity(crateModel, new Vector3f(65, 10, -75), 0, 0, 0, 0.04f));
-
-		// ************ ENTITIES *******************
-		entities = new EntityCreator(terrains).generateObjects(entities, 600);
+		Terrain terrain = new TerrainCreator(0, 0, "deadGrass1", "grassy2", "path", "path", "path", "blendMap2").getTerrain(); //create the terrain
+		entities = terrain.generateEntities(terrains, entities); //spawn the entities on it
+		entities = terrain.generateEnemies(terrains, entities, game_quality); // spawn the enemies on it
+		terrains.add(terrain); //add it to the array
+		
+		terrain = new TerrainCreator(1, 1, "deadGrass1", "grassy2", "path", "path", "path", "blendMap").getTerrain(); //create the terrain
+		entities = terrain.generateEntities(terrains, entities); //spawn the entities on it
+		entities = terrain.generateEnemies(terrains, entities, game_quality); // spawn the enemies on it
+		terrains.add(terrain); //add it to the array
 
 		// ******************* OTHER SETUP ***************
 
@@ -145,14 +139,7 @@ public class Mift {
 		camera = new Camera(player);
 		overheadCamera = new OverheadCamera(player, terrains);
 
-		MasterRenderer renderer = new MasterRenderer(1);
-		
-		// *********** ENEMY CREATION *******************************
-		
-		for (int i = 0; i < 200; i++) {
-			enemies.add(new EntityCreator(terrains).createRandomEnemy(move_factor.NOTHING, i));
-			entities.add(enemies.get(i));
-		}
+		MasterRenderer renderer = new MasterRenderer(game_quality);
 		
 		// ******************* EXTRAS ****************
 		
@@ -160,15 +147,15 @@ public class Mift {
 		defaultMouse = new MousePicker(camera, renderer.getProjectionMatrix(), terrain);
 		overheadMouse = new MousePicker(overheadCamera, renderer.getProjectionMatrix(), terrain);
 		
-		// ********** Water Renderer Set-up ************************
+		// ********** Water Renderer Top Side ************************
 
-		WaterFrameBuffers buffers = new WaterFrameBuffers(4);
-		WaterShader waterShader = new WaterShader();
-		WaterRenderer waterRenderer = new WaterRenderer(waterShader, renderer.getProjectionMatrix(), buffers);
+		WaterFrameBuffers topBuffers = new WaterFrameBuffers(game_quality);
+		WaterShader waterShaderTop = new WaterShader();
+		WaterRenderer topWaterRenderer = new WaterRenderer(waterShaderTop, renderer.getProjectionMatrix(), topBuffers);
 		List<WaterTile> waters = new ArrayList<WaterTile>();
-		WaterTile water = new WaterTile(500, 500, -9);
-		Mift.instance_count++;
-		waters.add(water);
+		WaterTile topWater = new WaterTile(500, 500);
+		instance_count++;
+		waters.add(topWater);
 		
 		Display.setTitle(NAME + " Release " + RELEASE + " b" + BUILD);
 		
@@ -204,39 +191,40 @@ public class Mift {
 		HUDRenderer hudRenderer = new HUDRenderer();
 		hudCreator = new HUDCreator(loader, false);
 		
+		MenuRenderer pauseRenderer = new MenuRenderer();
+		
 		// **************** Game Loop Below *********************
 
 		while (!Display.isCloseRequested()) {
-			player.move(terrain);
-							
-			//pe.generateParticles(new Vector3f(10, 20, 30));
-
-			//have all enemies in the map move around, even the ones spawned by player
-			for (Enemy e : enemies) {
-				if (e != null) {
-					e.move(player);
+			if (isPaused) { //render pause
+				pauseRenderer.render();
+			} else { //render in game
+				player.move(terrain);
+				//have all enemies in the map move around, even the ones spawned by player
+				for (Enemy e : enemies) {
+					if (e != null) {
+						e.move(player);
+					}
 				}
+				GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
+				if (player.isOverhead() == false) {
+					renderer.renderCallStandardView(topBuffers, camera, defaultMouse, topWaterRenderer, topWater, lights, entities, null, terrains, waters, sun, player, isNight);
+					//hudCreator.update(camera);
+				} else {
+					renderer.renderCallOverheadView(topBuffers, overheadCamera, overheadMouse, topWaterRenderer, topWater, lights, entities, null, terrains, waters, sun, isNight);
+					//hudCreator.update(overheadCamera);
+				}
+				attackRenderer.render(fireballHolder.getAll(), waterballHolder.getAll());
+				//ParticleHolder.renderParticles(player.isOverhead());
+				guiRenderer.render(guiTextures);
+				hudRenderer.render(hudCreator.getTextures(), hudCreator.getCompass());
+				fpsCounter.updateCounter();
+				texts[1].setText((int) (fpsCounter.getFPS()) + "");
+				texts[2].setText(updateDebugText(player));
+				texts[3].setText(updateModelPlacerText(entityTypeHolder, moveTypeHolder, player));
+				texts[4].setText(updateAttackText(attackHolder, player));
+				Text.render();
 			}
-			GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
-			if (player.isOverhead() == false) {
-				//ParticleHolder.update(camera);
-				renderer.renderCallStandardView(buffers, camera, defaultMouse, waterRenderer, water, lights, entities, normalMapEntities, terrains, waters, sun, player, isNight);
-				//hudCreator.update(camera);
-			} else {
-				//ParticleHolder.update(overheadCamera);
-				renderer.renderCallOverheadView(buffers, overheadCamera, overheadMouse, waterRenderer, water, lights, entities, normalMapEntities, terrains, waters, sun, isNight);
-				//hudCreator.update(overheadCamera);
-			}
-			attackRenderer.render(fireballHolder.getAll(), waterballHolder.getAll());
-			//ParticleHolder.renderParticles(player.isOverhead());
-			guiRenderer.render(guiTextures);
-			hudRenderer.render(hudCreator.getTextures(), hudCreator.getCompass());
-			fpsCounter.updateCounter();
-			texts[1].setText((int) (fpsCounter.getFPS()) + "");
-			texts[2].setText(updateDebugText(player));
-			texts[3].setText(updateModelPlacerText(entityTypeHolder, moveTypeHolder, player));
-			texts[4].setText(updateAttackText(attackHolder, player));
-			Text.render();
 			DisplayManager.updateDisplay();
 		}
 
@@ -244,8 +232,8 @@ public class Mift {
 		
 		//ParticleHolder.cleanUp();
 		Text.cleanUp();
-		buffers.cleanUp();
-		waterShader.cleanUp();
+		topBuffers.cleanUp();
+		waterShaderTop.cleanUp();
 		guiRenderer.cleanUp();
 		renderer.cleanUp();
 		loader.cleanUp();
@@ -258,6 +246,8 @@ public class Mift {
 		//update string
 		StringBuilder sb = new StringBuilder();
 		sb.append(" Developer Mode: " + DisplayManager.debugPolys);
+		sb.append("  ~ Resolution: " + DisplayManager.getRes());
+		sb.append("  ~ Fullscreened: " + DisplayManager.isFullscreen);
 		if (player.isOverhead()) {
 			sb.append("  ~ Camera Distance: " + (int)overheadCamera.distanceFromPlayer);
 			sb.append("  ~ Camera POV: Over Head Perspective");
@@ -347,8 +337,13 @@ public class Mift {
 		return (isOverhead ? overheadMouse : defaultMouse);
 	}
 	
-	public static Terrain getTerrain() {
-		return terrain;
+	public static Terrain getTerrain(int gridX, int gridZ) {
+		for (Terrain terrain : terrains) {
+			if (terrain.getX() ==  gridX && terrain.getZ() == gridZ) {
+				return terrain;
+			}
+		}
+		return terrains.get(0);
 	}
 	
 	public static Loader getLoader() {
@@ -368,5 +363,13 @@ public class Mift {
 		} else {
 			player.setRenderable(true);
 		}
+	}
+	
+	public boolean isPaused() {
+		return isPaused;
+	}
+	
+	public void setPaused(Boolean paused) {
+		isPaused = paused;
 	}
 }

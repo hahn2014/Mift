@@ -4,6 +4,7 @@ import java.util.Random;
 
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 import attacks.Attack.AttackType;
@@ -19,7 +20,7 @@ import terrains.Terrain;
 
 public class Player extends Entity {
 
-	private static final float RUN_SPEED = 15.0f;
+	private static final float RUN_SPEED = 15.0f * 5;
 	private static final float MAX_RUN_TIME = 200.0f;
 	private static final float RUN_COOLDOWN = 400f;
 	private static final float GRAVITY = -50;
@@ -29,11 +30,14 @@ public class Player extends Entity {
 	private float upwardsSpeed = 0f;
 	private float currentRunTime = 0f;
 	private float currentRunCooldown = RUN_COOLDOWN;
+	
+	private Vector2f gridPos = new Vector2f(0, 0);
 
 	private boolean isInAir = false;
 	private boolean isOverhead = false;
 	private boolean isRunning = false;
 	private boolean isRunCooldown = false;
+	private boolean runInfinite = true;
 	
 	public AttackType attackType = AttackType.fireball;
 	public AttackHolder at;
@@ -63,8 +67,8 @@ public class Player extends Entity {
 		float dz = (float) (distance * Math.cos(Math.toRadians(super.getRotY())));
 		upwardsSpeed += GRAVITY * DisplayManager.getFrameTimeSeconds();
 		super.increasePosition(dx, upwardsSpeed * DisplayManager.getFrameTimeSeconds(), dz);
-
-		float terrainHeight = terrain.getHeightOfTerrain(super.getPosition().x, super.getPosition().z);
+		
+		float terrainHeight = terrain.getHeightOfTerrain(super.getPosition().getX(), super.getPosition().getZ());
 
 		if (super.getPosition().y < terrainHeight) {
 			upwardsSpeed = 0;
@@ -81,13 +85,18 @@ public class Player extends Entity {
 	}
 	
 	private void checkRunCooldown() {
-		if (currentRunCooldown >= RUN_COOLDOWN) {
+		if (runInfinite == false) {
+			if (currentRunCooldown >= RUN_COOLDOWN) {
+				this.isRunning = true;
+				currentRunTime = 0f;
+				this.isRunCooldown = false;
+			} else {
+				this.isRunCooldown = true;
+				currentRunCooldown++;
+			}
+		} else {
 			this.isRunning = true;
 			currentRunTime = 0f;
-			this.isRunCooldown = false;
-		} else {
-			this.isRunCooldown = true;
-			currentRunCooldown++;
 		}
 	}
 	
@@ -96,7 +105,7 @@ public class Player extends Entity {
 			if (this.isRunning == false) {
 				this.currentSpeed = RUN_SPEED; //not running
 			} else {
-				if (currentRunTime >= MAX_RUN_TIME) { //weve ran for the max time, we need to cool down
+				if (currentRunTime >= MAX_RUN_TIME) { //we've ran for the max time, we need to cool down
 					this.currentSpeed = RUN_SPEED;
 					this.isRunning = false;
 					this.isRunCooldown = true;
@@ -194,5 +203,9 @@ public class Player extends Entity {
 
 	public void setOverhead(boolean overhead) {
 		this.isOverhead = overhead;
+	}
+	
+	public Vector2f getGridPos() {
+		return gridPos;
 	}
 }

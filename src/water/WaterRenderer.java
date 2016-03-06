@@ -44,12 +44,12 @@ public class WaterRenderer {
 		shader.stop();
 		setUpVAO(Mift.getLoader());
 	}
-
+	
 	public void render(List<WaterTile> water, Camera camera, Light sun) {
 		prepareRender(camera, sun);
 		for (WaterTile tile : water) {
 			Matrix4f modelMatrix = Maths.createTransformationMatrix(
-					new Vector3f(tile.getX(), tile.getHeight(), tile.getZ()), 0, 0, 0, WaterTile.SIZE);
+					new Vector3f(tile.getX(), WaterTile.height, tile.getZ()), 0, 0, 0, WaterTile.SIZE);
 			shader.loadModelMatrix(modelMatrix);
 			GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, quad.getVertexCount());
 		}
@@ -60,7 +60,7 @@ public class WaterRenderer {
 		prepareRender(camera, sun);
 		for (WaterTile tile : water) {
 			Matrix4f modelMatrix = Maths.createTransformationMatrix(
-					new Vector3f(tile.getX(), tile.getHeight(), tile.getZ()), 0, 0, 0, WaterTile.SIZE);
+					new Vector3f(tile.getX(), WaterTile.height, tile.getZ()), 0, 0, 0, WaterTile.SIZE);
 			shader.loadModelMatrix(modelMatrix);
 			GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, quad.getVertexCount());
 		}
@@ -121,9 +121,8 @@ public class WaterRenderer {
 	}
 
 	private void setUpVAO(Loader loader) {
-		// Just x and z vectex positions here, y is set to 0 in v.shader
+		// Just x and z vertex positions here, y is set to 0 in v.shader
 		float[] vertices = { -1, -1, -1, 1, 1, -1, 1, -1, -1, 1, 1, 1 };
 		quad = loader.loadToVAO(vertices, 2);
 	}
-
 }
