@@ -10,6 +10,7 @@ import org.lwjgl.util.vector.Vector4f;
 import terrains.Terrain;
 import entities.Camera;
 import entities.OverheadCamera;
+import main.Mift;
 
 public class MousePicker {
 
@@ -23,21 +24,18 @@ public class MousePicker {
 	private Camera camera;
 	private OverheadCamera overheadCamera;
 	
-	private Terrain terrain;
 	private Vector3f currentTerrainPoint;
 
-	public MousePicker(OverheadCamera cam, Matrix4f projection, Terrain terrain) {
+	public MousePicker(OverheadCamera cam, Matrix4f projection) {
 		overheadCamera = cam;
 		projectionMatrix = projection;
 		viewMatrix = Maths.createViewMatrix(overheadCamera);
-		this.terrain = terrain;
 	}
 	
-	public MousePicker(Camera cam, Matrix4f projection, Terrain terrain) {
+	public MousePicker(Camera cam, Matrix4f projection) {
 		camera = cam;
 		projectionMatrix = projection;
 		viewMatrix = Maths.createViewMatrix(camera);
-		this.terrain = terrain;
 	}
 	
 	public MousePicker() {}
@@ -112,7 +110,7 @@ public class MousePicker {
 		float half = start + ((finish - start) / 2f);
 		if (count >= RECURSION_COUNT) {
 			Vector3f endPoint = getPointOnRay(ray, half, isOverhead);
-			Terrain terrain = getTerrain(endPoint.getX(), endPoint.getZ());
+			Terrain terrain = Mift.terrain;
 			if (terrain != null) {
 				return endPoint;
 			} else {
@@ -137,7 +135,7 @@ public class MousePicker {
 	}
 
 	private boolean isUnderGround(Vector3f testPoint) {
-		Terrain terrain = getTerrain(testPoint.getX(), testPoint.getZ());
+		Terrain terrain = Mift.terrain;
 		float height = 0;
 		if (terrain != null) {
 			height = terrain.getHeightOfTerrain(testPoint.getX(), testPoint.getZ());
@@ -147,9 +145,5 @@ public class MousePicker {
 		} else {
 			return false;
 		}
-	}
-
-	private Terrain getTerrain(float worldX, float worldZ) {
-		return terrain;
 	}
 }

@@ -16,6 +16,7 @@ import entities.Light;
 import entities.OverheadCamera;
 import models.RawModel;
 import models.TexturedModel;
+import renderEngine.DisplayManager;
 import renderEngine.MasterRenderer;
 import textures.ModelTexture;
 import toolbox.Maths;
@@ -41,7 +42,11 @@ public class NormalMappingRenderer {
 			List<Entity> batch = entities.get(model);
 			for (Entity entity : batch) {
 				prepareInstance(entity);
-				GL11.glDrawElements(GL11.GL_TRIANGLES, model.getRawModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
+				if (DisplayManager.cg_debug_polygons) {
+					GL11.glDrawElements(GL11.GL_LINE_STRIP, model.getRawModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
+				} else {
+					GL11.glDrawElements(GL11.GL_TRIANGLES, model.getRawModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
+				}
 			}
 			unbindTexturedModel();
 		}

@@ -1,7 +1,5 @@
 package entities;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Random;
 
 import org.lwjgl.Sys;
@@ -12,7 +10,7 @@ import org.lwjgl.util.vector.Vector3f;
 import entities.EntityType.entityType;
 import entities.MoveType.move_factor;
 import main.Mift;
-import terrains.Terrain;
+import renderEngine.DisplayManager;
 
 /**
  * Third Person Camera view.
@@ -38,13 +36,13 @@ public class OverheadCamera {
 	public entityType placerType = entityType.PLAYER;
 	public move_factor move_type = move_factor.NOTHING;
 	
-	List<Terrain> terrains = new ArrayList<Terrain>();
-	
-	public OverheadCamera(Player player, List<Terrain> terrains) {
-		this.player = player;
+	public OverheadCamera() {
 		Mouse.setGrabbed(true);
-		this.terrains = terrains;
 		random.setSeed(Sys.getTime());
+	}
+	
+	public void setPlayer(Player player) {
+		this.player = player;
 	}
 	
 	public void move() {
@@ -59,10 +57,12 @@ public class OverheadCamera {
 
 	public void rotate() {
 		if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) { //close game for now
-			Mouse.setGrabbed(false);
-			System.exit(0);
+			Mift.setPaused(true);
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_F1)) { //unlock the mouse from the screen
+		if (Keyboard.isKeyDown(Keyboard.KEY_F1)) {
+			DisplayManager.setFullscreened(!DisplayManager.cg_fullscreened);
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_F2)) { //unlock the mouse from the screen
 			Mouse.setGrabbed(false);
 		}
 	}
@@ -74,9 +74,9 @@ public class OverheadCamera {
 		        if (Mouse.getEventButton() == 0) {
 		            //LEFT BUTTON RELEASED
 		        	random.setSeed(Sys.getTime());
-		        	EntityCreator e = new EntityCreator(terrains); //spawn a new model of the current model selection
+		        	EntityCreator e = new EntityCreator(); //spawn a new model of the current model selection
 		        	Mift.addEnemy(e.createEnemy(placerType, Mift.getMousePicker(true).getCurrentTerrainPoint(), 
-		        			player.getRotation(), move_type, random.nextInt(99999999), (int)player.getGridPos().x, (int)player.getGridPos().y));
+		        			player.getRotation(), move_type, random.nextInt(99999999)));
 		        }
 		        if (Mouse.getEventButton() == 1) {
 		            //RIGHT BUTTON RELEASED
@@ -105,8 +105,8 @@ public class OverheadCamera {
 		distanceFromPlayer -= change;
 		if (distanceFromPlayer < 50) {
 			distanceFromPlayer = 49;
-			Mift.getCamera().distanceFromPlayer = 49;
-			Mift.getCamera().setFPS(true);
+			Mift.camera.distanceFromPlayer = 49;
+			Mift.camera.setFPS(true);
 			player.setOverhead(false);
 			Mouse.setGrabbed(true);
 		} else {
@@ -122,8 +122,16 @@ public class OverheadCamera {
 		return position;
 	}
 	
+	public String getPositionDebug() {
+		return "[" + (int)position.x + ", " + (int)position.y + ", " + (int)position.z + "]";
+	}
+	
 	public Vector3f getView() {
 		return new Vector3f(pitch, yaw, 0);
+	}
+	
+	public String getViewDebug() {
+		return "[" + (int)pitch + ", " + (int)yaw + ", 0]";
 	}
 
 	public float getPitch() {

@@ -16,7 +16,6 @@ import entities.Camera;
 import entities.Entity;
 import entities.Light;
 import entities.OverheadCamera;
-import entities.Player;
 import main.Mift;
 import models.TexturedModel;
 import normalMappingRenderer.NormalMappingRenderer;
@@ -57,23 +56,23 @@ public class MasterRenderer {
 	private Map<TexturedModel, List<Entity>> normalMapEntities = new HashMap<TexturedModel, List<Entity>>();
 	private List<Terrain> terrains = new ArrayList<Terrain>();
 
-	public MasterRenderer(int quality) {
+	public MasterRenderer() {
 		enableCulling();
 		projectionMatrix = createProjectionMatrix();
 		renderer = new EntityRenderer(shader, projectionMatrix);
 		terrainRenderer = new TerrainRenderer(terrainShader, projectionMatrix);
-		skyboxRenderer = new SkyboxRenderer(Mift.getLoader(), projectionMatrix);
+		skyboxRenderer = new SkyboxRenderer(projectionMatrix);
 		normalMapRenderer = new NormalMappingRenderer(projectionMatrix);
-		this.shadowRenderer = new ShadowMapMasterRenderer(quality);
+		this.shadowRenderer = new ShadowMapMasterRenderer();
 	}
 
-	public static Matrix4f getProjectionMatrix() {
+	public Matrix4f getProjectionMatrix() {
 		return projectionMatrix;
 	}
 
 	public void renderCallOverheadView(WaterFrameBuffers buffers, OverheadCamera camera, MousePicker mouse,
 			WaterRenderer waterRenderer, WaterTile water, List<Light> lights, List<Entity> entities,
-			List<Entity> normalMapEntities, List<Terrain> terrains, List<WaterTile> waters, Light sun, boolean isNight) {
+			List<Entity> normalMapEntities, Light sun) {
 
 		camera.move();
 		camera.rotate();
@@ -88,26 +87,25 @@ public class MasterRenderer {
 		float distance = 2 * (camera.getPosition().y - WaterTile.height);
 		camera.getPosition().y -= distance;
 		camera.invertPitch();
-		renderScene(entities, normalMapEntities, terrains, lights, camera,
-				new Vector4f(0, 1, 0, -WaterTile.height + 2.0f), isNight);
+		renderScene(entities, normalMapEntities, lights, camera,
+				new Vector4f(0, 1, 0, -WaterTile.height + 2.0f));
 		camera.getPosition().y += distance;
 		camera.invertPitch();
 
 		// render refraction texture
 		buffers.bindRefractionFrameBuffer();
-		renderScene(entities, normalMapEntities, terrains, lights, camera, new Vector4f(0, -1, 0, WaterTile.height + 1.0f), isNight);
+		renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, WaterTile.height + 1.0f));
 
 		// render to screen
 		GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
 		buffers.unbindCurrentFrameBuffer();
-		renderScene(entities, normalMapEntities, terrains, lights, camera, new Vector4f(0, -1, 0, 100000), isNight);
-		waterRenderer.render(waters, camera, sun);
+		renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000));
+		waterRenderer.render(water, camera, sun);
 	}
 
 	public void renderCallStandardView(WaterFrameBuffers buffers, Camera camera, MousePicker mouse,
 			WaterRenderer waterRenderer, WaterTile water, List<Light> lights, List<Entity> entities,
-			List<Entity> normalMapEntities, List<Terrain> terrains, List<WaterTile> waters, Light sun,
-			Player player, boolean isNight) {
+			List<Entity> normalMapEntities, Light sun) {
 		camera.move();
 		camera.rotate();
 		camera.getClicks();
@@ -121,24 +119,24 @@ public class MasterRenderer {
 		float distance = 2 * (camera.getPosition().y - WaterTile.height);
 		camera.getPosition().y -= distance;
 		camera.invertPitch();
-		renderScene(entities, normalMapEntities, terrains, lights, camera,
-				new Vector4f(0, 1, 0, -WaterTile.height + 2.0f), isNight);
+		renderScene(entities, normalMapEntities, lights, camera,
+				new Vector4f(0, 1, 0, -WaterTile.height + 2.0f));
 		camera.getPosition().y += distance;
 		camera.invertPitch();
 
 		// render refraction texture
 		buffers.bindRefractionFrameBuffer();
-		renderScene(entities, normalMapEntities, terrains, lights, camera, new Vector4f(0, -1, 0, WaterTile.height + 1.0f), isNight);
+		renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, WaterTile.height + 1.0f));
 
 		// render to screen
 		GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
 		buffers.unbindCurrentFrameBuffer();
-		renderScene(entities, normalMapEntities, terrains, lights, camera, new Vector4f(0, -1, 0, 100000), isNight);
-		waterRenderer.render(waters, camera, sun);
+		renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000));
+		waterRenderer.render(water, camera, sun);
 	}
 
-	public void renderScene(List<Entity> entities, List<Entity> normalEntities, List<Terrain> terrains,
-			List<Light> lights, Camera camera, Vector4f clipPlane, boolean isNight) {
+	public void renderScene(List<Entity> entities, List<Entity> normalEntities,
+			List<Light> lights, Camera camera, Vector4f clipPlane) {
 		for (Terrain terrain : terrains) {
 			processTerrain(terrain);
 		}
@@ -152,11 +150,11 @@ public class MasterRenderer {
 				processNormalMapEntity(entity);
 			}
 		}
-		render(lights, camera, clipPlane, isNight);
+		render(lights, camera, clipPlane);
 	}
 
-	public void renderScene(List<Entity> entities, List<Entity> normalEntities, List<Terrain> terrains,
-			List<Light> lights, OverheadCamera camera, Vector4f clipPlane, boolean isNight) {
+	public void renderScene(List<Entity> entities, List<Entity> normalEntities,
+			List<Light> lights, OverheadCamera camera, Vector4f clipPlane) {
 		for (Terrain terrain : terrains) {
 			processTerrain(terrain);
 		}
@@ -170,14 +168,14 @@ public class MasterRenderer {
 				processNormalMapEntity(entity);
 			}
 		}
-		render(lights, camera, clipPlane, isNight);
+		render(lights, camera, clipPlane);
 	}
 
-	public void render(List<Light> lights, Camera camera, Vector4f clipPlane, boolean isNight) {
+	public void render(List<Light> lights, Camera camera, Vector4f clipPlane) {
 		prepare();
 		shader.start();
 		shader.loadClipPlane(clipPlane);
-		shader.loadSkyColour(RED, GREEN, BLUE);
+		shader.loadSkyColor(RED, GREEN, BLUE);
 		shader.loadLights(lights);
 		shader.loadViewMatrix(camera);
 		renderer.render(entities, shadowRenderer.getToShadowMapSpaceMatrix());
@@ -188,19 +186,19 @@ public class MasterRenderer {
 		terrainShader.loadSkyColour(RED, GREEN, BLUE);
 		terrainShader.loadLights(lights);
 		terrainShader.loadViewMatrix(camera);
-		terrainRenderer.render(terrains, shadowRenderer.getToShadowMapSpaceMatrix());
+		terrainRenderer.render(Mift.terrain, shadowRenderer.getToShadowMapSpaceMatrix());
 		terrainShader.stop();
-		skyboxRenderer.render(camera, RED, GREEN, BLUE, isNight);
+		skyboxRenderer.render(camera, (int)RED * 255, (int)GREEN * 255, (int)BLUE * 255);
 		terrains.clear();
 		entities.clear();
 		normalMapEntities.clear();
 	}
 
-	public void render(List<Light> lights, OverheadCamera camera, Vector4f clipPlane, boolean isNight) {
+	public void render(List<Light> lights, OverheadCamera camera, Vector4f clipPlane) {
 		prepare();
 		shader.start();
 		shader.loadClipPlane(clipPlane);
-		shader.loadSkyColour(RED, GREEN, BLUE);
+		shader.loadSkyColor(RED, GREEN, BLUE);
 		shader.loadLights(lights);
 		shader.loadViewMatrix(camera);
 		renderer.render(entities, shadowRenderer.getToShadowMapSpaceMatrix());
@@ -211,9 +209,9 @@ public class MasterRenderer {
 		terrainShader.loadSkyColour(RED, GREEN, BLUE);
 		terrainShader.loadLights(lights);
 		terrainShader.loadViewMatrix(camera);
-		terrainRenderer.render(terrains, shadowRenderer.getToShadowMapSpaceMatrix());
+		terrainRenderer.render(Mift.terrain, shadowRenderer.getToShadowMapSpaceMatrix());
 		terrainShader.stop();
-		skyboxRenderer.render(camera, RED, GREEN, BLUE, isNight);
+		skyboxRenderer.render(camera, (int)RED * 255, (int)GREEN * 255, (int)BLUE * 255);
 		terrains.clear();
 		entities.clear();
 		normalMapEntities.clear();

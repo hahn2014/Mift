@@ -130,6 +130,10 @@ public class Entity {
 		return new Vector3f(this.rotX, this.rotY, this.rotZ);
 	}
 	
+	public int getRotationDebug() {
+		return (int)this.rotY;
+	}
+	
 	public void setXPos(float x) {
 		this.position.x = x;
 	}
@@ -143,15 +147,7 @@ public class Entity {
 	}
 	
 	public String getPositionDebug() {
-		StringBuilder sb = new StringBuilder();
-		sb.append("[");
-		sb.append(this.getPosition().getX());
-		sb.append(", ");
-		sb.append(this.getPosition().getY());
-		sb.append(", ");
-		sb.append(this.getPosition().getZ());
-		sb.append("]");
-		return sb.toString();
+		return "[" + (int)this.getPosition().getX() + ", " + (int)this.getPosition().getY() + ", " + (int)this.getPosition().getZ() + "]";
 	}
 
 	public float getScale() {

@@ -60,7 +60,7 @@ public class WaterShader extends ShaderProgram {
 	}
 
 	public void loadLight(Light light) {
-		super.load3DVector(location_lightColour, light.getColour());
+		super.load3DVector(location_lightColour, light.getColor());
 		super.load3DVector(location_lightPosition, light.getPosition());
 	}
 

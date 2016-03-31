@@ -9,6 +9,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.PixelFormat;
 
+import io.Logger;
 import main.Mift;
 
 public class DisplayManager {
@@ -16,22 +17,25 @@ public class DisplayManager {
 	private static int WIDTH = 1920;
 	private static int HEIGHT = 1080;
 	private static final double FPS_CAP = 59.999998;
-	public static boolean isFullscreen = true;
-	public static boolean anisotropicFiltering = true;
-	public static boolean antialiasingFiltering = true;
-
-	public static boolean debugPolys = false;
+	
+	public static boolean cg_fullscreened = true;
+	public static boolean cg_anisotropic_filtering = false;
+	public static boolean cg_antialiasing_filtering = false;
+	public static boolean cg_debug_polygons = false;
+	public static boolean cg_developer_status = false;
+	public static boolean cs_windowsSystem = true;
+	public static int cg_quality = 1;
 
 	private static long lastFrameTime;
 	private static float delta;
 
-	public static void createDisplay(int quality) {
-		getQuality(quality);
+	public static void createDisplay() {
+		getQuality();
 		ContextAttribs attribs = new ContextAttribs(3, 3).withForwardCompatible(true).withProfileCore(true);
 		try {
 			setDisplayMode(WIDTH, HEIGHT);
-			if (antialiasingFiltering == true) {
-				Display.create(new PixelFormat().withSamples(4 * quality), attribs);
+			if (cg_antialiasing_filtering == true) {
+				Display.create(new PixelFormat().withSamples(4 * cg_quality), attribs);
 			} else {
 				Display.create(new PixelFormat(), attribs);
 			}
@@ -66,19 +70,19 @@ public class DisplayManager {
 	}
 	
 	public static String getRes() {
-		return "[" + WIDTH + ", " + HEIGHT + "]";
+		return WIDTH + "x" + HEIGHT;
 	}
 
 	private static void setDisplayMode(int width, int height) {
 		if ((Display.getDisplayMode().getWidth() == width) && (Display.getDisplayMode().getHeight() == height)
-				&& (Display.isFullscreen() == isFullscreen)) {
+				&& (Display.isFullscreen() == cg_fullscreened)) {
 			return;
 		}
 
 		try {
 			DisplayMode targetDisplayMode = null;
 
-			if (isFullscreen) {
+			if (cg_fullscreened) {
 				DisplayMode[] modes = Display.getAvailableDisplayModes();
 				int freq = 0;
 
@@ -106,34 +110,65 @@ public class DisplayManager {
 			}
 
 			if (targetDisplayMode == null) {
-				System.out.println("Failed to find value mode: " + width + "x" + height + " fs=" + isFullscreen);
+				Logger.error("Failed to find value mode: " + width + "x" + height + " fs=" + cg_fullscreened);
 				return;
 			}
 
 			Display.setDisplayMode(targetDisplayMode);
-			Display.setFullscreen(isFullscreen);
+			Display.setFullscreen(cg_fullscreened);
 			Display.setVSyncEnabled(true);
 
 		} catch (LWJGLException e) {
-			System.out.println("Unable to setup mode " + width + "x" + height + " fullscreen=" + isFullscreen + e);
+			Logger.error("Unable to setup mode " + width + "x" + height + " fullscreen=" + cg_fullscreened + e);
 		}
 	}
 	
-	private static void getQuality(int quality) {
-		if (quality == 1) {
-			WIDTH = 1280;
-			HEIGHT = 720;
-		} else if (quality == 2) {
-			WIDTH = 1920;
-			HEIGHT = 1080;
-		} else if (quality == 3) {
-			WIDTH = 2560;
-			HEIGHT = 1440;
-		} else if (quality == 4) {
-			WIDTH = 3840;
-			HEIGHT = 2160;
+	private static void getQuality() {
+		if (cg_quality == 1) {
+			if (cs_windowsSystem == true) {
+				WIDTH = 1280;
+				HEIGHT = 720;
+			} else {
+				WIDTH = 1280;
+				HEIGHT = 800;
+			}
+		} else if (cg_quality == 2) {
+			if (cs_windowsSystem == true) {
+				WIDTH = 1920;
+				HEIGHT = 1080;
+			} else {
+				WIDTH = 1280;
+				HEIGHT = 800;
+			}
+		} else if (cg_quality == 3) {
+			if (cs_windowsSystem == true) {
+				WIDTH = 2560;
+				HEIGHT = 1440;
+			} else {
+				WIDTH = 1280;
+				HEIGHT = 800;
+			}
+		} else if (cg_quality == 4) {
+			if (cs_windowsSystem == true) {
+				WIDTH = 3840;
+				HEIGHT = 2160;
+			} else {
+				WIDTH = 1280;
+				HEIGHT = 800;
+			}
 		} else {
-			getQuality(1);
+			cg_quality = 1;
+			getQuality();
+		}
+	}
+	
+	public static void setFullscreened(boolean fs) {
+		if (fs == true) {
+			cg_fullscreened = true;
+			setDisplayMode(WIDTH, HEIGHT);
+		} else {
+			cg_fullscreened = false;
+			setDisplayMode(WIDTH, HEIGHT);
 		}
 	}
 }

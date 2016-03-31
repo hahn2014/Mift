@@ -9,6 +9,7 @@ import entities.Camera;
 import entities.Entity;
 import entities.OverheadCamera;
 import guis.GuiTexture;
+import io.Logger;
 import main.Mift;
 import renderEngine.Loader;
 import toolbox.Maths;
@@ -33,7 +34,7 @@ public class Compass {
 				updateEntitiesOnCompass();
 			}
 			updateEnemiesOnCompass();
-			System.out.println("---------------------------------------------------------");
+			Logger.debug("---------------------------------------------------------");
 			updateDelay = 0;
 		}
 	}
@@ -48,7 +49,7 @@ public class Compass {
 				updateEntitiesOnCompass();
 			}
 			updateEnemiesOnCompass();
-			System.out.println("---------------------------------------------------------");
+			Logger.debug("---------------------------------------------------------");
 			updateDelay = 0;
 		}
 	}
@@ -61,7 +62,7 @@ public class Compass {
 			}
 		}
 		for (int i = 0; i < enemies.size(); i++) {
-			System.out.println("Enemy [" + i + "] is within 50 units from the player. Updating positiong on the compass." + enemies.get(i).getType().name());
+			Logger.debug("Enemy [" + i + "] is within 50 units from the player. Updating positiong on the compass." + enemies.get(i).getType().name());
 		}
 		enemies.clear();
 	}
@@ -74,7 +75,7 @@ public class Compass {
 			}
 		}
 		for (int i = 0; i < entities.size(); i++) {
-			System.out.println("Entity [" + i + "] is within 50 units from the player. Updating positiong on the compass. " + entities.get(i).getType().name());
+			Logger.debug("Entity [" + i + "] is within 50 units from the player. Updating positiong on the compass. " + entities.get(i).getType().name());
 		}
 		entities.clear();
 	}

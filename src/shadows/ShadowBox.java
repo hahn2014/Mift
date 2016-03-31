@@ -7,6 +7,7 @@ import org.lwjgl.util.vector.Vector4f;
 
 import entities.Camera;
 import entities.OverheadCamera;
+import renderEngine.DisplayManager;
 import renderEngine.MasterRenderer;
 
 public class ShadowBox {
@@ -25,17 +26,15 @@ public class ShadowBox {
 
 	private float farHeight, farWidth, nearHeight, nearWidth;
 
-	protected ShadowBox(Matrix4f lightViewMatrix, int quality) {
+	protected ShadowBox(Matrix4f lightViewMatrix) {
 		this.lightViewMatrix = lightViewMatrix;
 		calculateWidthsAndHeights();
-		setQuality(quality);
+		setQuality();
 	}
 	
-	private void setQuality(int quality) {
-		if (quality >= 1 && quality <= 4) {
-			SHADOW_DISTANCE = 50 * quality;
-		} else {
-			setQuality(1);
+	private void setQuality() {
+		if (DisplayManager.cg_quality >= 1 && DisplayManager.cg_quality <= 4) {
+			SHADOW_DISTANCE = 50 * DisplayManager.cg_quality;
 		}
 	}
 

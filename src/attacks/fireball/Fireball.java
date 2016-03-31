@@ -22,8 +22,8 @@ public class Fireball {
 	public Fireball(Vector3f pos) {
 		this.isRenderable = true;
 		this.currentPosition = pos;
-		this.model = new TexturedModel(OBJFileLoader.loadOBJ("sphere", Mift.getLoader()),
-				new ModelTexture(Mift.getLoader().loadTexture("sphere")));
+		this.model = new TexturedModel(OBJFileLoader.loadOBJ("sphere", Mift.loader),
+				new ModelTexture(Mift.loader.loadTexture("sphere")));
 	}
 	
 	public void update() {

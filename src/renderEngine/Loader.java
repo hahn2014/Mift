@@ -26,6 +26,7 @@ import org.newdawn.slick.opengl.TextureLoader;
 import textures.TextureData;
 import de.matthiasmann.twl.utils.PNGDecoder;
 import de.matthiasmann.twl.utils.PNGDecoder.Format;
+import io.Logger;
 
 public class Loader {
 
@@ -106,20 +107,20 @@ public class Loader {
 			GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
 			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
 
-			if (DisplayManager.anisotropicFiltering == true) {
+			if (DisplayManager.cg_anisotropic_filtering == true) {
 				if (GLContext.getCapabilities().GL_EXT_texture_filter_anisotropic) {
 					GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL14.GL_TEXTURE_LOD_BIAS, 0f);
 					float amount = Math.min(2f * quality, GL11.glGetFloat(EXTTextureFilterAnisotropic.GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT));
 					GL11.glTexParameterf(GL11.GL_TEXTURE_2D, EXTTextureFilterAnisotropic.GL_TEXTURE_MAX_ANISOTROPY_EXT, amount);
 				} else {
-					System.out.println("System does not support Anisotropic Filtering, we will disable it");
-					DisplayManager.anisotropicFiltering = false;
+					Logger.error("System does not support Anisotropic Filtering, we will disable it");
+					DisplayManager.cg_anisotropic_filtering = false;
 					GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL14.GL_TEXTURE_LOD_BIAS, -0.4f);
 				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.err.println("Failed to load texture " + fileName + ".png");
+			Logger.error("Failed to load texture " + fileName + ".png");
 			System.exit(-1);
 		}
 		textures.add(texture.getTextureID());
@@ -135,7 +136,7 @@ public class Loader {
 			GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL14.GL_TEXTURE_LOD_BIAS, -0.4f);
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.err.println("Failed to load texture " + fileName + ".png");
+			Logger.error("Failed to load texture " + fileName + ".png");
 			System.exit(-1);
 		}
 		textures.add(texture.getTextureID());
@@ -151,7 +152,7 @@ public class Loader {
 			GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL14.GL_TEXTURE_LOD_BIAS, 0);
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.err.println("Failed to load texture " + fileName + ".png");
+			Logger.error("Failed to load texture " + fileName + ".png");
 			System.exit(-1);
 		}
 		textures.add(texture.getTextureID());
@@ -204,7 +205,7 @@ public class Loader {
 			in.close();
 		} catch (Exception e) {
 			e.printStackTrace();
-			System.err.println("Tried to load texture " + fileName + ", didn't work");
+			Logger.error("Tried to load texture " + fileName + ", didn't work");
 			System.exit(-1);
 		}
 		return new TextureData(buffer, width, height);

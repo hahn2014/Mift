@@ -10,7 +10,7 @@ import entities.EntityCreator;
 import entities.MoveType.move_factor;
 import main.Mift;
 import models.RawModel;
-import renderEngine.Loader;
+import renderEngine.DisplayManager;
 import textures.TerrainTexture;
 import textures.TerrainTexturePack;
 import toolbox.Maths;
@@ -19,20 +19,19 @@ public class Terrain {
 
 	public static final float SIZE = 1000;
 
-	private float x;
-	private float z;
+	private static float x;
+	private static float z;
 	private RawModel model;
 	private TerrainTexturePack texturePack;
 	private TerrainTexture blendMap;
-
-	private float[][] heights;
-
-	public Terrain(int gridX, int gridZ, Loader loader, TerrainTexturePack texturePack, TerrainTexture blendMap) {
+	private static float[][] heights;
+	
+	public Terrain(int gridX, int gridZ, TerrainTexturePack texturePack, TerrainTexture blendMap) {
 		this.texturePack = texturePack;
 		this.blendMap = blendMap;
-		this.x = gridX * SIZE;
-		this.z = gridZ * SIZE;
-		this.model = generateTerrain(loader);
+		x = gridX * SIZE;
+		z = gridZ * SIZE;
+		this.model = generateTerrain();
 	}
 
 	public float getX() {
@@ -42,7 +41,7 @@ public class Terrain {
 	public float getZ() {
 		return z;
 	}
-
+	
 	public RawModel getModel() {
 		return model;
 	}
@@ -55,30 +54,19 @@ public class Terrain {
 		return blendMap;
 	}
 	
-	public Vector2f getGridPos(float x, float y) {
-		Vector2f gridPos = new Vector2f(0, 0);
-		
-		return gridPos;
-	}
-
 	public float getHeightOfTerrain(float worldX, float worldZ) {
-		float terrainX = worldX - this.x;
-		float terrainZ = worldZ - this.z;
-		int gridX = (int) Math.floor(terrainX / SIZE);
-		int gridZ = (int) Math.floor(terrainZ / SIZE);
-		if (gridX < 0) {
-			gridX *= -1;
-		}
-		if (gridZ < 0) {
-			gridZ *= -1;
-		}
+		float terrainX = worldX - x;
+		float terrainZ = worldZ - z;
+		float gridSquareSize = SIZE / ((float) heights.length - 1);
+		int gridX = (int) Math.floor(terrainX / gridSquareSize);
+		int gridZ = (int) Math.floor(terrainZ / gridSquareSize);
 
-		if (gridX >= heights.length - 1 || gridZ >= heights.length - 1) {
+		if (gridX >= heights.length - 1 || gridZ >= heights.length - 1 || gridX < 0 || gridZ < 0) {
 			return 0;
 		}
 
-		float xCoord = (terrainX % SIZE) / SIZE;
-		float zCoord = (terrainZ % SIZE) / SIZE;
+		float xCoord = (terrainX % gridSquareSize) / gridSquareSize;
+		float zCoord = (terrainZ % gridSquareSize) / gridSquareSize;
 		float answer;
 
 		if (xCoord <= (1 - zCoord)) {
@@ -90,24 +78,23 @@ public class Terrain {
 					new Vector3f(1, heights[gridX + 1][gridZ + 1], 1), new Vector3f(0, heights[gridX][gridZ + 1], 1),
 					new Vector2f(xCoord, zCoord));
 		}
-
 		return answer;
 	}
 	
-	public List<Entity> generateEntities(List<Terrain> terrains, List<Entity> entities) {
-		entities = new EntityCreator(terrains).generateObjects(entities, 600, this, (int)(this.x), (int)(this.z));
+	public List<Entity> generateEntities(List<Entity> entities) {
+		entities = new EntityCreator().generateObjects(entities, 600, this, (int)(x), (int)(z));
 		return entities;
 	}
 	
-	public List<Entity> generateEnemies(List<Terrain> terrains, List<Entity> entities, int game_quality) {
-		for (int i = 0; i < 50 * game_quality; i++) {
-			Mift.enemies.add(new EntityCreator(terrains).createRandomEnemyInGrid(move_factor.FACE_TOWARDS, i, this, (int)(this.x), (int)(this.z)));
+	public List<Entity> generateEnemies(move_factor factor, List<Entity> entities) {
+		for (int i = 0; i < 50 * DisplayManager.cg_quality; i++) {
+			Mift.enemies.add(new EntityCreator().createRandomEnemy(factor, i));
 			entities.add(Mift.enemies.get(i));
 		}
 		return entities;
 	}
 
-	private RawModel generateTerrain(Loader loader) {
+	private RawModel generateTerrain() {
 		HeightsGenerator generator = new HeightsGenerator();
 		
 		int VERTEX_COUNT = 128;
@@ -150,7 +137,7 @@ public class Terrain {
 				indices[pointer++] = bottomRight;
 			}
 		}
-		return loader.loadToVAO(vertices, textureCoords, normals, indices);
+		return Mift.loader.loadToVAO(vertices, textureCoords, normals, indices);
 	}
 
 	private Vector3f calculateNormal(int x, int z, HeightsGenerator generator) {

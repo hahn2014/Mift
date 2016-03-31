@@ -4,6 +4,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 import entities.EntityType.entityType;
 import entities.MoveType.move_factor;
+import main.Mift;
 import models.TexturedModel;
 import renderEngine.DisplayManager;
 import terrains.Terrain;
@@ -16,10 +17,10 @@ public class Enemy extends Entity {
 	private Terrain terrain;
 	private int id;
 	
-	public Enemy(TexturedModel model, Vector3f position, Vector3f rotation, float scale, move_factor move, Terrain terrain, int id) {
+	public Enemy(TexturedModel model, Vector3f position, Vector3f rotation, float scale, move_factor move, int id) {
 		super(model, position, rotation.getX(), rotation.getY(), rotation.getZ(), scale, entityType.ENEMY);
 		_move_factor = move;
-		this.terrain = terrain;
+		this.terrain = Mift.terrain;
 		this.id = id;
 	}
 	

@@ -5,6 +5,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.util.vector.Vector3f;
 
 import main.Mift;
+import renderEngine.DisplayManager;
 
 /**
  * Third Person Camera view.
@@ -31,11 +32,14 @@ public class Camera {
 	
 	private Player player;
 
-	public Camera(Player player) {
-		this.player = player;
+	public Camera() {
 		Mouse.setGrabbed(true);
 		maxPitch = 80;
 		minPitch = -40;
+	}
+	
+	public void setPlayer(Player player) {
+		this.player = player;
 	}
 	
 	public void move() {
@@ -75,11 +79,13 @@ public class Camera {
 				yaw = 0;
 			}
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) { //close game for now
-			Mouse.setGrabbed(false);
-			System.exit(0);
+		if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) { //pause the game / open menu
+			Mift.setPaused(true);
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_F1)) { //unlock the mouse from the screen
+		if (Keyboard.isKeyDown(Keyboard.KEY_F1)) {
+			DisplayManager.setFullscreened(!DisplayManager.cg_fullscreened);
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_F2)) { //unlock the mouse from the screen
 			Mouse.setGrabbed(false);
 		}
 	}
@@ -113,8 +119,16 @@ public class Camera {
 		return position;
 	}
 	
+	public String getPositionDebug() {
+		return "[" + (int)position.x + ", " + (int)position.y + ", " + (int)position.z + "]";
+	}
+	
 	public Vector3f getView() {
 		return new Vector3f(pitch, yaw, roll);
+	}
+	
+	public String getViewDebug() {
+		return "[" + (int)pitch + ", " + (int)yaw + ", 0]";
 	}
 
 	public float getPitch() {
@@ -139,7 +153,7 @@ public class Camera {
 		float offsetZ = (float) (horizDistance * Math.cos(Math.toRadians(theta)));
 		position.x = player.getPosition().x - offsetX;
 		position.z = player.getPosition().z - offsetZ;
-		position.y = player.getPosition().y + distanceFromPlayer + 7;
+		position.y = player.getPosition().y + distanceFromPlayer + 11;
 	}
 	
 	private float calculateHorizontalDistance() {
@@ -159,9 +173,9 @@ public class Camera {
 			distanceFromPlayer = 50;
 			player.setOverhead(true);
 			Mouse.setGrabbed(false);
-			Mift.getOverheadCamera().distanceFromPlayer = 50;
+			Mift.overheadCamera.distanceFromPlayer = 50;
 		}
-		Mift.updateEntities(player);
+		Mift.hidePlayerInFPS();
 	}
 
 	private void calculatePitch() {

@@ -4,23 +4,21 @@ import java.util.Random;
 
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
-import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 import attacks.Attack.AttackType;
 import attacks.AttackHolder;
 import entities.EntityType.entityType;
+import io.Logger;
 import main.Mift;
 import models.TexturedModel;
 import particles.ParticleEmitter;
 import particles.ParticleTexture;
 import renderEngine.DisplayManager;
-import renderEngine.Loader;
-import terrains.Terrain;
 
 public class Player extends Entity {
 
-	private static final float RUN_SPEED = 15.0f * 5;
+	private static final float RUN_SPEED = 15.0f;
 	private static final float MAX_RUN_TIME = 200.0f;
 	private static final float RUN_COOLDOWN = 400f;
 	private static final float GRAVITY = -50;
@@ -31,13 +29,14 @@ public class Player extends Entity {
 	private float currentRunTime = 0f;
 	private float currentRunCooldown = RUN_COOLDOWN;
 	
-	private Vector2f gridPos = new Vector2f(0, 0);
+	private float x;
+	private float z;
 
 	private boolean isInAir = false;
 	private boolean isOverhead = false;
 	private boolean isRunning = false;
 	private boolean isRunCooldown = false;
-	private boolean runInfinite = true;
+	public static boolean runInfinite = true;
 	
 	public AttackType attackType = AttackType.fireball;
 	public AttackHolder at;
@@ -46,18 +45,20 @@ public class Player extends Entity {
 	private OverheadCamera overheadCamera;
 	public ParticleEmitter particleEmitter;
 
-	public Player(Loader loader, TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
+	public Player(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
 		super(model, position, rotX, rotY, rotZ, scale, entityType.PLAYER);
 		at = Mift.attackHolder;
 		random = new Random();
 		random.setSeed(Sys.getTime());
-		ParticleTexture particleTexture = new ParticleTexture(loader.loadTexture("particles/star"), 1, false);
+		ParticleTexture particleTexture = new ParticleTexture(Mift.loader.loadTexture("particles/star"), 1, false);
 		particleEmitter = new ParticleEmitter(particleTexture, 100, 25, 0.35f, 4, 0.2f);
 	}
 
-	public void move(Terrain terrain) {
-		camera = Mift.getCamera();
-		overheadCamera = Mift.getOverheadCamera();
+	public void move() {
+		camera = Mift.camera;
+		overheadCamera = Mift.overheadCamera;
+		this.x = super.getPosition().getX();
+		this.z = super.getPosition().getZ();
 		checkInputs();
 		if (isRunCooldown) {
 			checkRunCooldown();
@@ -68,15 +69,15 @@ public class Player extends Entity {
 		upwardsSpeed += GRAVITY * DisplayManager.getFrameTimeSeconds();
 		super.increasePosition(dx, upwardsSpeed * DisplayManager.getFrameTimeSeconds(), dz);
 		
-		float terrainHeight = terrain.getHeightOfTerrain(super.getPosition().getX(), super.getPosition().getZ());
-
-		if (super.getPosition().y < terrainHeight) {
+		float terrainHeight = Mift.terrain.getHeightOfTerrain(x, z);
+		
+		if (super.getPosition().getY() < terrainHeight) {
 			upwardsSpeed = 0;
-			super.getPosition().y = terrainHeight;
+			super.getPosition().setY(terrainHeight);
 			isInAir = false;
 		}
 	}
-
+	
 	private void jump() {
 		if (!isInAir) {
 			this.upwardsSpeed = JUMP_POWER;
@@ -158,19 +159,15 @@ public class Player extends Entity {
 				if (isOverhead == true) {
 					if (Keyboard.getEventKey() == Keyboard.KEY_1) {
 				    	//go back one model place
-				    	System.out.println("called 1");
 						overheadCamera.placerType = overheadCamera.getETH().rotateReverse(overheadCamera.placerType);
 					} else if (Keyboard.getEventKey() == Keyboard.KEY_2) {
 						//go forward one model place
-				    	System.out.println("called 2");
 				    	overheadCamera.placerType = overheadCamera.getETH().rotate(overheadCamera.placerType);
 					} else if (Keyboard.getEventKey() == Keyboard.KEY_3) {
 						//go back one move type place
-				    	System.out.println("called 3");
 				    	overheadCamera.move_type = overheadCamera.getMTH().rotateReverse(overheadCamera.move_type);
 					} else if (Keyboard.getEventKey() == Keyboard.KEY_4) {
 						//go forward one move type place
-				    	System.out.println("called 4");
 				    	overheadCamera.move_type = overheadCamera.getMTH().rotate(overheadCamera.move_type);
 					}
 				}
@@ -186,10 +183,10 @@ public class Player extends Entity {
 					if (Keyboard.getEventKey() == Keyboard.KEY_RETURN) {
 						if (attackType == AttackType.fireball) {
 							Mift.fireballHolder.createFireball(super.getPosition());
-							System.out.println("Firing a fireball!");
+							Logger.debug("Firing a fireball!");
 						} else if (attackType == AttackType.waterball) {
 							Mift.waterballHolder.createWaterball(super.getPosition());
-							System.out.println("Firing a waterball!");
+							Logger.debug("Firing a waterball!");
 						}
 					}
 				}
@@ -203,9 +200,5 @@ public class Player extends Entity {
 
 	public void setOverhead(boolean overhead) {
 		this.isOverhead = overhead;
-	}
-	
-	public Vector2f getGridPos() {
-		return gridPos;
 	}
 }

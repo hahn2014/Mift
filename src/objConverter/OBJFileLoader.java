@@ -11,6 +11,7 @@ import java.util.List;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
+import io.Logger;
 import models.RawModel;
 import renderEngine.Loader;
 
@@ -25,7 +26,7 @@ public class OBJFileLoader {
 		try {
 			isr = new FileReader(objFile);
 		} catch (FileNotFoundException e) {
-			System.err.println("File not found in res; don't use any extention");
+			Logger.error("File not found in res; don't use any extention");
 		}
 		BufferedReader reader = new BufferedReader(isr);
 		String line;
@@ -70,7 +71,7 @@ public class OBJFileLoader {
 			}
 			reader.close();
 		} catch (IOException e) {
-			System.err.println("Error reading the file");
+			Logger.error("Error reading the file");
 		}
 		removeUnusedVertices(vertices);
 		float[] verticesArray = new float[vertices.size() * 3];

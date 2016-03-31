@@ -5,7 +5,7 @@ import java.io.File;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
-import fontRender.Text;
+import fontRender.TextRenderer;
 import main.Mift;
 
 public class GUIText {
@@ -26,34 +26,40 @@ public class GUIText {
 	private Vector2f position;
 	private float lineMaxSize;
 	private int numberOfLines;
+	
+	private boolean renderable = true;
 
-	private FontType font;
+	private static FontType font;
 
 	private ALIGNMENT alignment = ALIGNMENT.CENTER;
 
 	public GUIText() {
 		this.textString = "";
 		this.fontSize = 1.0f;
-		this.font = new FontType(Mift.getLoader().loadFontTexture("sans"), new File("res/fonts/sans.fnt"));
+		font = new FontType(Mift.loader.loadFontTexture("sans"), new File("res/fonts/sans.fnt"));
 		this.position = new Vector2f(0.0f, 0.0f);
 		this.lineMaxSize = 1.0f;
 		this.alignment = ALIGNMENT.CENTER;
+		prepText();
 	}
 	
-	public GUIText(String text, float fontSize, FontType font, Vector2f position, float maxLineLength,
+	public GUIText(TextRenderer textRenderer, String text, float fontSize, FontType Font, Vector2f position, float maxLineLength,
 			ALIGNMENT align) {
 		this.textString = text;
 		this.fontSize = fontSize;
-		this.font = font;
+		font = Font;
 		this.position = position;
 		this.lineMaxSize = maxLineLength;
 		this.alignment = align;
-		// load text
-		Text.loadText(this);
+		prepText();
 	}
-
-	public void remove() {
-		Text.removeText(this);
+	
+	public boolean isRenderable() {
+		return renderable;
+	}
+	
+	public void setRenderable(boolean renderable) {
+		this.renderable = renderable;
 	}
 
 	public FontType getFont() {
@@ -82,15 +88,20 @@ public class GUIText {
 		}
 		color.set((float)r / 255.0f, (float)g / 255.0f, (float)b / 255.0f);
 	}
-
+	
+	private void prepText() {
+		TextData data = font.loadText(this);
+		int vao = Mift.loader.loadToVAO(data.getVertexPositions(), data.getTextureCoords());
+		setMeshInfo(vao, data.getVertexCount());
+	}
+	
 	public Vector3f getColor() {
 		return color;
 	}
 	
 	public void setText(String text) {
 		this.textString = text;
-		Text.removeText(this);
-		Text.loadText(this);
+		prepText();
 	}
 
 	public int getNumberOfLines() {

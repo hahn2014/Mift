@@ -17,8 +17,8 @@ uniform vec3 lightColour;
 uniform float moveFactor;
 
 const float waveStrength = 0.04;
-const float shineDamper = 20.0;
-const float reflectivity = 0.5;
+const float shineDamper = 15.0;
+const float reflectivity = 0.6;
 
 void main(void) {
 

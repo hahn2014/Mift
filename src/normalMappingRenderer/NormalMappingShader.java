@@ -102,7 +102,7 @@ public class NormalMappingShader extends ShaderProgram {
 		for (int i = 0; i < MAX_LIGHTS; i++) {
 			if (i < lights.size()) {
 				super.load3DVector(location_lightPositionEyeSpace[i], getEyeSpacePosition(lights.get(i), viewMatrix));
-				super.load3DVector(location_lightColour[i], lights.get(i).getColour());
+				super.load3DVector(location_lightColour[i], lights.get(i).getColor());
 				super.load3DVector(location_attenuation[i], lights.get(i).getAttenuation());
 			} else {
 				super.load3DVector(location_lightPositionEyeSpace[i], new Vector3f(0, 0, 0));

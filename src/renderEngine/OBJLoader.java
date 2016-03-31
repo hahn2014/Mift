@@ -7,19 +7,21 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
 
-import models.RawModel;
-
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
+import io.Logger;
+import main.Mift;
+import models.RawModel;
+
 public class OBJLoader {
 
-	public static RawModel loadObjModel(String fileName, Loader loader) {
+	public static RawModel loadObjModel(String fileName) {
 		FileReader fr = null;
 		try {
 			fr = new FileReader(new File("res/" + fileName + ".obj"));
 		} catch (FileNotFoundException e) {
-			System.err.println("Couldn't load file!");
+			Logger.error("Couldn't load file!");
 			e.printStackTrace();
 		}
 		BufferedReader reader = new BufferedReader(fr);
@@ -88,7 +90,7 @@ public class OBJLoader {
 		for (int i = 0; i < indices.size(); i++) {
 			indicesArray[i] = indices.get(i);
 		}
-		return loader.loadToVAO(verticesArray, textureArray, normalsArray, indicesArray);
+		return Mift.loader.loadToVAO(verticesArray, textureArray, normalsArray, indicesArray);
 
 	}
 

@@ -5,31 +5,24 @@ import java.io.File;
 import main.Mift;
 
 public class FontHolder {
-	private static FontType arial;
-	private static FontType berlinSans;
-	private static FontType candara;
-	private static FontType segoe;
+	private static FontType arial = new FontType(Mift.loader.loadFontTexture("arial"), new File("res/fonts/arial.fnt"));
+	private static FontType berlinSans = new FontType(Mift.loader.loadFontTexture("berlinSans"), new File("res/fonts/berlinSans.fnt"));
+	private static FontType candara = new FontType(Mift.loader.loadFontTexture("candara"), new File("res/fonts/candara.fnt"));
+	private static FontType segoe = new FontType(Mift.loader.loadFontTexture("segoe"), new File("res/fonts/segoe.fnt"));
 	
-	public FontHolder() {
-		arial = new FontType(Mift.getLoader().loadFontTexture("arial"), new File("res/fonts/arial.fnt"));
-		berlinSans = new FontType(Mift.getLoader().loadFontTexture("berlinSans"), new File("res/fonts/berlinSans.fnt"));
-		candara = new FontType(Mift.getLoader().loadFontTexture("candara"), new File("res/fonts/candara.fnt"));
-		segoe = new FontType(Mift.getLoader().loadFontTexture("segoe"), new File("res/fonts/segoe.fnt"));
-	}
-
-	public FontType getSegoe() {
+	public static FontType getSegoe() {
 		return segoe;
 	}
 
-	public FontType getArial() {
+	public static FontType getArial() {
 		return arial;
 	}
 
-	public FontType getBerlinSans() {
+	public static FontType getBerlinSans() {
 		return berlinSans;
 	}
 
-	public FontType getCandara() {
+	public static FontType getCandara() {
 		return candara;
 	}
 }

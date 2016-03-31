@@ -1,8 +1,5 @@
 package fontRender;
 
-import java.util.List;
-import java.util.Map;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
@@ -19,22 +16,14 @@ public class FontRenderer {
 		shader = new FontShader();
 	}
 	
-	/**
-	 * Only to be accessed within the Text class,
-	 * this method will take in the GUIText objects
-	 * that are queued to be rendered.
-	 * @param texts
-	 */
-	public void render(Map<FontType, List<GUIText>> texts) {
-		prepare();
-		for (FontType font : texts.keySet()) {
+	public void render(FontType font, GUIText text) {
+		if (text.isRenderable()) {
+			prepare();
 			GL13.glActiveTexture(GL13.GL_TEXTURE0);
 			GL11.glBindTexture(GL11.GL_TEXTURE_2D, font.getTextureAtlas());
-			for (GUIText text : texts.get(font)) {
-				renderText(text);
-			}
+			renderText(text);
+			endRendering();
 		}
-		endRendering();
 	}
 
 	/**
@@ -75,7 +64,7 @@ public class FontRenderer {
 		//allows to change location mid render
 		shader.loadTranslation(text.getPosition());
 		//draw the vertices to the screen,
-		//in a fuck ton of triangles
+		//in a ton of triangles
 		GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, text.getVertexCount());
 		//clear up and disable both allocated 
 		//system memory slots to be used elsewhere

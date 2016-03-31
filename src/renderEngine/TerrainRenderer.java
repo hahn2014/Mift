@@ -1,7 +1,5 @@
 package renderEngine;
 
-import java.util.List;
-
 import models.RawModel;
 
 import org.lwjgl.opengl.GL11;
@@ -28,14 +26,16 @@ public class TerrainRenderer {
 		shader.stop();
 	}
 
-	public void render(List<Terrain> terrains, Matrix4f toShadowSpace) {
+	public void render(Terrain terrain, Matrix4f toShadowSpace) {
 		shader.loadToShadowSpaceMatrix(toShadowSpace);
-		for (Terrain terrain : terrains) {
-			prepareTerrain(terrain);
-			loadModelMatrix(terrain);
+		prepareTerrain(terrain);
+		loadModelMatrix(terrain);
+		if (DisplayManager.cg_debug_polygons) {
+			GL11.glDrawElements(GL11.GL_LINE_STRIP, terrain.getModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
+		} else {
 			GL11.glDrawElements(GL11.GL_TRIANGLES, terrain.getModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
-			unbindTexturedModel();
 		}
+		unbindTexturedModel();
 	}
 
 	private void prepareTerrain(Terrain terrain) {
@@ -71,7 +71,7 @@ public class TerrainRenderer {
 
 	private void loadModelMatrix(Terrain terrain) {
 		Matrix4f transformationMatrix = Maths
-				.createTransformationMatrix(new Vector3f(terrain.getX(), 0, terrain.getZ()), 0, 0, 0, 1);
+				.createTransformationMatrix(new Vector3f(0, 0, 0), 0, 0, 0, 1);
 		shader.loadTransformationMatrix(transformationMatrix);
 	}
 }

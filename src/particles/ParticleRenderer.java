@@ -54,9 +54,9 @@ public class ParticleRenderer {
 	protected void render(Map<ParticleTexture, List<Particle>> particles, boolean isOverhead) {
 		Matrix4f viewMatrix = new Matrix4f();
 		if (isOverhead == true) {
-			viewMatrix = Maths.createViewMatrix(Mift.getOverheadCamera());
+			viewMatrix = Maths.createViewMatrix(Mift.overheadCamera);
 		} else {
-			viewMatrix = Maths.createViewMatrix(Mift.getCamera());
+			viewMatrix = Maths.createViewMatrix(Mift.camera);
 		}
 		prepare();
 		for (ParticleTexture texture : particles.keySet()) {

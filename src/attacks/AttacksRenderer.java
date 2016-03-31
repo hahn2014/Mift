@@ -8,11 +8,10 @@ import attacks.fireball.Fireball;
 import attacks.fireball.FireballRenderer;
 import attacks.waterball.Waterball;
 import main.Mift;
-import renderEngine.MasterRenderer;
 
 public class AttacksRenderer {
 	private AttackShader shader =  new AttackShader();
-	Matrix4f projectionMatrix = MasterRenderer.getProjectionMatrix();
+	Matrix4f projectionMatrix = Mift.renderer.getProjectionMatrix();
 	FireballRenderer fireRender = new FireballRenderer(shader);
 
 	public AttacksRenderer() {

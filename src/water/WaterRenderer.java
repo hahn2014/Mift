@@ -1,7 +1,5 @@
 package water;
 
-import java.util.List;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
@@ -15,7 +13,6 @@ import entities.OverheadCamera;
 import main.Mift;
 import models.RawModel;
 import renderEngine.DisplayManager;
-import renderEngine.Loader;
 import toolbox.Maths;
 
 public class WaterRenderer {
@@ -36,34 +33,34 @@ public class WaterRenderer {
 	public WaterRenderer(WaterShader shader, Matrix4f projectionMatrix, WaterFrameBuffers fbos) {
 		this.shader = shader;
 		this.fbos = fbos;
-		dudvTexture = Mift.getLoader().loadTexture(DUDV_MAP);
-		normalMap = Mift.getLoader().loadTexture(NORMAL_MAP);
+		dudvTexture = Mift.loader.loadTexture(DUDV_MAP);
+		normalMap = Mift.loader.loadTexture(NORMAL_MAP);
 		shader.start();
 		shader.connectTextureUnits();
 		shader.loadProjectionMatrix(projectionMatrix);
 		shader.stop();
-		setUpVAO(Mift.getLoader());
+		setUpVAO();
 	}
 	
-	public void render(List<WaterTile> water, Camera camera, Light sun) {
+	public void render(WaterTile water, Camera camera, Light sun) {
 		prepareRender(camera, sun);
-		for (WaterTile tile : water) {
-			Matrix4f modelMatrix = Maths.createTransformationMatrix(
-					new Vector3f(tile.getX(), WaterTile.height, tile.getZ()), 0, 0, 0, WaterTile.SIZE);
-			shader.loadModelMatrix(modelMatrix);
+		Matrix4f modelMatrix = Maths.createTransformationMatrix(
+				new Vector3f(water.getX(), WaterTile.height, water.getZ()), 0, 0, 0, WaterTile.SIZE);
+		shader.loadModelMatrix(modelMatrix);
+		if (DisplayManager.cg_debug_polygons) {
+			GL11.glDrawArrays(GL11.GL_LINE_STRIP, 0, quad.getVertexCount());
+		} else {
 			GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, quad.getVertexCount());
 		}
 		unbind();
 	}
 	
-	public void render(List<WaterTile> water, OverheadCamera camera, Light sun) {
+	public void render(WaterTile water, OverheadCamera camera, Light sun) {
 		prepareRender(camera, sun);
-		for (WaterTile tile : water) {
-			Matrix4f modelMatrix = Maths.createTransformationMatrix(
-					new Vector3f(tile.getX(), WaterTile.height, tile.getZ()), 0, 0, 0, WaterTile.SIZE);
-			shader.loadModelMatrix(modelMatrix);
-			GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, quad.getVertexCount());
-		}
+		Matrix4f modelMatrix = Maths.createTransformationMatrix(
+				new Vector3f(water.getX(), WaterTile.height, water.getZ()), 0, 0, 0, WaterTile.SIZE);
+		shader.loadModelMatrix(modelMatrix);
+		GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, quad.getVertexCount());
 		unbind();
 	}
 
@@ -120,9 +117,9 @@ public class WaterRenderer {
 		shader.stop();
 	}
 
-	private void setUpVAO(Loader loader) {
+	private void setUpVAO() {
 		// Just x and z vertex positions here, y is set to 0 in v.shader
 		float[] vertices = { -1, -1, -1, 1, 1, -1, 1, -1, -1, 1, 1, 1 };
-		quad = loader.loadToVAO(vertices, 2);
+		quad = Mift.loader.loadToVAO(vertices, 2);
 	}
 }

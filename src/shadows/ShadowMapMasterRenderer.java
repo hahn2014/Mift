@@ -13,6 +13,7 @@ import entities.Entity;
 import entities.Light;
 import entities.OverheadCamera;
 import models.TexturedModel;
+import renderEngine.DisplayManager;
 
 public class ShadowMapMasterRenderer {
 
@@ -28,19 +29,17 @@ public class ShadowMapMasterRenderer {
 
 	private ShadowMapEntityRenderer entityRenderer;
 
-	public ShadowMapMasterRenderer(int quality) {
+	public ShadowMapMasterRenderer() {
 		shader = new ShadowShader();
-		shadowBox = new ShadowBox(lightViewMatrix, quality);
-		setQuality(quality);
+		shadowBox = new ShadowBox(lightViewMatrix);
+		setQuality();
 		shadowFbo = new ShadowFrameBuffer(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE);
 		entityRenderer = new ShadowMapEntityRenderer(shader, projectionViewMatrix);
 	}
 	
-	private void setQuality(int quality) {
-		if (quality >= 1 && quality <= 4) {
-			SHADOW_MAP_SIZE = 4100 * quality;
-		} else {
-			setQuality(1);
+	private void setQuality() {
+		if (DisplayManager.cg_quality >= 1 && DisplayManager.cg_quality <= 4) {
+			SHADOW_MAP_SIZE = 4100 * DisplayManager.cg_quality;
 		}
 	}
 

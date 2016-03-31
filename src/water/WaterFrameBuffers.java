@@ -8,6 +8,8 @@ import org.lwjgl.opengl.GL14;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL32;
 
+import renderEngine.DisplayManager;
+
 public class WaterFrameBuffers {
 
 	protected static int REFLECTION_WIDTH = 1280;
@@ -24,8 +26,8 @@ public class WaterFrameBuffers {
 	private int refractionTexture;
 	private int refractionDepthTexture;
 
-	public WaterFrameBuffers(int quality) {// call when loading the game, takes in a number 1-4 for quality
-		getWaterQuality(quality);
+	public WaterFrameBuffers() {// call when loading the game, takes in a number 1-4 for quality
+		getWaterQuality();
 		initialiseReflectionFrameBuffer();
 		initialiseRefractionFrameBuffer();
 	}
@@ -39,33 +41,31 @@ public class WaterFrameBuffers {
 		GL11.glDeleteTextures(refractionDepthTexture);
 	}
 	
-	private void getWaterQuality(int quality) {
-		if (quality == 1) {
+	private void getWaterQuality() {
+		if (DisplayManager.cg_quality == 1) {
 			REFLECTION_WIDTH = 426;
 			REFLECTION_HEIGHT = 240;
 			
 			REFRACTION_WIDTH = 426;
 			REFRACTION_HEIGHT = 240;
-		} else if (quality == 2) {
+		} else if (DisplayManager.cg_quality == 2) {
 			REFLECTION_WIDTH = 480;
 			REFLECTION_HEIGHT = 360;
 			
 			REFRACTION_WIDTH = 480;
 			REFRACTION_HEIGHT = 360;
-		} else if (quality == 3) {
+		} else if (DisplayManager.cg_quality == 3) {
 			REFLECTION_WIDTH = 1280;
 			REFLECTION_HEIGHT = 720;
 			
 			REFRACTION_WIDTH = 1280;
 			REFRACTION_HEIGHT = 720;
-		} else if (quality == 4) {
+		} else if (DisplayManager.cg_quality == 4) {
 			REFLECTION_WIDTH = 1920;
 			REFLECTION_HEIGHT = 1080;
 			
 			REFRACTION_WIDTH = 1920;
 			REFRACTION_HEIGHT = 1080;
-		} else { //unknown number, just use default quality
-			getWaterQuality(1);
 		}
 	}
 

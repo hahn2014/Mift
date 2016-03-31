@@ -107,7 +107,7 @@ public class TerrainShader extends ShaderProgram {
 		for (int i = 0; i < MAX_LIGHTS; i++) {
 			if (i < lights.size()) {
 				super.load3DVector(location_lightPosition[i], lights.get(i).getPosition());
-				super.load3DVector(location_lightColour[i], lights.get(i).getColour());
+				super.load3DVector(location_lightColour[i], lights.get(i).getColor());
 				super.load3DVector(location_attenuation[i], lights.get(i).getAttenuation());
 			} else {
 				super.load3DVector(location_lightPosition[i], new Vector3f(0, 0, 0));

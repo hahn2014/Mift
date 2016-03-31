@@ -50,6 +50,10 @@ public class Maths {
 		return viewMatrix;
 	}
 	
+	public static float normalize(float val) {
+		return (val - Math.min(val, 1) / Math.max(val, 1) - Math.min(val, 1));
+	}
+	
 	public static Matrix4f createViewMatrix(OverheadCamera camera) {
 		Matrix4f viewMatrix = new Matrix4f();
 		viewMatrix.setIdentity();
@@ -119,5 +123,15 @@ public class Maths {
 			return false;
 		}
 		return true;
+	}
+	
+	public static boolean intToBoolean(int value) {
+		if (value == 0) {
+			return false;
+		} else if (value == 1) {
+			return true;
+		} else {
+			return false;
+		}
 	}
 }
