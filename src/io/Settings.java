@@ -32,7 +32,7 @@ public class Settings {
 		BufferedWriter bw = null;
 		try {
 			bw = new BufferedWriter(new FileWriter(settingsFile));
-			bw.write(new String("cg_developer 1;cg_fullscreened 1;cg_animate_day 1;cg_debug_polygons 0;cg_anisotropic_filtering 1;cg_antialiasing_filtering 1;player_sprint_unlimited 0;"));
+			bw.write(new String("cg_developer 1;cg_fullscreened 1;cg_animate_day 1;cg_debug_polygons 0;cg_anisotropic_filtering 1;cg_antialiasing_filtering 1;player_sprint_unlimited 0;cg_quality 1;cp_myo_enabled 0"));
 			bw.newLine();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -127,6 +127,9 @@ public class Settings {
 		} else if (variable.equalsIgnoreCase("cg_quality")) {
 			DisplayManager.cg_quality = value;
 			Logger.debug(variable + " has been set to " + value);
+		} else if (variable.equalsIgnoreCase("cp_myo_enabled")) {
+			DisplayManager.myo_use = Maths.intToBoolean(value);
+			Logger.debug(variable + " has been set to " + Maths.intToBoolean(value));
 		} else {
 			Logger.error("Could not find variable " + variable + " with value " + value);
 		}

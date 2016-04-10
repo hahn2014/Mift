@@ -30,6 +30,7 @@ import guis.GuiRenderer;
 import guis.GuiTexture;
 import guis.menu.MenuRenderer;
 import io.Settings;
+import myo.MyoSetup;
 import particles.ParticleEmitter;
 import renderEngine.DisplayManager;
 import renderEngine.Loader;
@@ -46,13 +47,13 @@ import water.WaterTile;
 /**
  * Already surpassed 10k lines of
  * cumulative code! Keep up the
- * good work - Mift Build 54
+ * good work - Mift Build 56
  * 
  * @author Bryce Hahn, Mason Cluff
  * @since 1.0 - 06/12/2015
  */
 public class Mift {
-	public static final String BUILD = "54";
+	public static final String BUILD = "56";
 	public static final String RELEASE = "1";
 	public static final String RELEASE_TITLE = "Alpha";
 	public static final String NAME = "Mift";
@@ -97,6 +98,9 @@ public class Mift {
 		DisplayManager.createDisplay();
 		settings = new Settings();
 		new Initialize(args);
+
+		MyoSetup.init(DisplayManager.myo_use);
+		
 		//init main objects
 		FPSCounter fpsCounter = new FPSCounter();
 		entityTypeHolder = new EntityTypeHolder();
@@ -107,24 +111,22 @@ public class Mift {
 		textRenderer = new TextRenderer();
 		
 		// ******************* LIGHT SETUP ***************
-
 		List<Light> lights = new ArrayList<Light>();
 		sunLight = new Sun(new Vector3f(Terrain.SIZE, 50, Terrain.SIZE / 2), 203, 133, 173, 1.0f); //about 12:00am
 		Mift.instance_count++;
 		lights.add(sunLight);
+		
 		// ******************* PLAYER SETUP ***************
 		camera = new Camera();
 		overheadCamera = new OverheadCamera();
 		renderer = new MasterRenderer();
 		
 		// ******************* EXTRAS ****************
-		
 		GuiRenderer guiRenderer = new GuiRenderer();
 		defaultMouse = new MousePicker(camera, renderer.getProjectionMatrix());
 		overheadMouse = new MousePicker(overheadCamera, renderer.getProjectionMatrix());
 		
 		// ********** Water Renderer Top Side ************************
-
 		WaterFrameBuffers topBuffers = new WaterFrameBuffers();
 		WaterShader waterShaderTop = new WaterShader();
 		WaterRenderer topWaterRenderer = new WaterRenderer(waterShaderTop, renderer.getProjectionMatrix(), topBuffers);
@@ -134,8 +136,7 @@ public class Mift {
 		Display.setTitle(NAME + " Release " + RELEASE + " b" + BUILD);
 		
 		// **************** Text Rendering *********************
-		
-		texts.add(new GUIText(textRenderer, Mift.NAME + " Alpha Build " + Mift.RELEASE + "." + Mift.BUILD, 1.25f, FontHolder.getBerlinSans(), new Vector2f(0, 0), 0.25f, ALIGNMENT.LEFT));
+		texts.add(new GUIText(textRenderer, "", 1.25f, FontHolder.getBerlinSans(), new Vector2f(0, 0), 0.25f, ALIGNMENT.LEFT));
 			texts.get(0).setColor(255, 255, 255);
 		texts.add(new GUIText(textRenderer, "", 2.0f, FontHolder.getCandara(), new Vector2f(0.85f, 0.0f), 0.25f, ALIGNMENT.CENTER));
 			texts.get(1).setColor(255, 223, 0);
@@ -164,15 +165,16 @@ public class Mift {
 		// **************** HUD *********************************
 //		HUDRenderer hudRenderer = new HUDRenderer();
 //		hudCreator = new HUDCreator(loader, false);
-		
 		MenuRenderer pauseRenderer = new MenuRenderer();
 		
 		// **************** Game Loop Below *********************
-
 		while (!Display.isCloseRequested()) {
 			if (isPaused) { //render pause
 				pauseRenderer.update();
 			} else { //render in game
+				if (DisplayManager.myo_use) {
+					MyoSetup.update((int)DisplayManager.getFrameTimeSeconds());
+				}
 				player.move();
 				sunLight.move();
 				SkyboxRenderer.move();
@@ -195,6 +197,7 @@ public class Mift {
 				guiRenderer.render(guiTextures);
 //				hudRenderer.render(hudCreator.getTextures(), hudCreator.getCompass());
 				fpsCounter.updateCounter();
+				texts.get(0).setText(Mift.NAME + " Alpha Build " + Mift.RELEASE + "." + Mift.BUILD);
 				texts.get(1).setText((int) (fpsCounter.getFPS()) + "");
 				texts.get(2).setText(DisplayManager.cg_developer_status ? updateDebugText(player) : "");
 				texts.get(3).setText(player.isOverhead() ? updateModelPlacerText(entityTypeHolder, moveTypeHolder, player) : "");
@@ -206,10 +209,10 @@ public class Mift {
 				}
 			}
 			DisplayManager.updateDisplay();
+			
 		}
 
 		// ********* Clean Up Below **************
-		
 		//ParticleHolder.cleanUp();
 		textRenderer.cleanUp();
 		topBuffers.cleanUp();
@@ -295,8 +298,8 @@ public class Mift {
 		if (paused) {
 			//dissable all texts then re-enable
 			textsDissabled = true;
-			for (GUIText text : texts) {
-				text.setRenderable(false);
+			for (int i = 0; i < texts.size(); i++) {
+				texts.get(i).setRenderable(false);
 			}
 		} else {
 			isPaused = false;
@@ -304,8 +307,8 @@ public class Mift {
 	}
 	
 	private static void enableAllTexts(boolean pause) {
-		for (GUIText text : texts) {
-			text.setRenderable(true);
+		for (int i = 0; i < texts.size(); i++) {
+			texts.get(i).setRenderable(true);
 		}
 		textsDissabled = false;
 		isPaused = pause;

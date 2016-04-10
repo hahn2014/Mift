@@ -18,13 +18,14 @@ public class DisplayManager {
 	private static int HEIGHT = 1080;
 	private static final double FPS_CAP = 59.999998;
 	
-	public static boolean cg_fullscreened = true;
+	public static boolean cg_fullscreened = false;
 	public static boolean cg_anisotropic_filtering = false;
 	public static boolean cg_antialiasing_filtering = false;
 	public static boolean cg_debug_polygons = false;
 	public static boolean cg_developer_status = false;
 	public static boolean cs_windowsSystem = true;
-	public static int cg_quality = 1;
+	public static boolean myo_use = false;
+	public static int cg_quality = 2;
 
 	private static long lastFrameTime;
 	private static float delta;

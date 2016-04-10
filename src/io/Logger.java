@@ -10,6 +10,10 @@ public class Logger {
 		}
 	}
 	
+	public static void warn(String msg) {
+		System.out.println("[WARN] " + msg);
+	}
+	
 	public static void info(String message) {
 		System.out.println("[INFO] " + message);
 	}

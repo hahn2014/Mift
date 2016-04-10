@@ -33,7 +33,7 @@ public class TerrainCreator {
 		Mift.entities.clear();
 		Mift.enemies.clear();
 		Mift.entities = Mift.terrain.generateEntities(Mift.entities); //spawn the entities on it
-		Mift.entities = Mift.terrain.generateEnemies(move_factor.NOTHING, Mift.entities); // spawn the enemies on it
+		//Mift.entities = Mift.terrain.generateEnemies(move_factor.NOTHING, Mift.entities); // spawn the enemies on it
 		Mift.player = new EntityCreator().createPlayer(new Vector3f(500, Mift.terrain.getHeightOfTerrain(500,  500), 500), new Vector3f(0, 90, 0));
 		Mift.entities.add(Mift.player);
 		Mift.camera.setPlayer(Mift.player);
