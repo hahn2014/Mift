@@ -3,7 +3,6 @@ package terrains;
 import org.lwjgl.util.vector.Vector3f;
 
 import entities.EntityCreator;
-import entities.MoveType.move_factor;
 import main.Mift;
 import textures.TerrainTexture;
 import textures.TerrainTexturePack;

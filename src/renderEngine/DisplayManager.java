@@ -13,9 +13,11 @@ import io.Logger;
 import main.Mift;
 
 public class DisplayManager {
+	
+	private static final int downscale = 1;
 
-	private static int WIDTH = 1920;
-	private static int HEIGHT = 1080;
+	private static int WIDTH = 1920 / downscale;
+	private static int HEIGHT = 1080 / downscale;
 	private static final double FPS_CAP = 59.999998;
 	
 	public static boolean cg_fullscreened = false;
@@ -24,11 +26,11 @@ public class DisplayManager {
 	public static boolean cg_debug_polygons = false;
 	public static boolean cg_developer_status = false;
 	public static boolean cs_windowsSystem = true;
-	public static boolean myo_use = false;
-	public static int cg_quality = 2;
+	public static boolean myo_use = true;
+	public static int cg_quality = 1;
 
 	private static long lastFrameTime;
-	private static float delta;
+	private static float delta; // Measured in nanoseconds
 
 	public static void createDisplay() {
 		getQuality();
@@ -48,13 +50,24 @@ public class DisplayManager {
 
 		GL11.glViewport(0, 0, WIDTH, HEIGHT);
 		lastFrameTime = getCurrentTime();
+		testDelta();
+	}
+	
+	public static void testDelta() {
+		lastFrameTime = getCurrentTime();
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		Logger.info((getCurrentTime() - lastFrameTime) + "");
 	}
 
 	public static void updateDisplay() {
 		Display.sync((int) FPS_CAP);
 		Display.update();
 		long currentFrameTime = getCurrentTime();
-		delta = (currentFrameTime - lastFrameTime) / 1000f;
+		delta = (currentFrameTime - lastFrameTime);// / 1000f; // Measured in nanoseconds
 		lastFrameTime = currentFrameTime;
 	}
 
@@ -66,8 +79,12 @@ public class DisplayManager {
 		Display.destroy();
 	}
 
+	/**
+	 * Get the current system time in milliseconds
+	 * @return Current system time in milliseconds
+	 */
 	private static long getCurrentTime() {
-		return Sys.getTime() * 1000 / Sys.getTimerResolution();
+		return (Sys.getTime() * 1000) / Sys.getTimerResolution();
 	}
 	
 	public static String getRes() {

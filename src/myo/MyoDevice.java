@@ -33,6 +33,10 @@ public class MyoDevice extends AbstractDeviceListener {
 	public int getYaw() {
 		return (int) yawW;
 	}
+	
+	public PoseType getPose() {
+		return currentPose.getType();
+	}
 
 	@Override
 	public void onOrientationData(Myo myo, long timestamp, Quaternion rotation) {
@@ -126,7 +130,7 @@ public class MyoDevice extends AbstractDeviceListener {
 		return builder.toString();
 	}
 
-	private String repeatCharacter(char character, int numOfTimes) {
+	protected String repeatCharacter(char character, int numOfTimes) {
 		StringBuilder builder = new StringBuilder();
 		for (int i = 0; i < numOfTimes; i++) {
 			builder.append(character);

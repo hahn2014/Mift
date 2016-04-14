@@ -14,9 +14,9 @@ public class MyoSetup {
 		if (initialize == true) {
 			hub = new Hub("");
 			Myo myo = hub.waitForMyo(10000);
-			DisplayManager.myo_use = (myo == null);
+			DisplayManager.myo_use = (myo != null);
 			if (DisplayManager.myo_use == true) {
-				io.Logger.info("Using Myo for input");
+				Logger.info("Using Myo for input");
 			}
 			
 			myoManager = new MyoManager();
@@ -28,8 +28,7 @@ public class MyoSetup {
 		return hub;
 	}
 	
-	public static void update(int diff) {
-		hub.run(diff);
-		Logger.info(myoManager.toString());
+	public static void update(double diff) {
+		hub.run(10);
 	}
 }

@@ -65,6 +65,8 @@ public class Mift {
 	private static boolean textsDissabled = false;
 	
 	public static int instance_count = 0;
+	public static final int dayTimeMultiplier = 1;
+	
 	//camera stuff
 	public static Camera camera;
 	public static OverheadCamera overheadCamera;
@@ -173,7 +175,7 @@ public class Mift {
 				pauseRenderer.update();
 			} else { //render in game
 				if (DisplayManager.myo_use) {
-					MyoSetup.update((int)DisplayManager.getFrameTimeSeconds());
+					MyoSetup.update(DisplayManager.getFrameTimeSeconds());
 				}
 				player.move();
 				sunLight.move();

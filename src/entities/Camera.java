@@ -5,6 +5,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.util.vector.Vector3f;
 
 import main.Mift;
+import myo.MyoManager;
 import renderEngine.DisplayManager;
 
 /**
@@ -46,7 +47,7 @@ public class Camera {
 		if (Mouse.isGrabbed()) {
 			calculateZoom();
 			calculatePitch();
-			calculateAngleAroundPlayer();
+			calculateAngleAroundPlayer(Mouse.getDX());
 			horizontalDistance = calculateHorizontalDistance();
 			verticalDistance = calculateVerticalDistance();
 			calculateCameraPosition(horizontalDistance, verticalDistance);
@@ -54,31 +55,17 @@ public class Camera {
 		}
 	}
 
-	public void rotate() {
-		if (Keyboard.isKeyDown(Keyboard.KEY_DOWN)) { // look up
-			if (pitch + 0.75f <= maxPitch) {
-				pitch += 0.75f;
-			}
+	/**
+	 * I don't know why the pause menu is controlled by the Camera, but it is :D
+	 */
+	public void getKeys() {
+		if (DisplayManager.myo_use) {
+			pitch += MyoManager.getMoveMyo().getPitchDiff();
+			calculateAngleAroundPlayer((int) (MyoManager.getMoveMyo().getYawDiff() * 10));
+		} else {
+			calculateAngleAroundPlayer(Mouse.getDX());
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_UP)) { // look down
-			if (pitch - 0.75f >= minPitch) {
-				pitch -= 0.75f;
-			}
-		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_LEFT)) { // look left
-			if (yaw - 2.0f >= 0) {
-				yaw -= 2.0f;
-			} else {
-				yaw = 360;
-			}
-		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) { // look right
-			if (yaw + 2.0f <= 360) {
-				yaw += 2.0f;
-			} else {
-				yaw = 0;
-			}
-		}
+		
 		if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) { //pause the game / open menu
 			Mift.setPaused(true);
 		}
@@ -87,6 +74,9 @@ public class Camera {
 		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_F2)) { //unlock the mouse from the screen
 			Mouse.setGrabbed(false);
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_F3)) {
+			DisplayManager.closeDisplay();
 		}
 	}
 	
@@ -185,8 +175,8 @@ public class Camera {
 		}
 	}
 
-	private void calculateAngleAroundPlayer() {
-		float angleChange = Mouse.getDX() * horizontalSensitivity;
+	private void calculateAngleAroundPlayer(int diff) {
+		float angleChange = diff * horizontalSensitivity;
 		player.setRotY(player.getRotY() - angleChange);
 	}
 

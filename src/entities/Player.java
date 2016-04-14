@@ -12,9 +12,14 @@ import entities.EntityType.entityType;
 import io.Logger;
 import main.Mift;
 import models.TexturedModel;
+import myo.MoveMyo;
+import myo.MyoManager;
 import particles.ParticleEmitter;
 import particles.ParticleTexture;
 import renderEngine.DisplayManager;
+import com.thalmic.*;
+import com.thalmic.myo.Pose;
+import com.thalmic.myo.enums.PoseType;
 
 public class Player extends Entity {
 
@@ -101,7 +106,30 @@ public class Player extends Entity {
 		}
 	}
 	
+	/**
+	 * Set the current speed measured in Bryce Units
+	 * @param speed Speed
+	 */
+	public void setSpeed(int speed) {
+		this.currentSpeed = speed;
+	}
+	
+	public void updateMyo() {
+		MoveMyo myo = MyoManager.getMoveMyo();
+		if (myo.getPose() == PoseType.FIST) {
+			if (currentSpeed <= 0) {
+				currentSpeed = RUN_SPEED;
+			} else {
+				currentSpeed = 0f;
+			}
+		}
+	}
+	
 	private void checkInputs() {
+		if (DisplayManager.myo_use == true) {
+			updateMyo();
+			return;
+		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
 			if (this.isRunning == false) {
 				this.currentSpeed = RUN_SPEED; //not running

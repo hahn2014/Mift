@@ -107,7 +107,7 @@ public class MasterRenderer {
 			WaterRenderer waterRenderer, WaterTile water, List<Light> lights, List<Entity> entities,
 			List<Entity> normalMapEntities, Light sun) {
 		camera.move();
-		camera.rotate();
+		camera.getKeys();
 		camera.getClicks();
 		mouse.update(false);
 
