@@ -1,16 +1,14 @@
 package guis.menu;
 
-import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.Display;
 
 import main.Mift;
 import renderEngine.DisplayManager;
 import terrains.TerrainCreator;
 
 public class MenuController {
-	private int selected = 2;
+	private int selected = 1;
 	
 	public void checkInputs() {
 		while (Keyboard.next()) {

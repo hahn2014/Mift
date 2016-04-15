@@ -65,7 +65,6 @@ public class Settings {
 				ex.printStackTrace();
 			}
 		}
-		Logger.info("Applying changes");
 		String[] variables = listToArray(lines);
 		String vari = "";
 		int vali = 0;

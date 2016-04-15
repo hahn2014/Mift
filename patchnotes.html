@@ -1,6 +1,11 @@
 <style>
 	.version-update {
-		background:#c0f2e8;
+		background: #affdef; /* Old browsers */
+		background: -moz-linear-gradient(-45deg, #affdef 0%, #05edc3 34%, #00d6af 51%, #05edc3 73%, #05edc3 73%, #52f6d8 100%); /* FF3.6-15 */
+		background: -webkit-linear-gradient(-45deg, #affdef 0%,#05edc3 34%,#00d6af 51%,#05edc3 73%,#05edc3 73%,#52f6d8 100%); /* Chrome10-25,Safari5.1-6 */
+		background: linear-gradient(135deg, #affdef 0%,#05edc3 34%,#00d6af 51%,#05edc3 73%,#05edc3 73%,#52f6d8 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#affdef', endColorstr='#52f6d8',GradientType=1 ); /* IE6-9 fallback on horizontal gradient */
+
 	    padding:20px;
 	    position:relative;
 	    z-index: 0;
@@ -37,6 +42,20 @@
 </style>
 
 <div class="version-update">
+	<h2>Mift Pre-Alpha 1 Build 57</h2>
+	<ul class="157">
+		<li>Myo properly syncs to Mift when connected.</li>
+		<li>Myo changed camera pitch and yaw, replacing original code moving mouse position</li>
+		<li>Game time calculated through milliseconds instead of nanoseconds</li>
+			<ul>
+				<li>This feature temporarily affects player movement speed and day time calculations</li>
+			</ul>
+	</ul>
+</div>
+
+<div class="seperator"></div>
+
+<div class="version-update">
 	<h2>Mift Pre-Alpha 1 Build 56</h2>
 	<ul class="156">
 		<li>Menu Optimizations</li>
@@ -57,3 +76,17 @@
 		<li>In game day progression</li>
 	</ul>
 </div>
+
+<!--Version Update template
+	<div class="version-update">
+		<h2>Mift Pre-Alpha 1 Build xx</h2>
+		<ul class="1xx">
+			<li>Update 1</li>
+			<li>Update 2</li>
+			<li>Update 3</li>
+			<li>Update 4</li>
+		</ul>
+	</div>
+
+	<div class="seperator"></div>
+-->

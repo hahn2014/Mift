@@ -12,15 +12,21 @@ public class MyoSetup {
 	
 	public static void init(boolean initialize) {
 		if (initialize == true) {
-			hub = new Hub("");
-			Myo myo = hub.waitForMyo(10000);
-			DisplayManager.myo_use = (myo != null);
-			if (DisplayManager.myo_use == true) {
-				Logger.info("Using Myo for input");
+			try {
+				hub = new Hub("");
+				Myo myo = hub.waitForMyo(10000);
+				DisplayManager.myo_use = (myo != null);
+				if (DisplayManager.myo_use == true) {
+					Logger.info("Using Myo for input");
+				}
+				
+				myoManager = new MyoManager();
+				hub.addListener(myoManager);
+			} catch (Exception e) { //myo init failsafe will disable use myo if unable to access
+				Logger.error("Unable to initialize Myo Armband. -> ");
+				e.printStackTrace();
+				DisplayManager.myo_use = false;
 			}
-			
-			myoManager = new MyoManager();
-			hub.addListener(myoManager);
 		}
 	}
 	

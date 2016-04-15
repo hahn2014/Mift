@@ -27,9 +27,9 @@ public class MenuRenderer extends MenuController {
 		mainMenuTexts.add(new GUIText(textRenderer, Mift.NAME + " Alpha Build " + Mift.RELEASE + "." + Mift.BUILD, 2.5f, FontHolder.getCandara(), new Vector2f(0.35f, 0f), 0.35f, ALIGNMENT.LEFT));
 		mainMenuTexts.get(0).setColor(100, 0, 200);
 		mainMenuTexts.add(new GUIText(textRenderer, "New Game", 1f, FontHolder.getCandara(), new Vector2f(0.47f, 0.35f), 0.35f, ALIGNMENT.LEFT));
-		mainMenuTexts.get(1).setColor(255, 255, 255);
+		mainMenuTexts.get(1).setColor(255, 100, 100);
 		mainMenuTexts.add(new GUIText(textRenderer, "Continue Game", 1f, FontHolder.getCandara(), new Vector2f(0.457f, 0.45f), 0.35f, ALIGNMENT.LEFT));
-		mainMenuTexts.get(2).setColor(255, 100, 100);
+		mainMenuTexts.get(2).setColor(255, 255, 255);
 		mainMenuTexts.add(new GUIText(textRenderer, "Settings", 1f, FontHolder.getCandara(), new Vector2f(0.475f, 0.55f), 0.35f, ALIGNMENT.LEFT));
 		mainMenuTexts.get(3).setColor(255, 255, 255);
 		mainMenuTexts.add(new GUIText(textRenderer, "Quit", 1f, FontHolder.getCandara(), new Vector2f(0.487f, 0.65f), 0.35f, ALIGNMENT.LEFT));

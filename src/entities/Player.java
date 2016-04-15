@@ -17,8 +17,6 @@ import myo.MyoManager;
 import particles.ParticleEmitter;
 import particles.ParticleTexture;
 import renderEngine.DisplayManager;
-import com.thalmic.*;
-import com.thalmic.myo.Pose;
 import com.thalmic.myo.enums.PoseType;
 
 public class Player extends Entity {
