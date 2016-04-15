@@ -21,11 +21,12 @@ import com.thalmic.myo.enums.PoseType;
 
 public class Player extends Entity {
 
-	private static final float RUN_SPEED = 15.0f;
+	private static final float RUN_SPEED = 20.0f;
 	private static final float MAX_RUN_TIME = 200.0f;
 	private static final float RUN_COOLDOWN = 400f;
 	private static final float GRAVITY = -50;
 	private static final float JUMP_POWER = 20;
+	private static final float timeDivider = 1000.0f;
 
 	private float currentSpeed = 0f;
 	private float upwardsSpeed = 0f;
@@ -70,7 +71,7 @@ public class Player extends Entity {
 		float dx = (float) (distance * Math.sin(Math.toRadians(super.getRotY())));
 		float dz = (float) (distance * Math.cos(Math.toRadians(super.getRotY())));
 		upwardsSpeed += GRAVITY * DisplayManager.getFrameTimeSeconds();
-		super.increasePosition(dx, upwardsSpeed * DisplayManager.getFrameTimeSeconds(), dz);
+		super.increasePosition(dx / timeDivider, upwardsSpeed * DisplayManager.getFrameTimeSeconds() / timeDivider, dz / timeDivider);
 		
 		float terrainHeight = Mift.terrain.getHeightOfTerrain(x, z);
 		
@@ -83,7 +84,7 @@ public class Player extends Entity {
 	
 	private void jump() {
 		if (!isInAir) {
-			this.upwardsSpeed = JUMP_POWER;
+			this.upwardsSpeed = JUMP_POWER / timeDivider;
 			isInAir = true;
 		}
 	}
@@ -159,20 +160,20 @@ public class Player extends Entity {
 				//strafe
 				float distance = (RUN_SPEED * DisplayManager.getFrameTimeSeconds());
 				float yaw = camera.getYaw();
-				super.increasePosition(-(distance * (float)Math.sin(Math.toRadians(yaw - 90))), 0, (distance * (float)Math.cos(Math.toRadians(yaw - 90))));
+				super.increasePosition(-(distance * (float)Math.sin(Math.toRadians(yaw - 90))) / timeDivider, 0, (distance * (float)Math.cos(Math.toRadians(yaw - 90))) / timeDivider);
 			} else {
 				//rotate
-				super.increaseRotation(0, -1.2f, 0);
+				super.increaseRotation(0, -1.2f / timeDivider, 0);
 			}
 		} else if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
 			if (isOverhead == false) {
 				//strafe
 				float distance = (RUN_SPEED * DisplayManager.getFrameTimeSeconds());
 				float yaw = camera.getYaw();
-				super.increasePosition(-(distance * (float)Math.sin(Math.toRadians(yaw + 90))), 0, (distance * (float)Math.cos(Math.toRadians(yaw + 90))));
+				super.increasePosition(-(distance * (float)Math.sin(Math.toRadians(yaw + 90))) / timeDivider, 0, (distance * (float)Math.cos(Math.toRadians(yaw + 90))) / timeDivider);
 			} else {
 				//rotate
-				super.increaseRotation(0, 1.2f, 0);
+				super.increaseRotation(0, 1.2f / timeDivider, 0);
 			}
 		}
 
@@ -180,8 +181,7 @@ public class Player extends Entity {
 			jump();
 		}
 		while (Keyboard.next()) {
-			if (Keyboard.getEventKeyState()) { //pressed
-			} else { //released
+			if (Keyboard.getEventKeyState() == false) { //release
 				if (isOverhead == true) {
 					if (Keyboard.getEventKey() == Keyboard.KEY_1) {
 				    	//go back one model place

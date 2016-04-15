@@ -99,7 +99,6 @@ public class Mift {
 		//initialize the quality of the game while loading
 		DisplayManager.createDisplay();
 		settings = new Settings();
-		new Initialize(args);
 
 		MyoSetup.init(DisplayManager.myo_use);
 		

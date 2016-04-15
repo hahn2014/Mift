@@ -11,6 +11,7 @@ public class ImportLibs {
 
 	public ImportLibs() {
 		System.setProperty("org.lwjgl.librarypath", new File("lib/lwjgl-2.9.3/native/").getAbsolutePath());
+		System.setProperty("org.lwjgl.opengl.Display.enableHighDPI", "true");
 		Logger.info("Succesfully linked lwjgl natives to " + OS_NAME + " system path.");
 		if (OS_NAME.startsWith("windows")) {
 			DisplayManager.cs_windowsSystem = true;

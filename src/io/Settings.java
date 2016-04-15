@@ -113,6 +113,7 @@ public class Settings {
 			Logger.debug(variable + " has been set to " + Maths.intToBoolean(value));
 		} else if (variable.equalsIgnoreCase("cg_fullscreened")) {
 			DisplayManager.cg_fullscreened = Maths.intToBoolean(value);
+			DisplayManager.setFullscreened(Maths.intToBoolean(value));
 			Logger.debug(variable + " has been set to " + Maths.intToBoolean(value));
 		} else if (variable.equalsIgnoreCase("cg_anisotropic_filtering")) {
 			DisplayManager.cg_anisotropic_filtering = Maths.intToBoolean(value);
