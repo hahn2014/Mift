@@ -26,7 +26,6 @@ public class Player extends Entity {
 	private static final float RUN_COOLDOWN = 400f;
 	private static final float GRAVITY = -50;
 	private static final float JUMP_POWER = 20;
-	private static final float timeDivider = 1000.0f;
 
 	private float currentSpeed = 0f;
 	private float upwardsSpeed = 0f;
@@ -71,7 +70,7 @@ public class Player extends Entity {
 		float dx = (float) (distance * Math.sin(Math.toRadians(super.getRotY())));
 		float dz = (float) (distance * Math.cos(Math.toRadians(super.getRotY())));
 		upwardsSpeed += GRAVITY * DisplayManager.getFrameTimeSeconds();
-		super.increasePosition(dx / timeDivider, upwardsSpeed * DisplayManager.getFrameTimeSeconds() / timeDivider, dz / timeDivider);
+		super.increasePosition(dx, upwardsSpeed * DisplayManager.getFrameTimeSeconds(), dz);
 		
 		float terrainHeight = Mift.terrain.getHeightOfTerrain(x, z);
 		
@@ -84,7 +83,7 @@ public class Player extends Entity {
 	
 	private void jump() {
 		if (!isInAir) {
-			this.upwardsSpeed = JUMP_POWER / timeDivider;
+			this.upwardsSpeed = JUMP_POWER;
 			isInAir = true;
 		}
 	}
@@ -160,20 +159,20 @@ public class Player extends Entity {
 				//strafe
 				float distance = (RUN_SPEED * DisplayManager.getFrameTimeSeconds());
 				float yaw = camera.getYaw();
-				super.increasePosition(-(distance * (float)Math.sin(Math.toRadians(yaw - 90))) / timeDivider, 0, (distance * (float)Math.cos(Math.toRadians(yaw - 90))) / timeDivider);
+				super.increasePosition(-(distance * (float)Math.sin(Math.toRadians(yaw - 90))), 0, (distance * (float)Math.cos(Math.toRadians(yaw - 90))));
 			} else {
 				//rotate
-				super.increaseRotation(0, -1.2f / timeDivider, 0);
+				super.increaseRotation(0, -1.2f, 0);
 			}
 		} else if (Keyboard.isKeyDown(Keyboard.KEY_A)) {
 			if (isOverhead == false) {
 				//strafe
 				float distance = (RUN_SPEED * DisplayManager.getFrameTimeSeconds());
 				float yaw = camera.getYaw();
-				super.increasePosition(-(distance * (float)Math.sin(Math.toRadians(yaw + 90))) / timeDivider, 0, (distance * (float)Math.cos(Math.toRadians(yaw + 90))) / timeDivider);
+				super.increasePosition(-(distance * (float)Math.sin(Math.toRadians(yaw + 90))), 0, (distance * (float)Math.cos(Math.toRadians(yaw + 90))));
 			} else {
 				//rotate
-				super.increaseRotation(0, 1.2f / timeDivider, 0);
+				super.increaseRotation(0, 1.2f, 0);
 			}
 		}
 

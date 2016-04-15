@@ -13,6 +13,7 @@ public class Entity {
 	private float scale;
 	private entityType type = entityType.DEFAULT;
 	private boolean renderable = true;
+	private static final float timeDivider = 1000f;
 
 	private int textureIndex = 0;
 
@@ -50,15 +51,15 @@ public class Entity {
 	}
 
 	public void increasePosition(float dx, float dy, float dz) {
-		this.position.x += dx;
-		this.position.y += dy;
-		this.position.z += dz;
+		this.position.x += dx / timeDivider;
+		this.position.y += dy / timeDivider;
+		this.position.z += dz / timeDivider;
 	}
 
 	public void increaseRotation(float dx, float dy, float dz) {
-		this.rotX += dx;
-		this.rotY += dy;
-		this.rotZ += dz;
+		this.rotX += dx / timeDivider;
+		this.rotY += dy / timeDivider;
+		this.rotZ += dz / timeDivider;
 	}
 	
 	public void increaseRotation(Vector3f rotation) {
@@ -121,9 +122,9 @@ public class Entity {
 	}
 	
 	public void setRotation(Vector3f direction) {
-		this.rotX = direction.getX();
-		this.rotY = direction.getY();
-		this.rotZ = direction.getZ();
+		this.rotX = direction.getX() / timeDivider;
+		this.rotY = direction.getY()  / timeDivider;
+		this.rotZ = direction.getZ()  / timeDivider;
 	}
 	
 	public Vector3f getRotation() {
