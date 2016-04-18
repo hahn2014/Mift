@@ -49,7 +49,7 @@ public class MoveMyo extends MyoDevice {
 		pitchDiff = pitchW - (pitch * (360 / Math.PI));
 		yawDiff = yawW - (yaw * (360 / Math.PI));
 		
-		Logger.info("roll=" + rollDiff + ", pitch=" + pitchDiff + ", yaw=" + yawDiff);
+		//Logger.info("roll=" + rollDiff + ", pitch=" + pitchDiff + ", yaw=" + yawDiff);
 		
 		pitchW = pitch * (360 / Math.PI);
 		yawW = yaw * (360 / Math.PI);
@@ -57,15 +57,15 @@ public class MoveMyo extends MyoDevice {
 	}
 	
 	public double getRollDiff() {
-		return rollDiff;// > 0.3 ? rollDiff : 0;
+		return Math.abs(rollDiff) > 0.1 ? rollDiff : 0;
 	}
 	
 	public double getPitchDiff() {
-		return pitchDiff;// > 0.3 ? pitchDiff : 0;
+		return Math.abs(pitchDiff) > 0.1 ? pitchDiff : 0;
 	}
 	
 	public double getYawDiff() {
-		return yawDiff;// > 0.3 ? yawDiff : 0;
+		return Math.abs(yawDiff) > 0.1 ? yawDiff : 0;
 	}
 	
 

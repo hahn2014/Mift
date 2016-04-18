@@ -8,15 +8,18 @@ import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
 import attacks.AttackShader;
+import entities.Camera;
+import entities.OverheadCamera;
 import models.RawModel;
 import models.TexturedModel;
+import renderEngine.DisplayManager;
 import renderEngine.MasterRenderer;
 import textures.ModelTexture;
 import toolbox.Maths;
 
 public class FireballRenderer {
 	private AttackShader shader;
-	Matrix4f projectionMatrix = MasterRenderer.createProjectionMatrix();
+	Matrix4f projectionMatrix = MasterRenderer.getProjectionMatrix();
 
 	public FireballRenderer(AttackShader shader) {
 		this.shader = shader;
@@ -25,13 +28,33 @@ public class FireballRenderer {
 		shader.stop();
 	}
 
-	public void render(Fireball fireball) {
-		TexturedModel model;
-		model = fireball.getTexturedModel();
+	public void render(Fireball fireball, OverheadCamera camera) {
+		shader.loadViewMatrix(camera);
+		TexturedModel model = fireball.getTexturedModel();
 		prepareTexturedModel(model);
 		if (fireball.isRenderable()) {
-			prepareInstance(fireball.getCurrentPosition(), fireball.getRotation());
-			GL11.glDrawElements(GL11.GL_TRIANGLES, model.getRawModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
+			prepareInstance(fireball.getCurrentPosition());
+			if (DisplayManager.cg_debug_polygons) {
+				GL11.glDrawElements(GL11.GL_LINE_STRIP, model.getRawModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
+			} else {
+				GL11.glDrawElements(GL11.GL_TRIANGLES, model.getRawModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
+			}
+		}
+		unbindTexturedModel();
+		fireball.update();
+	}
+	
+	public void render(Fireball fireball, Camera camera) {
+		shader.loadViewMatrix(camera);
+		TexturedModel model = fireball.getTexturedModel();
+		prepareTexturedModel(model);
+		if (fireball.isRenderable()) {
+			prepareInstance(fireball.getCurrentPosition());
+			if (DisplayManager.cg_debug_polygons) {
+				GL11.glDrawElements(GL11.GL_LINE_STRIP, model.getRawModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
+			} else {
+				GL11.glDrawElements(GL11.GL_TRIANGLES, model.getRawModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
+			}
 		}
 		unbindTexturedModel();
 		fireball.update();
@@ -60,9 +83,8 @@ public class FireballRenderer {
 		GL30.glBindVertexArray(0);
 	}
 
-	private void prepareInstance(Vector3f curPos, Vector3f rotation) {
-		Matrix4f transformationMatrix = Maths.createTransformationMatrix(curPos, rotation.getX(),
-				rotation.getY(), rotation.getZ(), 1);
-		shader.loadProjectionMatrix(transformationMatrix);
+	private void prepareInstance(Vector3f curPos) {
+		Matrix4f transformationMatrix = Maths.createTransformationMatrix(curPos, 0, 0, 0, 1);
+		shader.loadTransformationMatrix(transformationMatrix);
 	}
 }

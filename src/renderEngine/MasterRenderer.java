@@ -66,7 +66,7 @@ public class MasterRenderer {
 		this.shadowRenderer = new ShadowMapMasterRenderer();
 	}
 
-	public Matrix4f getProjectionMatrix() {
+	public static Matrix4f getProjectionMatrix() {
 		return projectionMatrix;
 	}
 

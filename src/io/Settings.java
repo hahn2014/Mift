@@ -125,7 +125,7 @@ public class Settings {
 			Player.runInfinite = Maths.intToBoolean(value);
 			Logger.debug(variable + " has been set to " + Maths.intToBoolean(value));
 		} else if (variable.equalsIgnoreCase("cg_quality")) {
-			DisplayManager.cg_quality = value;
+			DisplayManager.setQuality(value, false);
 			Logger.debug(variable + " has been set to " + value);
 		} else if (variable.equalsIgnoreCase("cp_myo_enabled")) {
 			DisplayManager.myo_use = Maths.intToBoolean(value);

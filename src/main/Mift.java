@@ -28,10 +28,14 @@ import fontCreator.GUIText.ALIGNMENT;
 import fontRender.TextRenderer;
 import guis.GuiRenderer;
 import guis.GuiTexture;
+import guis.hud.HUDCreator;
+import guis.hud.HUDRenderer;
 import guis.menu.MenuRenderer;
 import io.Settings;
 import myo.MyoSetup;
 import particles.ParticleEmitter;
+import particles.ParticleHolder;
+import particles.ParticleTexture;
 import renderEngine.DisplayManager;
 import renderEngine.Loader;
 import renderEngine.MasterRenderer;
@@ -45,15 +49,14 @@ import water.WaterShader;
 import water.WaterTile;
 
 /**
- * Already surpassed 10k lines of
- * cumulative code! Keep up the
- * good work - Mift Build 57
+ * Already surpassed 14k lines of
+ * cumulative code! - Mift Build 58
  * 
  * @author Bryce Hahn, Mason Cluff
  * @since 1.0 - 06/12/2015
  */
 public class Mift {
-	public static final String BUILD = "57";
+	public static final String BUILD = "58";
 	public static final String RELEASE = "1";
 	public static final String RELEASE_TITLE = "Alpha";
 	public static final String NAME = "Mift";
@@ -92,13 +95,17 @@ public class Mift {
 	public static WaterballHolder waterballHolder;
 	public static Player player;
 	
+	private static DisplayManager dm;
+	
+	@SuppressWarnings("static-access")
 	public static void main(String[] args) {
 		new ImportLibs(); //link the natives for lwjgl
 		random = new SecureRandom();
 		random.setSeed(System.currentTimeMillis());
 		//initialize the quality of the game while loading
-		DisplayManager.createDisplay();
+		dm = new DisplayManager();
 		settings = new Settings();
+		dm.createDisplay();
 
 		MyoSetup.init(DisplayManager.myo_use);
 		
@@ -151,21 +158,21 @@ public class Mift {
 			texts.get(5).setColor(100, 100, 255);
 		
 		// **************** PARTICLE SYSTEM *********************
-//		ParticleHolder.init(loader, renderer.getProjectionMatrix());
-//		
-//		ParticleTexture pt = new ParticleTexture(loader.loadParticleTexture("star"), 4, true);
-//		ParticleEmitter pe = new ParticleEmitter(pt, 120, 10, 0.1f, 1, 1.6f);
-//		pe.setLifeError(0.1f);
-//		pe.setSpeedError(0.25f);
-//		pe.setScaleError(0.5f);
-//		pe.randomizeRotation();
+		ParticleHolder.init(loader, renderer.getProjectionMatrix());
+		
+		ParticleTexture pt = new ParticleTexture(loader.loadParticleTexture("star"), 4, true);
+		ParticleEmitter pe = new ParticleEmitter(pt, 120, 10, 0.1f, 1, 1.6f);
+		pe.setLifeError(0.1f);
+		pe.setSpeedError(0.25f);
+		pe.setScaleError(0.5f);
+		pe.randomizeRotation();
 		
 		// ********************* ATTACKS ************************\
 		AttacksRenderer attackRenderer = new AttacksRenderer();
 		
 		// **************** HUD *********************************
-//		HUDRenderer hudRenderer = new HUDRenderer();
-//		hudCreator = new HUDCreator(loader, false);
+		HUDRenderer hudRenderer = new HUDRenderer();
+		HUDCreator hudCreator = new HUDCreator(loader, false);
 		MenuRenderer pauseRenderer = new MenuRenderer();
 		
 		// **************** Game Loop Below *********************
@@ -179,6 +186,9 @@ public class Mift {
 				player.move();
 				sunLight.move();
 				SkyboxRenderer.move();
+				
+				//pe.generateParticles(player.getPosition());
+				
 				//have all enemies in the map move around, even the ones spawned by player
 				for (Enemy e : enemies) {
 					if (e != null) {
@@ -188,15 +198,17 @@ public class Mift {
 				GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
 				if (player.isOverhead() == false) {
 					renderer.renderCallStandardView(topBuffers, camera, defaultMouse, topWaterRenderer, topWater, lights, entities, null, sunLight);
-					//hudCreator.update(camera);
+					attackRenderer.render(camera, fireballHolder.getAll(), waterballHolder.getAll());
+					ParticleHolder.renderParticles(camera);
+					hudCreator.update(camera);
 				} else {
 					renderer.renderCallOverheadView(topBuffers, overheadCamera, overheadMouse, topWaterRenderer, topWater, lights, entities, null, sunLight);
-					//hudCreator.update(overheadCamera);
+					attackRenderer.render(overheadCamera, fireballHolder.getAll(), waterballHolder.getAll());
+					ParticleHolder.renderParticles(overheadCamera);
+					hudCreator.update(overheadCamera);
 				}
-				attackRenderer.render(fireballHolder.getAll(), waterballHolder.getAll());
-				//ParticleHolder.renderParticles(player.isOverhead());
 				guiRenderer.render(guiTextures);
-//				hudRenderer.render(hudCreator.getTextures(), hudCreator.getCompass());
+				guiRenderer.render(hudCreator.getTextures());
 				fpsCounter.updateCounter();
 				texts.get(0).setText(Mift.NAME + " Alpha Build " + Mift.RELEASE + "." + Mift.BUILD);
 				texts.get(1).setText((int) (fpsCounter.getFPS()) + "");

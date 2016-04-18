@@ -5,8 +5,7 @@ import org.lwjgl.util.vector.Vector3f;
 import main.Mift;
 
 public class Sun extends Light {
-	private static final float timeDivider = 1000.0f;
-	private static final float realTimeMultiplyer = 22 * Mift.dayTimeMultiplier / timeDivider; //1 minute in game = about 1 seconds in real life
+	private static final float realTimeMultiplyer = 22 * Mift.dayTimeMultiplier; //1 minute in game = about 1 seconds in real life
 	private static final float realTimeSeconds = 0.1f; //0.01345f; //will slow the increments down to a days second within 5%
 	private static final float stepSeconds = (realTimeSeconds * realTimeMultiplyer);
 	private static final int dayStart = 0; 			//12:00.00am

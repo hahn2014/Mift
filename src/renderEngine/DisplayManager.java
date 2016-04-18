@@ -33,6 +33,7 @@ public class DisplayManager {
 	private static float delta; // Measured in nanoseconds
 
 	public static void createDisplay() {
+		Display.destroy();
 		getQuality();
 		ContextAttribs attribs = new ContextAttribs(3, 3).withForwardCompatible(true).withProfileCore(true);
 		try {
@@ -48,7 +49,8 @@ public class DisplayManager {
 			e.printStackTrace();
 		}
 
-		GL11.glViewport(0, 0, WIDTH, HEIGHT);
+		GL11.glViewport(0, 0, (int)(WIDTH * Display.getPixelScaleFactor()), 
+	             (int)(HEIGHT * Display.getPixelScaleFactor()));
 		lastFrameTime = getCurrentTime();
 		testDelta();
 	}
@@ -143,40 +145,29 @@ public class DisplayManager {
 	
 	private static void getQuality() {
 		if (cg_quality == 1) {
-			if (cs_windowsSystem == true) {
-				WIDTH = 1280;
-				HEIGHT = 720;
-			} else {
-				WIDTH = 1280;
-				HEIGHT = 800;
-			}
+			WIDTH = 1280;
+			HEIGHT = 720;
 		} else if (cg_quality == 2) {
-			if (cs_windowsSystem == true) {
-				WIDTH = 1920;
-				HEIGHT = 1080;
-			} else {
-				WIDTH = 1280;
-				HEIGHT = 800;
-			}
+			WIDTH = 1920;
+			HEIGHT = 1080;
 		} else if (cg_quality == 3) {
-			if (cs_windowsSystem == true) {
-				WIDTH = 2560;
-				HEIGHT = 1440;
-			} else {
-				WIDTH = 1280;
-				HEIGHT = 800;
-			}
+			WIDTH = 2560;
+			HEIGHT = 1440;
 		} else if (cg_quality == 4) {
-			if (cs_windowsSystem == true) {
-				WIDTH = 3840;
-				HEIGHT = 2160;
-			} else {
-				WIDTH = 1280;
-				HEIGHT = 800;
-			}
+			WIDTH = 3840;
+			HEIGHT = 2160;
 		} else {
 			cg_quality = 1;
 			getQuality();
+		}
+	}
+	
+	public static void setQuality(int quality, boolean ingame) {
+		cg_quality = quality;
+		getQuality();
+		if (ingame) {
+			Display.destroy();
+			createDisplay();
 		}
 	}
 	

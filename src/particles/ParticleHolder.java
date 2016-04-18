@@ -62,8 +62,12 @@ public class ParticleHolder {
 		}
 	}
 	
-	public static void renderParticles(Boolean isOverhead) {
-		renderer.render(particles, isOverhead);
+	public static void renderParticles(OverheadCamera camera) {
+		renderer.render(particles, camera);
+	}
+	
+	public static void renderParticles(Camera camera) {
+		renderer.render(particles, camera);
 	}
 	
 	public static void cleanUp() {

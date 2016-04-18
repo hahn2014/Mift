@@ -2,28 +2,28 @@ package attacks;
 
 import java.util.List;
 
-import org.lwjgl.util.vector.Matrix4f;
-
 import attacks.fireball.Fireball;
 import attacks.fireball.FireballRenderer;
 import attacks.waterball.Waterball;
+import entities.Camera;
+import entities.OverheadCamera;
 import main.Mift;
+import renderEngine.MasterRenderer;
 
 public class AttacksRenderer {
 	private AttackShader shader =  new AttackShader();
-	Matrix4f projectionMatrix = Mift.renderer.getProjectionMatrix();
 	FireballRenderer fireRender = new FireballRenderer(shader);
 
 	public AttacksRenderer() {
 		shader.start();
-		shader.loadProjectionMatrix(projectionMatrix);
+		shader.loadProjectionMatrix(MasterRenderer.getProjectionMatrix());
 		shader.stop();
 	}
 
-	public void render(List<Fireball> fireballs, List<Waterball> waterballs) {
+	public void render(Camera camera, List<Fireball> fireballs, List<Waterball> waterballs) {
 //************FIREBALL ATTACKS********************
 		for (Fireball fire : fireballs) {
-			fireRender.render(fire);
+			fireRender.render(fire, camera);
 		}
 		//check for deletables
 		for (Fireball fire : fireballs) {
@@ -34,7 +34,32 @@ public class AttacksRenderer {
 		}
 //************WATERBALL ATTACK********************
 		for (@SuppressWarnings("unused") Waterball water : waterballs) {
-			//render
+			//waterRender.render(water, camera);
+		}
+		//check for deletables
+		for (Waterball water : waterballs) {
+			if (water.isRenderable() == false) {
+				Mift.waterballHolder.remove(water);
+				break;
+			}
+		}
+	}
+	
+	public void render(OverheadCamera camera, List<Fireball> fireballs, List<Waterball> waterballs) {
+		//************FIREBALL ATTACKS********************
+		for (Fireball fire : fireballs) {
+			fireRender.render(fire, camera);
+		}
+		//check for deletables
+		for (Fireball fire : fireballs) {
+			if (fire.isRenderable() == false) {
+				Mift.fireballHolder.remove(fire);
+				break;
+			}
+		}
+//************WATERBALL ATTACK********************
+		for (@SuppressWarnings("unused") Waterball water : waterballs) {
+			//waterRender.render(water, camera);
 		}
 		//check for deletables
 		for (Waterball water : waterballs) {

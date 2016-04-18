@@ -2,13 +2,13 @@ package attacks.fireball;
 
 import org.lwjgl.util.vector.Vector3f;
 
+import io.Logger;
 import main.Mift;
 import models.TexturedModel;
 import objConverter.OBJFileLoader;
 import textures.ModelTexture;
 
 public class Fireball {
-	private Vector3f rotation = new Vector3f(0, 0, 0);
 	private Vector3f currentPosition;
 	private Vector3f gotoPosition;
 	private Vector3f goingTo;
@@ -27,13 +27,14 @@ public class Fireball {
 	}
 	
 	public void update() {
+		Logger.debug("Fireball Position: " + currentPosition.toString());
 		if (timeAlive + 1 <= maxTimeAlive) {
 			this.increasePosition();
 			timeAlive++;
 		} else {
 			//lived long enough, time to die ball
 			this.isRenderable = false;
-			System.out.println("fireball has died");
+			Logger.debug("fireball has died");
 		}
 	}
 	
@@ -79,25 +80,5 @@ public class Fireball {
 
 	public float getSpeed() {
 		return speed;
-	}
-
-	public Vector3f getRotation() {
-		return rotation;
-	}
-
-	public void setRotation(Vector3f rotation) {
-		this.rotation = rotation;
-	}
-	
-	public float getRotX() {
-		return rotation.getX();
-	}
-	
-	public float getRotY() {
-		return rotation.getY();
-	}
-	
-	public float getRotZ() {
-		return rotation.getZ();
 	}
 }

@@ -115,10 +115,11 @@ public class Player extends Entity {
 	public void updateMyo() {
 		MoveMyo myo = MyoManager.getMoveMyo();
 		if (myo.getPose() == PoseType.FIST) {
-			if (currentSpeed <= 0) {
+			isRunning = !isRunning;
+			if (isRunning) {
 				currentSpeed = RUN_SPEED;
 			} else {
-				currentSpeed = 0f;
+				currentSpeed = 0;
 			}
 		}
 	}

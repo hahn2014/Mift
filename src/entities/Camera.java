@@ -2,6 +2,7 @@ package entities;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector3f;
 
 import main.Mift;
@@ -76,7 +77,8 @@ public class Camera {
 			Mouse.setGrabbed(false);
 		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_F3)) {
-			DisplayManager.closeDisplay();
+			//DisplayManager.setQuality(DisplayManager.cg_quality, true);
+			Display.destroy();
 		}
 	}
 	

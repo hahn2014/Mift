@@ -13,7 +13,8 @@ import org.lwjgl.opengl.GL31;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
-import main.Mift;
+import entities.Camera;
+import entities.OverheadCamera;
 import models.RawModel;
 import renderEngine.Loader;
 import toolbox.Maths;
@@ -51,13 +52,26 @@ public class ParticleRenderer {
 		shader.stop();
 	}
 
-	protected void render(Map<ParticleTexture, List<Particle>> particles, boolean isOverhead) {
-		Matrix4f viewMatrix = new Matrix4f();
-		if (isOverhead == true) {
-			viewMatrix = Maths.createViewMatrix(Mift.overheadCamera);
-		} else {
-			viewMatrix = Maths.createViewMatrix(Mift.camera);
+	protected void render(Map<ParticleTexture, List<Particle>> particles, Camera camera) {
+		Matrix4f viewMatrix = Maths.createViewMatrix(camera);
+		prepare();
+		for (ParticleTexture texture : particles.keySet()) {
+			bindTexture(texture);
+			List<Particle> particleList = particles.get(texture);
+			pointer = 0;
+			float[] vboData = new float[particleList.size() * INSTANCE_DATA_LENGTH];
+			for (Particle particle : particleList) {
+				updateModelViewMatrix(particle.getPosition(), particle.getRotation(), particle.getScale(), viewMatrix, vboData);
+				updateTextureCoordInfo(particle, vboData);
+			}
+			loader.updateVBO(vbo, vboData, buffer);
+			GL31.glDrawArraysInstanced(GL11.GL_TRIANGLE_STRIP, 0, quad.getVertexCount(), particleList.size());
 		}
+		finishRendering();
+	}
+	
+	protected void render(Map<ParticleTexture, List<Particle>> particles, OverheadCamera camera) {
+		Matrix4f viewMatrix = Maths.createViewMatrix(camera);
 		prepare();
 		for (ParticleTexture texture : particles.keySet()) {
 			bindTexture(texture);
