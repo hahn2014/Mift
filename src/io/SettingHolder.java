@@ -18,6 +18,7 @@ public class SettingHolder {
 		settings.add(new Setting("cg_antialiasing_filtering", 	SettingType.bool,		true));
 		settings.add(new Setting("cg_fps", 						SettingType.bool,		true));
 		settings.add(new Setting("cg_theatrical",  				SettingType.bool,		false));
+		settings.add(new Setting("cg_post_processing", 			SettingType.bool,		true));
 		settings.add(new Setting("player_sprint_unlimited", 	SettingType.bool,		false));
 		settings.add(new Setting("player_ufo",					SettingType.bool, 		false));
 		settings.add(new Setting("cp_myo_enabled", 				SettingType.bool,		false));

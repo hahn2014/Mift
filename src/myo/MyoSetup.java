@@ -3,6 +3,7 @@ package myo;
 import com.thalmic.myo.Hub;
 import com.thalmic.myo.Myo;
 
+import guis.menu.SettingsRenderer;
 import io.Logger;
 import io.SettingHolder;
 
@@ -26,6 +27,7 @@ public class MyoSetup {
 				Logger.error("Unable to initialize Myo Armband. -> ");
 				e.printStackTrace();
 				SettingHolder.get("cp_myo_enabled").setValueB(false);
+				SettingsRenderer.getTexts().get(7).setText("Myo Armband Connection [Off]");
 			}
 		}
 	}

@@ -14,7 +14,7 @@ import io.Setting.SettingType;
 public class Settings {
 	private static final String settingsFile = "mift.set";
 	private static final File settingsF = new File(settingsFile);
-	
+
 	public Settings() {
 		if (settingsF.exists()) {
 			Logger.info("Settings file was found, attempting to load settings.");
@@ -25,6 +25,39 @@ public class Settings {
 		}
 	}
 	
+	private static void replaceFile() {
+		File old = new File(settingsFile);
+		old.delete();
+		createSettingsFileNewVals();
+	}
+
+	private static void createSettingsFileNewVals() {
+		BufferedWriter bw = null;
+		try {
+			bw = new BufferedWriter(new FileWriter(settingsFile));
+			for (Setting set : SettingHolder.getAll()) {
+				if (set.getType() == SettingType.integer) {
+					bw.write(set.getVariable() + ": " + set.getValueI() + ";");
+				} else if (set.getType() == SettingType.bool) {
+					bw.write(set.getVariable() + ": " + set.getValueB() + ";");
+				} else if (set.getType() == SettingType.string) {
+					bw.write(set.getVariable() + ": " + set.getValueS() + ";");
+				}
+				bw.newLine();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (bw != null)
+					bw.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+		Logger.debug("Settings file has been replaced");
+	}
+
 	private void createSettingsFile() {
 		BufferedWriter bw = null;
 		try {
@@ -43,7 +76,8 @@ public class Settings {
 			e.printStackTrace();
 		} finally {
 			try {
-				if (bw != null) bw.close();
+				if (bw != null)
+					bw.close();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -51,7 +85,7 @@ public class Settings {
 		Logger.info("New settings file has been created");
 		loadSettings();
 	}
-	
+
 	private void loadSettings() {
 		BufferedReader br = null;
 		List<String> lines = new ArrayList<String>();
@@ -65,12 +99,13 @@ public class Settings {
 			e.printStackTrace();
 		} finally {
 			try {
-				if (br != null)br.close();
+				if (br != null)
+					br.close();
 			} catch (IOException ex) {
 				ex.printStackTrace();
 			}
 		}
-		
+
 		String[] variables = listToArray(lines);
 		for (String var : variables) {
 			String vari = "";
@@ -86,51 +121,61 @@ public class Settings {
 					break;
 				}
 			}
-			
-			if (isInteger(var.substring(valiAt, var.length()))) { //integer
+
+			if (isInteger(var.substring(valiAt, var.length()))) { // integer
 				valiI = Integer.parseInt(var.substring(valiAt, var.length()));
-			} else if (isBoolean(var.substring(valiAt, var.length()))) { //boolean
+			} else if (isBoolean(var.substring(valiAt, var.length()))) { // boolean
 				valiB = var.substring(valiAt, var.length());
-			} else { //String
+			} else { // String
 				valiS = var.substring(valiAt, var.length());
 			}
-			
-			if (valiI != -1 && valiB == "" && valiS == "") { //value is a integer
+
+			if (valiI != -1 && valiB == "" && valiS == "") { // value is a
+																// integer
 				applyChanges(vari, Integer.toString(valiI));
-			} else if (valiI == -1 && valiB != "" && valiS == "") { //value is a boolean
+			} else if (valiI == -1 && valiB != "" && valiS == "") { // value is
+																	// a boolean
 				applyChanges(vari, valiB);
 			} else if (valiI == -1 && valiB == "" && valiS != "") {
 				applyChanges(vari, valiS);
 			} else {
-				Logger.error("Something messed up while importing " + vari + " at value " + var.substring(valiAt, var.length()));
+				Logger.error("Something messed up while importing " + vari + " at value "
+						+ var.substring(valiAt, var.length()));
 			}
 		}
 	}
-	
+
 	private static boolean isInteger(String s) {
-	    try { 
-	        Integer.parseInt(s);
-	    } catch(NumberFormatException e) { 
-	        return false; 
-	    } catch(NullPointerException e) {
-	        return false;
-	    }
-	    return true;
-	}
-	
-	private static boolean isBoolean(String s) { 
 		try {
-			Boolean.parseBoolean(s);
-		} catch(Exception e) {
+			Integer.parseInt(s);
+		} catch (NumberFormatException e) {
+			return false;
+		} catch (NullPointerException e) {
 			return false;
 		}
 		return true;
 	}
-	
-	public void saveSettings() {
-		
+
+	private static boolean isBoolean(String s) {
+		try {
+			Boolean.parseBoolean(s);
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
 	}
-	
+
+	public static void saveSettings() {
+		Logger.debug("Saving Settings to file");
+		if (settingsF.exists()) {
+			Logger.debug("Settings file was found, attempting to delete and recreate.");
+			replaceFile();
+		} else {
+			Logger.debug("Setings file was not found, creating file with new values.");
+			createSettingsFileNewVals();
+		}
+	}
+
 	private String[] listToArray(List<String> lines) {
 		List<String> variables = new ArrayList<String>();
 		String curVar = "";
@@ -139,6 +184,7 @@ public class Settings {
 				if (line.charAt(i) == ';') {
 					variables.add(curVar);
 					curVar = "";
+					break;
 				} else {
 					if (line.charAt(i) != ' ') {
 						curVar += line.charAt(i);
@@ -148,24 +194,24 @@ public class Settings {
 		}
 		return variables.toArray(new String[variables.size()]);
 	}
-	
+
 	private void applyChanges(String var, String val) {
 		if (SettingHolder.get(var).getType() == SettingType.integer) {
 			try {
 				SettingHolder.get(var).setValueI(Integer.parseInt(val));
-			}  catch (Exception e) {
+			} catch (Exception e) {
 				SettingHolder.get(var).setValueI(SettingHolder.get(var).getDefaultInteger());
 			}
 		} else if (SettingHolder.get(var).getType() == SettingType.string) {
 			try {
 				SettingHolder.get(var).setValueS(val);
-			}  catch (Exception e) {
+			} catch (Exception e) {
 				SettingHolder.get(var).setValueS(SettingHolder.get(var).getDefaultString());
 			}
 		} else if (SettingHolder.get(var).getType() == SettingType.bool) {
 			try {
 				SettingHolder.get(var).setValueB(Boolean.parseBoolean(val));
-			}  catch (Exception e) {
+			} catch (Exception e) {
 				SettingHolder.get(var).setValueB(SettingHolder.get(var).getDefaultBoolean());
 			}
 		}

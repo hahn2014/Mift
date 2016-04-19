@@ -2,6 +2,7 @@ package guis.menu;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.Display;
 
 import io.SettingHolder;
 import main.Mift;
@@ -9,7 +10,7 @@ import renderEngine.DisplayManager;
 import terrains.TerrainCreator;
 
 public class MenuController {
-	private int selected = 1;
+	public static int selected = 1;
 	
 	public void checkInputs() {
 		while (Keyboard.next()) {
@@ -29,10 +30,8 @@ public class MenuController {
 						}
 					} else if (selected == 3) {
 						//settings
-						MenuRenderer.renderable(false);
-//						SettingsRenderer.renderable(true);
-						MenuRenderer.clearScreen();
-//						MenuRenderer.setMenuScene(1);
+						Mift.menuIndex = 1;
+						SettingsController.changed = false;
 					} else if (selected == 4) {
 						//quit
 						System.exit(0);
@@ -76,6 +75,9 @@ public class MenuController {
 				}
 				if (Keyboard.getEventKey() == Keyboard.KEY_F2) {
 					Mouse.setGrabbed(!Mouse.isGrabbed());
+				}
+				if (Keyboard.getEventKey() == Keyboard.KEY_F3) {
+					Display.destroy();
 				}
 			}
 		}

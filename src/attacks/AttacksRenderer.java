@@ -2,6 +2,8 @@ package attacks;
 
 import java.util.List;
 
+import org.lwjgl.opengl.GL11;
+
 import attacks.fireball.Fireball;
 import attacks.fireball.FireballRenderer;
 import attacks.waterball.Waterball;
@@ -16,6 +18,7 @@ public class AttacksRenderer {
 
 	public AttacksRenderer() {
 		fireRender = new FireballRenderer(shader);
+		GL11.glDisable(GL11.GL_DEPTH_TEST);
 		shader.start();
 		shader.loadProjectionMatrix(MasterRenderer.getProjectionMatrix());
 		shader.stop();

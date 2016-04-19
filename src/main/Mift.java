@@ -32,12 +32,16 @@ import guis.GuiTexture;
 import guis.hud.HUDCreator;
 import guis.hud.HUDRenderer;
 import guis.menu.MenuRenderer;
+import guis.menu.SettingsRenderer;
+import io.Logger;
 import io.SettingHolder;
 import io.Settings;
 import myo.MyoSetup;
 import particles.ParticleEmitter;
 import particles.ParticleHolder;
 import particles.ParticleTexture;
+import postProcessing.FBO;
+import postProcessing.PostProcessing;
 import renderEngine.DisplayManager;
 import renderEngine.Loader;
 import renderEngine.MasterRenderer;
@@ -52,13 +56,13 @@ import water.WaterTile;
 
 /**
  * Already surpassed 14k lines of
- * cumulative code! - Mift Build 58
+ * cumulative code! - Mift Build 59
  * 
  * @author Bryce Hahn, Mason Cluff
  * @since 1.0 - 06/12/2015
  */
 public class Mift {
-	public static final String BUILD = "58";
+	public static final String BUILD = "59";
 	public static final String RELEASE = "1";
 	public static final String RELEASE_TITLE = "Alpha";
 	public static final String NAME = "Mift";
@@ -70,6 +74,7 @@ public class Mift {
 	
 	public static int instance_count = 0;
 	public static final int dayTimeMultiplier = 1;
+	public static int menuIndex = 0;
 	
 	//camera stuff
 	public static Camera camera;
@@ -177,11 +182,23 @@ public class Mift {
 		HUDRenderer hudRenderer = new HUDRenderer();
 		hudCreator = new HUDCreator(loader, false);
 		MenuRenderer pauseRenderer = new MenuRenderer();
+		SettingsRenderer settingRenderer = new SettingsRenderer();
+		
+		// ******************POST PROCESSING ********************
+		FBO fbo1 = new FBO(Display.getWidth(), Display.getHeight(), FBO.DEPTH_RENDER_BUFFER);
+		PostProcessing.init(loader);
 		
 		// **************** Game Loop Below *********************
 		while (!Display.isCloseRequested()) {
-			if (isPaused) { //render pause
-				pauseRenderer.update();
+			if (isPaused) { 
+				if (menuIndex == 0) {//render pause main menu
+					pauseRenderer.update();
+				} else if (menuIndex == 1) { //render settings
+					settingRenderer.update();
+				} else { //render load world
+					Logger.error("Something went wrong when rendering menu index of " + menuIndex);
+					Display.destroy();
+				}
 			} else { //render in game
 				if (SettingHolder.get("cp_myo_enabled").getValueB()) {
 					MyoSetup.update(DisplayManager.getFrameTimeSeconds());
@@ -198,22 +215,35 @@ public class Mift {
 					}
 				}
 				GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
-				if (player.isOverhead() == false) {
+				//post processing effects
+				if (SettingHolder.get("cg_post_processing").getValueB()) {
+					fbo1.bindFrameBuffer();
+				}
+				//render calls
+				if (player.isOverhead() == false) { //3rd to 1st person view
 					renderer.renderCallStandardView(topBuffers, camera, defaultMouse, waterRenderer, water, lights, entities, null, sunLight);
 					ParticleHolder.renderParticles(camera);
 					attackRenderer.render(camera, fireballHolder.getAll(), waterballHolder.getAll());
 					if (!SettingHolder.get("cg_theatrical").getValueB()) {hudCreator.update(camera);}
-				} else {
+				} else { //overhead view
 					renderer.renderCallOverheadView(topBuffers, overheadCamera, overheadMouse, waterRenderer, water, lights, entities, null, sunLight);
 					ParticleHolder.renderParticles(overheadCamera);
 					attackRenderer.render(overheadCamera, fireballHolder.getAll(), waterballHolder.getAll());
 					if (!SettingHolder.get("cg_theatrical").getValueB()) {hudCreator.update(overheadCamera);}
 				}
+				//post processing effects
+				if (SettingHolder.get("cg_post_processing").getValueB()) {
+					fbo1.unbindFrameBuffer();
+					PostProcessing.doPostProcessing(fbo1.getColorTexture());
+				}
+				
 				if (SettingHolder.get("cg_fps").getValueB()) fpsCounter.updateCounter();
 				
 				if (!SettingHolder.get("cg_theatrical").getValueB()) {
 					guiRenderer.render(guiTextures);
-					hudRenderer.render(hudCreator.getTextures(), hudCreator.getCompass());
+					
+					if (camera.distanceFromPlayer == 0) {hudRenderer.render(hudCreator.getTextures(), hudCreator.getCompass());}
+					
 					texts.get(0).setText(Mift.NAME + " Alpha Build " + Mift.RELEASE + "." + Mift.BUILD);
 					texts.get(1).setText((SettingHolder.get("cg_fps").getValueB() ? (int)(fpsCounter.getFPS()) + "" : ""));
 					texts.get(2).setText(SettingHolder.get("cg_developer").getValueB() ? updateDebugText(player) : "");
@@ -232,7 +262,9 @@ public class Mift {
 		}
 
 		// ********* Clean Up Below **************
-		//ParticleHolder.cleanUp();
+		PostProcessing.cleanUp();
+		ParticleHolder.cleanUp();
+		fbo1.cleanUp();
 		textRenderer.cleanUp();
 		topBuffers.cleanUp();
 		waterShaderTop.cleanUp();

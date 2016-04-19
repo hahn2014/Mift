@@ -14,7 +14,7 @@ public class Sun extends Light {
 	private static final int nightStart = 43200; 	//12:00.00pm
 	private static final int nightMid = 64800;		//06:00.00pm
 	private static final int nightEnd = 86399; 		//11:59.59pm
-	private static float currentTime = 0; 			//12:00.00am
+	private static float currentTime = dayMid; 		//06:00.00am
 	private static float hour = 3600;				//one hour time in seconds
 	
 	private static int daysLived = 1;

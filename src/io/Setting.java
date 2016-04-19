@@ -94,4 +94,31 @@ public class Setting {
 		valueI = value;
 		Logger.info(variable + ":" + spacer + "-> " + value);
 	}
+	
+	public String getValueDebug() {
+		if (type == SettingType.bool) {
+			return (valueB ? "On" : "Off");
+		} else if (type == SettingType.integer) {
+			return valueI + "";
+		} else if (type == SettingType.string) {
+			return valueS;
+		} else {
+			return "null";
+		}
+	}
+	
+	public String getQualityDebug() {
+		if (type == SettingType.integer) {
+			if (valueI == 1) {
+				return "Low";
+			} else if (valueI == 2) {
+				return "Medium";
+			} else if (valueI == 3) {
+				return "High";
+			} else if (valueI == 4) {
+				return "Ultra";
+			}
+		}
+		return "null";
+	}
 }

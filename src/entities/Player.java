@@ -23,7 +23,7 @@ import renderEngine.DisplayManager;
 
 public class Player extends Entity {
 
-	private static final float RUN_SPEED = (SettingHolder.get("player_ufo").getValueB() ? 20.0f : 50.0f);
+	private static final float RUN_SPEED = (!SettingHolder.get("player_ufo").getValueB() ? 20.0f : 50.0f);
 	private static final float MAX_RUN_TIME = 200.0f;
 	private static final float RUN_COOLDOWN = 400f;
 	private static final float GRAVITY = -50;
