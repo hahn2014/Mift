@@ -1,7 +1,5 @@
 package renderEngine;
 
-import models.RawModel;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
@@ -9,6 +7,8 @@ import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector3f;
 
+import io.SettingHolder;
+import models.RawModel;
 import shaders.TerrainShader;
 import terrains.Terrain;
 import textures.TerrainTexturePack;
@@ -30,7 +30,7 @@ public class TerrainRenderer {
 		shader.loadToShadowSpaceMatrix(toShadowSpace);
 		prepareTerrain(terrain);
 		loadModelMatrix(terrain);
-		if (DisplayManager.cg_debug_polygons) {
+		if (SettingHolder.get("cg_debug_polygons").getValueB()) {
 			GL11.glDrawElements(GL11.GL_LINE_STRIP, terrain.getModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
 		} else {
 			GL11.glDrawElements(GL11.GL_TRIANGLES, terrain.getModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);

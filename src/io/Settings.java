@@ -9,10 +9,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import entities.Player;
-import entities.Sun;
-import renderEngine.DisplayManager;
-import toolbox.Maths;
+import io.Setting.SettingType;
 
 public class Settings {
 	private static final String settingsFile = "mift.set";
@@ -32,8 +29,16 @@ public class Settings {
 		BufferedWriter bw = null;
 		try {
 			bw = new BufferedWriter(new FileWriter(settingsFile));
-			bw.write(new String("cg_developer 1;cg_fullscreened 1;cg_animate_day 1;cg_debug_polygons 0;cg_anisotropic_filtering 1;cg_antialiasing_filtering 1;player_sprint_unlimited 0;cg_quality 1;cp_myo_enabled 0"));
-			bw.newLine();
+			for (Setting set : SettingHolder.getAll()) {
+				if (set.getType() == SettingType.integer) {
+					bw.write(set.getVariable() + ": " + set.getDefaultInteger() + ";");
+				} else if (set.getType() == SettingType.bool) {
+					bw.write(set.getVariable() + ": " + set.getDefaultBoolean() + ";");
+				} else if (set.getType() == SettingType.string) {
+					bw.write(set.getVariable() + ": " + set.getDefaultString() + ";");
+				}
+				bw.newLine();
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		} finally {
@@ -65,18 +70,61 @@ public class Settings {
 				ex.printStackTrace();
 			}
 		}
+		
 		String[] variables = listToArray(lines);
-		String vari = "";
-		int vali = 0;
 		for (String var : variables) {
-			vari = var.substring(0, var.length() - 1);
-			try {
-				vali = Integer.parseInt(var.substring(var.length() - 1, var.length()));
-			} catch (Exception e) {
-				vali = 0;
+			String vari = "";
+			int valiAt = 0;
+			int valiI = -1;
+			String valiB = "";
+			String valiS = "";
+			for (int i = 0; i < var.length(); i++) {
+				if (var.charAt(i) != ':') {
+					vari += var.charAt(i);
+				} else {
+					valiAt = i + 1;
+					break;
+				}
 			}
-			applyVariableChange(vari, vali);
+			
+			if (isInteger(var.substring(valiAt, var.length()))) { //integer
+				valiI = Integer.parseInt(var.substring(valiAt, var.length()));
+			} else if (isBoolean(var.substring(valiAt, var.length()))) { //boolean
+				valiB = var.substring(valiAt, var.length());
+			} else { //String
+				valiS = var.substring(valiAt, var.length());
+			}
+			
+			if (valiI != -1 && valiB == "" && valiS == "") { //value is a integer
+				applyChanges(vari, Integer.toString(valiI));
+			} else if (valiI == -1 && valiB != "" && valiS == "") { //value is a boolean
+				applyChanges(vari, valiB);
+			} else if (valiI == -1 && valiB == "" && valiS != "") {
+				applyChanges(vari, valiS);
+			} else {
+				Logger.error("Something messed up while importing " + vari + " at value " + var.substring(valiAt, var.length()));
+			}
 		}
+	}
+	
+	private static boolean isInteger(String s) {
+	    try { 
+	        Integer.parseInt(s);
+	    } catch(NumberFormatException e) { 
+	        return false; 
+	    } catch(NullPointerException e) {
+	        return false;
+	    }
+	    return true;
+	}
+	
+	private static boolean isBoolean(String s) { 
+		try {
+			Boolean.parseBoolean(s);
+		} catch(Exception e) {
+			return false;
+		}
+		return true;
 	}
 	
 	public void saveSettings() {
@@ -101,37 +149,25 @@ public class Settings {
 		return variables.toArray(new String[variables.size()]);
 	}
 	
-	private void applyVariableChange(String variable, int value) {
-		if (variable.equalsIgnoreCase("cg_animate_day")) {
-			Sun.cg_animate_day = Maths.intToBoolean(value);
-			Logger.debug(variable + " has been set to " + Maths.intToBoolean(value));
-		} else if (variable.equalsIgnoreCase("cg_debug_polygons")) {
-			DisplayManager.cg_debug_polygons = Maths.intToBoolean(value);
-			Logger.debug(variable + " has been set to " + Maths.intToBoolean(value));
-		} else if (variable.equalsIgnoreCase("cg_developer")) {
-			DisplayManager.cg_developer_status = Maths.intToBoolean(value);
-			Logger.debug(variable + " has been set to " + Maths.intToBoolean(value));
-		} else if (variable.equalsIgnoreCase("cg_fullscreened")) {
-			DisplayManager.cg_fullscreened = Maths.intToBoolean(value);
-			DisplayManager.setFullscreened(Maths.intToBoolean(value));
-			Logger.debug(variable + " has been set to " + Maths.intToBoolean(value));
-		} else if (variable.equalsIgnoreCase("cg_anisotropic_filtering")) {
-			DisplayManager.cg_anisotropic_filtering = Maths.intToBoolean(value);
-			Logger.debug(variable + " has been set to " + Maths.intToBoolean(value));
-		} else if (variable.equalsIgnoreCase("cg_antialiasing_filtering")) {
-			DisplayManager.cg_antialiasing_filtering = Maths.intToBoolean(value);
-			Logger.debug(variable + " has been set to " + Maths.intToBoolean(value));
-		} else if (variable.equalsIgnoreCase("player_sprint_unlimited")) {
-			Player.runInfinite = Maths.intToBoolean(value);
-			Logger.debug(variable + " has been set to " + Maths.intToBoolean(value));
-		} else if (variable.equalsIgnoreCase("cg_quality")) {
-			DisplayManager.setQuality(value, false);
-			Logger.debug(variable + " has been set to " + value);
-		} else if (variable.equalsIgnoreCase("cp_myo_enabled")) {
-			DisplayManager.myo_use = Maths.intToBoolean(value);
-			Logger.debug(variable + " has been set to " + Maths.intToBoolean(value));
-		} else {
-			Logger.error("Could not find variable " + variable + " with value " + value);
+	private void applyChanges(String var, String val) {
+		if (SettingHolder.get(var).getType() == SettingType.integer) {
+			try {
+				SettingHolder.get(var).setValueI(Integer.parseInt(val));
+			}  catch (Exception e) {
+				SettingHolder.get(var).setValueI(SettingHolder.get(var).getDefaultInteger());
+			}
+		} else if (SettingHolder.get(var).getType() == SettingType.string) {
+			try {
+				SettingHolder.get(var).setValueS(val);
+			}  catch (Exception e) {
+				SettingHolder.get(var).setValueS(SettingHolder.get(var).getDefaultString());
+			}
+		} else if (SettingHolder.get(var).getType() == SettingType.bool) {
+			try {
+				SettingHolder.get(var).setValueB(Boolean.parseBoolean(val));
+			}  catch (Exception e) {
+				SettingHolder.get(var).setValueB(SettingHolder.get(var).getDefaultBoolean());
+			}
 		}
 	}
 }

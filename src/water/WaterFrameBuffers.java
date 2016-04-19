@@ -8,7 +8,7 @@ import org.lwjgl.opengl.GL14;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.opengl.GL32;
 
-import renderEngine.DisplayManager;
+import io.SettingHolder;
 
 public class WaterFrameBuffers {
 
@@ -42,25 +42,25 @@ public class WaterFrameBuffers {
 	}
 	
 	private void getWaterQuality() {
-		if (DisplayManager.cg_quality == 1) {
+		if (SettingHolder.get("cg_quality").getValueI() == 1) {
 			REFLECTION_WIDTH = 426;
 			REFLECTION_HEIGHT = 240;
 			
 			REFRACTION_WIDTH = 426;
 			REFRACTION_HEIGHT = 240;
-		} else if (DisplayManager.cg_quality == 2) {
+		} else if (SettingHolder.get("cg_quality").getValueI() == 2) {
 			REFLECTION_WIDTH = 480;
 			REFLECTION_HEIGHT = 360;
 			
 			REFRACTION_WIDTH = 480;
 			REFRACTION_HEIGHT = 360;
-		} else if (DisplayManager.cg_quality == 3) {
+		} else if (SettingHolder.get("cg_quality").getValueI() == 3) {
 			REFLECTION_WIDTH = 1280;
 			REFLECTION_HEIGHT = 720;
 			
 			REFRACTION_WIDTH = 1280;
 			REFRACTION_HEIGHT = 720;
-		} else if (DisplayManager.cg_quality == 4) {
+		} else if (SettingHolder.get("cg_quality").getValueI() == 4) {
 			REFLECTION_WIDTH = 1920;
 			REFLECTION_HEIGHT = 1080;
 			

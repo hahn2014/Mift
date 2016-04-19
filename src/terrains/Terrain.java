@@ -8,9 +8,9 @@ import org.lwjgl.util.vector.Vector3f;
 import entities.Entity;
 import entities.EntityCreator;
 import entities.MoveType.move_factor;
+import io.SettingHolder;
 import main.Mift;
 import models.RawModel;
-import renderEngine.DisplayManager;
 import textures.TerrainTexture;
 import textures.TerrainTexturePack;
 import toolbox.Maths;
@@ -87,7 +87,7 @@ public class Terrain {
 	}
 	
 	public List<Entity> generateEnemies(move_factor factor, List<Entity> entities) {
-		for (int i = 0; i < 50 * DisplayManager.cg_quality; i++) {
+		for (int i = 0; i < 50 * SettingHolder.get("cg_quality").getValueI(); i++) {
 			Mift.enemies.add(new EntityCreator().createRandomEnemy(factor, i));
 			entities.add(Mift.enemies.get(i));
 		}

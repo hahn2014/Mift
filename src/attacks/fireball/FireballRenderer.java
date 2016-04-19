@@ -10,9 +10,9 @@ import org.lwjgl.util.vector.Vector3f;
 import attacks.AttackShader;
 import entities.Camera;
 import entities.OverheadCamera;
+import io.SettingHolder;
 import models.RawModel;
 import models.TexturedModel;
-import renderEngine.DisplayManager;
 import renderEngine.MasterRenderer;
 import textures.ModelTexture;
 import toolbox.Maths;
@@ -22,19 +22,17 @@ public class FireballRenderer {
 	Matrix4f projectionMatrix = MasterRenderer.getProjectionMatrix();
 
 	public FireballRenderer(AttackShader shader) {
-		this.shader = shader;
 		shader.start();
 		shader.loadProjectionMatrix(projectionMatrix);
 		shader.stop();
 	}
 
 	public void render(Fireball fireball, OverheadCamera camera) {
-		shader.loadViewMatrix(camera);
 		TexturedModel model = fireball.getTexturedModel();
 		prepareTexturedModel(model);
 		if (fireball.isRenderable()) {
 			prepareInstance(fireball.getCurrentPosition());
-			if (DisplayManager.cg_debug_polygons) {
+			if (SettingHolder.get("cg_debug_polygons").getValueB()) {
 				GL11.glDrawElements(GL11.GL_LINE_STRIP, model.getRawModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
 			} else {
 				GL11.glDrawElements(GL11.GL_TRIANGLES, model.getRawModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
@@ -45,12 +43,11 @@ public class FireballRenderer {
 	}
 	
 	public void render(Fireball fireball, Camera camera) {
-		shader.loadViewMatrix(camera);
 		TexturedModel model = fireball.getTexturedModel();
 		prepareTexturedModel(model);
 		if (fireball.isRenderable()) {
 			prepareInstance(fireball.getCurrentPosition());
-			if (DisplayManager.cg_debug_polygons) {
+			if (SettingHolder.get("cg_debug_polygons").getValueB()) {
 				GL11.glDrawElements(GL11.GL_LINE_STRIP, model.getRawModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
 			} else {
 				GL11.glDrawElements(GL11.GL_TRIANGLES, model.getRawModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);

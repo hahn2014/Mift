@@ -3,6 +3,7 @@ package guis.menu;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
+import io.SettingHolder;
 import main.Mift;
 import renderEngine.DisplayManager;
 import terrains.TerrainCreator;
@@ -71,7 +72,7 @@ public class MenuController {
 					}
 				}
 				if (Keyboard.getEventKey() == Keyboard.KEY_F1) {
-					DisplayManager.setFullscreened(!DisplayManager.cg_fullscreened);
+					DisplayManager.setFullscreened(!SettingHolder.get("cg_fullscreened").getValueB());
 				}
 				if (Keyboard.getEventKey() == Keyboard.KEY_F2) {
 					Mouse.setGrabbed(!Mouse.isGrabbed());

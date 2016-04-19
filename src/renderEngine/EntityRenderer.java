@@ -13,6 +13,7 @@ import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
 
 import entities.Entity;
+import io.SettingHolder;
 import shaders.StaticShader;
 import textures.ModelTexture;
 import toolbox.Maths;
@@ -36,7 +37,7 @@ public class EntityRenderer {
 			for (Entity entity : batch) {
 				if (entity.isRenderable()) {
 					prepareInstance(entity);
-					if (DisplayManager.cg_debug_polygons) {
+					if (SettingHolder.get("cg_debug_polygons").getValueB()) {
 						GL11.glDrawElements(GL11.GL_LINE_STRIP, model.getRawModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);
 					} else {
 						GL11.glDrawElements(GL11.GL_TRIANGLES, model.getRawModel().getVertexCount(), GL11.GL_UNSIGNED_INT, 0);

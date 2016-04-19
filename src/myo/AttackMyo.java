@@ -1,7 +1,5 @@
 package myo;
 
-import org.lwjgl.util.vector.Vector2f;
-
 import com.thalmic.myo.Myo;
 import com.thalmic.myo.Pose;
 import com.thalmic.myo.Quaternion;
@@ -11,6 +9,7 @@ import com.thalmic.myo.enums.WarmupState;
 import com.thalmic.myo.enums.XDirection;
 
 import io.Logger;
+import main.Mift;
 
 public class AttackMyo extends MyoDevice {
 	private static final int SCALE = 18;
@@ -77,13 +76,17 @@ public class AttackMyo extends MyoDevice {
 		Logger.info(currentPose.toString());
 		
 		if (currentPose.getType() == PoseType.FINGERS_SPREAD || currentPose.getType() == PoseType.FIST) {
-			Logger.info("FIRE SHIT");
+			Logger.info(Mift.player.attackType.name());
 		}
 		
 		if (currentPose.getType() == PoseType.WAVE_IN) {
 			Logger.info("next spell");
+			Mift.player.attackType = Mift.player.at.rotate(Mift.player.attackType);
+			Logger.info("new: " + Mift.player.attackType.name());
 		} else if (currentPose.getType() == PoseType.WAVE_OUT) {
 			Logger.info("prev spell");
+			Mift.player.attackType = Mift.player.at.rotateReverse(Mift.player.attackType);
+			Logger.info("new: " + Mift.player.attackType.name());
 		}
 	}
 

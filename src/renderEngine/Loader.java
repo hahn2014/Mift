@@ -27,6 +27,7 @@ import textures.TextureData;
 import de.matthiasmann.twl.utils.PNGDecoder;
 import de.matthiasmann.twl.utils.PNGDecoder.Format;
 import io.Logger;
+import io.SettingHolder;
 
 public class Loader {
 
@@ -107,14 +108,14 @@ public class Loader {
 			GL30.glGenerateMipmap(GL11.GL_TEXTURE_2D);
 			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR_MIPMAP_LINEAR);
 
-			if (DisplayManager.cg_anisotropic_filtering == true) {
+			if (SettingHolder.get("cg_anisotropic_filtering").getValueB() == true) {
 				if (GLContext.getCapabilities().GL_EXT_texture_filter_anisotropic) {
 					GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL14.GL_TEXTURE_LOD_BIAS, 0f);
 					float amount = Math.min(2f * quality, GL11.glGetFloat(EXTTextureFilterAnisotropic.GL_MAX_TEXTURE_MAX_ANISOTROPY_EXT));
 					GL11.glTexParameterf(GL11.GL_TEXTURE_2D, EXTTextureFilterAnisotropic.GL_TEXTURE_MAX_ANISOTROPY_EXT, amount);
 				} else {
 					Logger.error("System does not support Anisotropic Filtering, we will disable it");
-					DisplayManager.cg_anisotropic_filtering = false;
+					SettingHolder.get("cg_anisotropic_filtering").setValueB(false);
 					GL11.glTexParameterf(GL11.GL_TEXTURE_2D, GL14.GL_TEXTURE_LOD_BIAS, -0.4f);
 				}
 			}

@@ -9,7 +9,6 @@ import entities.Camera;
 import entities.Entity;
 import entities.OverheadCamera;
 import guis.GuiTexture;
-import io.Logger;
 import main.Mift;
 import renderEngine.Loader;
 import toolbox.Maths;
@@ -24,32 +23,26 @@ public class Compass {
 		//compassTexture = new GuiTexture(loader.loadTexture("compass"), new Vector2f(-0.25f, -0.25f), new Vector2f(0.18f, 0.30f));
 	}
 	
-	public void update(Camera camera, boolean enemiesOnly) {
+	public void update(Camera camera) {
 		compassTexture.setRotation(camera.getYaw());
 		if (updateDelay < 120) {
 			updateDelay++;
 		} else {
 			//look for enemies/friendlies
-			if (enemiesOnly == false) {
-				updateEntitiesOnCompass();
-			}
+			updateEntitiesOnCompass();
 			updateEnemiesOnCompass();
-			Logger.debug("---------------------------------------------------------");
 			updateDelay = 0;
 		}
 	}
 	
-	public void update(OverheadCamera camera, boolean enemiesOnly) {
+	public void update(OverheadCamera camera) {
 		compassTexture.setRotation(camera.getYaw());
 		if (updateDelay < 120) {
 			updateDelay++;
 		} else {
 			//look for enemies/friendlies
-			if (enemiesOnly == false) {
-				updateEntitiesOnCompass();
-			}
+			updateEntitiesOnCompass();
 			updateEnemiesOnCompass();
-			Logger.debug("---------------------------------------------------------");
 			updateDelay = 0;
 		}
 	}
@@ -61,9 +54,9 @@ public class Compass {
 				enemies.add(Mift.enemies.get(i));
 			}
 		}
-		for (int i = 0; i < enemies.size(); i++) {
-			Logger.debug("Enemy [" + i + "] is within 50 units from the player. Updating positiong on the compass." + enemies.get(i).getType().name());
-		}
+//		for (int i = 0; i < enemies.size(); i++) {
+//			Logger.debug("Enemy [" + i + "] is within 50 units from the player. Updating positiong on the compass." + enemies.get(i).getType().name());
+//		}
 		enemies.clear();
 	}
 	
@@ -74,9 +67,9 @@ public class Compass {
 				entities.add(Mift.entities.get(i));
 			}
 		}
-		for (int i = 0; i < entities.size(); i++) {
-			Logger.debug("Entity [" + i + "] is within 50 units from the player. Updating positiong on the compass. " + entities.get(i).getType().name());
-		}
+//		for (int i = 0; i < entities.size(); i++) {
+//			Logger.debug("Entity [" + i + "] is within 50 units from the player. Updating positiong on the compass. " + entities.get(i).getType().name());
+//		}
 		entities.clear();
 	}
 }

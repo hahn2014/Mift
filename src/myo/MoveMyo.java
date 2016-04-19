@@ -7,8 +7,6 @@ import com.thalmic.myo.enums.Arm;
 import com.thalmic.myo.enums.WarmupState;
 import com.thalmic.myo.enums.XDirection;
 
-import io.Logger;
-
 public class MoveMyo extends MyoDevice {
 	private static final int SCALE = 18;
 	public static double rollW;

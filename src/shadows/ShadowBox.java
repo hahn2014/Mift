@@ -7,7 +7,7 @@ import org.lwjgl.util.vector.Vector4f;
 
 import entities.Camera;
 import entities.OverheadCamera;
-import renderEngine.DisplayManager;
+import io.SettingHolder;
 import renderEngine.MasterRenderer;
 
 public class ShadowBox {
@@ -33,8 +33,8 @@ public class ShadowBox {
 	}
 	
 	private void setQuality() {
-		if (DisplayManager.cg_quality >= 1 && DisplayManager.cg_quality <= 4) {
-			SHADOW_DISTANCE = 50 * DisplayManager.cg_quality;
+		if (SettingHolder.get("cg_quality").getValueI() >= 1 && SettingHolder.get("cg_quality").getValueI() <= 4) {
+			SHADOW_DISTANCE = 50 * SettingHolder.get("cg_quality").getValueI();
 		}
 	}
 

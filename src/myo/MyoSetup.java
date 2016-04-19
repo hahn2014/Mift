@@ -4,7 +4,7 @@ import com.thalmic.myo.Hub;
 import com.thalmic.myo.Myo;
 
 import io.Logger;
-import renderEngine.DisplayManager;
+import io.SettingHolder;
 
 public class MyoSetup {
 	private static Hub hub;
@@ -15,8 +15,8 @@ public class MyoSetup {
 			try {
 				hub = new Hub("");
 				Myo myo = hub.waitForMyo(10000);
-				DisplayManager.myo_use = (myo != null);
-				if (DisplayManager.myo_use == true) {
+				SettingHolder.get("cp_myo_enabled").setValueB(myo != null);
+				if (SettingHolder.get("cp_myo_enabled").getValueB()) {
 					Logger.info("Using Myo for input");
 				}
 				
@@ -25,7 +25,7 @@ public class MyoSetup {
 			} catch (Exception e) { //myo init failsafe will disable use myo if unable to access
 				Logger.error("Unable to initialize Myo Armband. -> ");
 				e.printStackTrace();
-				DisplayManager.myo_use = false;
+				SettingHolder.get("cp_myo_enabled").setValueB(false);
 			}
 		}
 	}

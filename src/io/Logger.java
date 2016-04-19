@@ -1,11 +1,9 @@
 package io;
 
-import renderEngine.DisplayManager;
-
 public class Logger {
 	
 	public static void debug(String message) {
-		if (DisplayManager.cg_developer_status == true) {
+		if (SettingHolder.get("cg_developer").getValueB()) {
 			System.out.println("[DBUG] " + message);
 		}
 	}

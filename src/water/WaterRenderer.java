@@ -10,6 +10,7 @@ import org.lwjgl.util.vector.Vector3f;
 import entities.Camera;
 import entities.Light;
 import entities.OverheadCamera;
+import io.SettingHolder;
 import main.Mift;
 import models.RawModel;
 import renderEngine.DisplayManager;
@@ -47,7 +48,7 @@ public class WaterRenderer {
 		Matrix4f modelMatrix = Maths.createTransformationMatrix(
 				new Vector3f(water.getX(), WaterTile.height, water.getZ()), 0, 0, 0, WaterTile.SIZE);
 		shader.loadModelMatrix(modelMatrix);
-		if (DisplayManager.cg_debug_polygons) {
+		if (SettingHolder.get("cg_debug_polygons").getValueB()) {
 			GL11.glDrawArrays(GL11.GL_LINE_STRIP, 0, quad.getVertexCount());
 		} else {
 			GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, quad.getVertexCount());

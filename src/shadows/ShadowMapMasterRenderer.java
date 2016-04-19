@@ -12,8 +12,8 @@ import entities.Camera;
 import entities.Entity;
 import entities.Light;
 import entities.OverheadCamera;
+import io.SettingHolder;
 import models.TexturedModel;
-import renderEngine.DisplayManager;
 
 public class ShadowMapMasterRenderer {
 
@@ -38,8 +38,8 @@ public class ShadowMapMasterRenderer {
 	}
 	
 	private void setQuality() {
-		if (DisplayManager.cg_quality >= 1 && DisplayManager.cg_quality <= 4) {
-			SHADOW_MAP_SIZE = 4100 * DisplayManager.cg_quality;
+		if (SettingHolder.get("cg_quality").getValueI() >= 1 && SettingHolder.get("cg_quality").getValueI() <= 4) {
+			SHADOW_MAP_SIZE = 4100 * SettingHolder.get("cg_quality").getValueI();
 		}
 	}
 

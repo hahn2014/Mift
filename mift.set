@@ -1,1 +1,12 @@
-cg_developer 1;cg_fullscreened 0;cg_animate_day 1;cg_debug_polygons 0;cg_anisotropic_filtering 1;cg_antialiasing_filtering 1;player_sprint_unlimited 1;cg_quality 2;cp_myo_enabled 1;
+cg_developer: true; 			//give player developer status
+cg_fullscreened: false; 		//fullscreen the game
+cg_animate_day: true; 			//allow for sun movement and day progression
+cg_debug_polygons: false; 		//(!WARNING SLOWER!) render only vertice connections with lines
+cg_anisotropic_filtering: true; 	//smoother textures at angles from a distance away
+cg_antialiasing_filtering: true; 	//smoother textures and models
+cg_fps: true; 				//render fps value on screen
+cg_theatrical: false;			//dissable all text and GUI elements on screen
+player_sprint_unlimited: true;		//player can sprint forever
+player_ufo: false;			//player has no collision checking and can float up and down
+cp_myo_enabled: false;			//attempt to connect to myo armband on startup
+cg_quality: 1;				//set you computer quality from 1 to 4 based on desired performance

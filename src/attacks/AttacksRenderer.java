@@ -11,10 +11,11 @@ import main.Mift;
 import renderEngine.MasterRenderer;
 
 public class AttacksRenderer {
-	private AttackShader shader =  new AttackShader();
-	FireballRenderer fireRender = new FireballRenderer(shader);
+	AttackShader shader = new AttackShader();
+	FireballRenderer fireRender;
 
 	public AttacksRenderer() {
+		fireRender = new FireballRenderer(shader);
 		shader.start();
 		shader.loadProjectionMatrix(MasterRenderer.getProjectionMatrix());
 		shader.stop();

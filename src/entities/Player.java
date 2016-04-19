@@ -6,10 +6,13 @@ import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector3f;
 
+import com.thalmic.myo.enums.PoseType;
+
 import attacks.Attack.AttackType;
 import attacks.AttackHolder;
 import entities.EntityType.entityType;
 import io.Logger;
+import io.SettingHolder;
 import main.Mift;
 import models.TexturedModel;
 import myo.MoveMyo;
@@ -17,11 +20,10 @@ import myo.MyoManager;
 import particles.ParticleEmitter;
 import particles.ParticleTexture;
 import renderEngine.DisplayManager;
-import com.thalmic.myo.enums.PoseType;
 
 public class Player extends Entity {
 
-	private static final float RUN_SPEED = 20.0f;
+	private static final float RUN_SPEED = (SettingHolder.get("player_ufo").getValueB() ? 20.0f : 50.0f);
 	private static final float MAX_RUN_TIME = 200.0f;
 	private static final float RUN_COOLDOWN = 400f;
 	private static final float GRAVITY = -50;
@@ -39,7 +41,6 @@ public class Player extends Entity {
 	private boolean isOverhead = false;
 	private boolean isRunning = false;
 	private boolean isRunCooldown = false;
-	public static boolean runInfinite = true;
 	
 	public AttackType attackType = AttackType.fireball;
 	public AttackHolder at;
@@ -69,27 +70,35 @@ public class Player extends Entity {
 		float distance = currentSpeed * DisplayManager.getFrameTimeSeconds();
 		float dx = (float) (distance * Math.sin(Math.toRadians(super.getRotY())));
 		float dz = (float) (distance * Math.cos(Math.toRadians(super.getRotY())));
-		upwardsSpeed += GRAVITY * DisplayManager.getFrameTimeSeconds();
+		if (!SettingHolder.get("player_ufo").getValueB()) {
+			upwardsSpeed += GRAVITY * DisplayManager.getFrameTimeSeconds() / 1000;
+		}
 		super.increasePosition(dx, upwardsSpeed * DisplayManager.getFrameTimeSeconds(), dz);
 		
-		float terrainHeight = Mift.terrain.getHeightOfTerrain(x, z);
-		
-		if (super.getPosition().getY() < terrainHeight) {
-			upwardsSpeed = 0;
-			super.getPosition().setY(terrainHeight);
-			isInAir = false;
+		if (!SettingHolder.get("player_ufo").getValueB()) {
+			float terrainHeight = Mift.terrain.getHeightOfTerrain(x, z);
+			
+			if (super.getPosition().getY() < terrainHeight) {
+				upwardsSpeed = 0;
+				super.getPosition().setY(terrainHeight);
+				isInAir = false;
+			}
 		}
 	}
 	
 	private void jump() {
-		if (!isInAir) {
-			this.upwardsSpeed = JUMP_POWER;
-			isInAir = true;
+		if (!SettingHolder.get("player_ufo").getValueB()) {
+			if (!isInAir) {
+				this.upwardsSpeed = JUMP_POWER;
+				isInAir = true;
+			}
+		} else {
+			super.increasePosition(0, 10 * DisplayManager.getFrameTimeSeconds(), 0);
 		}
 	}
 	
 	private void checkRunCooldown() {
-		if (runInfinite == false) {
+		if (SettingHolder.get("player_sprint_unlimited").getValueB() == false) {
 			if (currentRunCooldown >= RUN_COOLDOWN) {
 				this.isRunning = true;
 				currentRunTime = 0f;
@@ -125,7 +134,7 @@ public class Player extends Entity {
 	}
 	
 	private void checkInputs() {
-		if (DisplayManager.myo_use == true) {
+		if (SettingHolder.get("cp_myo_enabled").getValueB()) {
 			updateMyo();
 			return;
 		}
@@ -152,6 +161,11 @@ public class Player extends Entity {
 		if (Keyboard.isKeyDown(Keyboard.KEY_LSHIFT)) {
 			if (!isRunning) {
 				checkRunCooldown();
+			}
+		}
+		if (Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
+			if (SettingHolder.get("player_ufo").getValueB()) {
+				super.increasePosition(0, -10 * DisplayManager.getFrameTimeSeconds(), 0);
 			}
 		}
 

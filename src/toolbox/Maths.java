@@ -134,4 +134,14 @@ public class Maths {
 			return false;
 		}
 	}
+	
+	public static int booleanToInt(boolean value) {
+		if (value == false) {
+			return 0;
+		} else if (value == true) {
+			return 1;
+		} else {
+			return 0;
+		}
+	}
 }

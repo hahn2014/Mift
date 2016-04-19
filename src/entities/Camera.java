@@ -5,6 +5,7 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector3f;
 
+import io.SettingHolder;
 import main.Mift;
 import myo.MyoManager;
 import renderEngine.DisplayManager;
@@ -45,7 +46,7 @@ public class Camera {
 	}
 	
 	public void move() {
-		if (Mouse.isGrabbed()) {
+		if (Mouse.isGrabbed() && Mift.isPaused() == false) {
 			calculateZoom();
 			calculatePitch();
 			calculateAngleAroundPlayer(Mouse.getDX());
@@ -60,7 +61,7 @@ public class Camera {
 	 * I don't know why the pause menu is controlled by the Camera, but it is :D
 	 */
 	public void getKeys() {
-		if (DisplayManager.myo_use) {
+		if (SettingHolder.get("cp_myo_enabled").getValueB()) {
 			pitch += MyoManager.getMoveMyo().getPitchDiff();
 			calculateAngleAroundPlayer((int) (MyoManager.getMoveMyo().getYawDiff() * 10));
 		} else {
@@ -71,7 +72,7 @@ public class Camera {
 			Mift.setPaused(true);
 		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_F1)) {
-			DisplayManager.setFullscreened(!DisplayManager.cg_fullscreened);
+			DisplayManager.setFullscreened(!SettingHolder.get("cg_fullscreened").getValueB());
 		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_F2)) { //unlock the mouse from the screen
 			Mouse.setGrabbed(false);

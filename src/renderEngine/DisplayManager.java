@@ -10,6 +10,7 @@ import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.PixelFormat;
 
 import io.Logger;
+import io.SettingHolder;
 import main.Mift;
 
 public class DisplayManager {
@@ -20,15 +21,6 @@ public class DisplayManager {
 	private static int HEIGHT = 1080 / downscale;
 	private static final double FPS_CAP = 59.999998;
 	
-	public static boolean cg_fullscreened = false;
-	public static boolean cg_anisotropic_filtering = false;
-	public static boolean cg_antialiasing_filtering = false;
-	public static boolean cg_debug_polygons = false;
-	public static boolean cg_developer_status = false;
-	public static boolean cs_windowsSystem = true;
-	public static boolean myo_use = true;
-	public static int cg_quality = 1;
-
 	private static long lastFrameTime;
 	private static float delta; // Measured in nanoseconds
 
@@ -38,8 +30,8 @@ public class DisplayManager {
 		ContextAttribs attribs = new ContextAttribs(3, 3).withForwardCompatible(true).withProfileCore(true);
 		try {
 			setDisplayMode(WIDTH, HEIGHT);
-			if (cg_antialiasing_filtering == true) {
-				Display.create(new PixelFormat().withSamples(4 * cg_quality), attribs);
+			if (SettingHolder.get("cg_antialiasing_filtering").getValueB() == true) {
+				Display.create(new PixelFormat().withSamples(4 * SettingHolder.get("cg_quality").getValueI()), attribs);
 			} else {
 				Display.create(new PixelFormat(), attribs);
 			}
@@ -95,14 +87,14 @@ public class DisplayManager {
 
 	private static void setDisplayMode(int width, int height) {
 		if ((Display.getDisplayMode().getWidth() == width) && (Display.getDisplayMode().getHeight() == height)
-				&& (Display.isFullscreen() == cg_fullscreened)) {
+				&& (Display.isFullscreen() == SettingHolder.get("cg_fullscreened").getValueB())) {
 			return;
 		}
 
 		try {
 			DisplayMode targetDisplayMode = null;
 
-			if (cg_fullscreened) {
+			if (SettingHolder.get("cg_fullscreened").getValueB()) {
 				DisplayMode[] modes = Display.getAvailableDisplayModes();
 				int freq = 0;
 
@@ -130,40 +122,40 @@ public class DisplayManager {
 			}
 
 			if (targetDisplayMode == null) {
-				Logger.error("Failed to find value mode: " + width + "x" + height + " fs=" + cg_fullscreened);
+				Logger.error("Failed to find value mode: " + width + "x" + height + " fs=" + SettingHolder.get("cg_fullscreened").getValueB());
 				return;
 			}
 
 			Display.setDisplayMode(targetDisplayMode);
-			Display.setFullscreen(cg_fullscreened);
+			Display.setFullscreen(SettingHolder.get("cg_fullscreened").getValueB());
 			Display.setVSyncEnabled(true);
 
 		} catch (LWJGLException e) {
-			Logger.error("Unable to setup mode " + width + "x" + height + " fullscreen=" + cg_fullscreened + e);
+			Logger.error("Unable to setup mode " + width + "x" + height + " fullscreen=" + SettingHolder.get("cg_fullscreened").getValueB() + e);
 		}
 	}
 	
 	private static void getQuality() {
-		if (cg_quality == 1) {
+		if (SettingHolder.get("cg_quality").getValueI() == 1) {
 			WIDTH = 1280;
 			HEIGHT = 720;
-		} else if (cg_quality == 2) {
+		} else if (SettingHolder.get("cg_quality").getValueI() == 2) {
 			WIDTH = 1920;
 			HEIGHT = 1080;
-		} else if (cg_quality == 3) {
+		} else if (SettingHolder.get("cg_quality").getValueI() == 3) {
 			WIDTH = 2560;
 			HEIGHT = 1440;
-		} else if (cg_quality == 4) {
+		} else if (SettingHolder.get("cg_quality").getValueI() == 4) {
 			WIDTH = 3840;
 			HEIGHT = 2160;
 		} else {
-			cg_quality = 1;
+			SettingHolder.get("cg_quality").setValueI(1);
 			getQuality();
 		}
 	}
 	
 	public static void setQuality(int quality, boolean ingame) {
-		cg_quality = quality;
+		SettingHolder.get("cg_quality").setValueI(quality);
 		getQuality();
 		if (ingame) {
 			Display.destroy();
@@ -173,10 +165,10 @@ public class DisplayManager {
 	
 	public static void setFullscreened(boolean fs) {
 		if (fs == true) {
-			cg_fullscreened = true;
+			SettingHolder.get("cg_fullscreened").setValueB(true);
 			setDisplayMode(WIDTH, HEIGHT);
 		} else {
-			cg_fullscreened = false;
+			SettingHolder.get("cg_fullscreened").setValueB(false);
 			setDisplayMode(WIDTH, HEIGHT);
 		}
 	}

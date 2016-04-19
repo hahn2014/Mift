@@ -9,6 +9,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 import entities.EntityType.entityType;
 import entities.MoveType.move_factor;
+import io.SettingHolder;
 import main.Mift;
 import renderEngine.DisplayManager;
 
@@ -60,7 +61,7 @@ public class OverheadCamera {
 			Mift.setPaused(true);
 		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_F1)) {
-			DisplayManager.setFullscreened(!DisplayManager.cg_fullscreened);
+			DisplayManager.setFullscreened(!SettingHolder.get("cg_fullscreened").getValueB());
 		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_F2)) { //unlock the mouse from the screen
 			Mouse.setGrabbed(false);

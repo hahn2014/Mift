@@ -3,6 +3,7 @@ package main;
 import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
@@ -31,6 +32,7 @@ import guis.GuiTexture;
 import guis.hud.HUDCreator;
 import guis.hud.HUDRenderer;
 import guis.menu.MenuRenderer;
+import io.SettingHolder;
 import io.Settings;
 import myo.MyoSetup;
 import particles.ParticleEmitter;
@@ -61,7 +63,6 @@ public class Mift {
 	public static final String RELEASE_TITLE = "Alpha";
 	public static final String NAME = "Mift";
 	
-	public static final Boolean fps = false;
 	private static boolean isPaused = true;
 	private static SecureRandom random;
 	public static boolean hasMadeWorld = false;
@@ -87,6 +88,7 @@ public class Mift {
 	public static Loader loader = new Loader();
 	public static Settings settings;
 
+	public static HUDCreator hudCreator;
 	public static MasterRenderer renderer;
 	public static EntityTypeHolder entityTypeHolder;
 	public static MoveTypeHolder moveTypeHolder;
@@ -100,6 +102,7 @@ public class Mift {
 	@SuppressWarnings("static-access")
 	public static void main(String[] args) {
 		new ImportLibs(); //link the natives for lwjgl
+		new SettingHolder(); //generate and import settings
 		random = new SecureRandom();
 		random.setSeed(System.currentTimeMillis());
 		//initialize the quality of the game while loading
@@ -107,7 +110,7 @@ public class Mift {
 		settings = new Settings();
 		dm.createDisplay();
 
-		MyoSetup.init(DisplayManager.myo_use);
+		MyoSetup.init(SettingHolder.get("cp_myo_enabled").getValueB());
 		
 		//init main objects
 		FPSCounter fpsCounter = new FPSCounter();
@@ -137,8 +140,8 @@ public class Mift {
 		// ********** Water Renderer Top Side ************************
 		WaterFrameBuffers topBuffers = new WaterFrameBuffers();
 		WaterShader waterShaderTop = new WaterShader();
-		WaterRenderer topWaterRenderer = new WaterRenderer(waterShaderTop, renderer.getProjectionMatrix(), topBuffers);
-		WaterTile topWater = new WaterTile(500, 500);
+		WaterRenderer waterRenderer = new WaterRenderer(waterShaderTop, renderer.getProjectionMatrix(), topBuffers);
+		WaterTile water = new WaterTile(500, 500);
 		instance_count++;
 		
 		Display.setTitle(NAME + " Release " + RELEASE + " b" + BUILD);
@@ -166,13 +169,13 @@ public class Mift {
 		pe.setSpeedError(0.25f);
 		pe.setScaleError(0.5f);
 		pe.randomizeRotation();
-		
-		// ********************* ATTACKS ************************\
+
+		// **************** ATTACKS *****************************
 		AttacksRenderer attackRenderer = new AttacksRenderer();
 		
 		// **************** HUD *********************************
 		HUDRenderer hudRenderer = new HUDRenderer();
-		HUDCreator hudCreator = new HUDCreator(loader, false);
+		hudCreator = new HUDCreator(loader, false);
 		MenuRenderer pauseRenderer = new MenuRenderer();
 		
 		// **************** Game Loop Below *********************
@@ -180,7 +183,7 @@ public class Mift {
 			if (isPaused) { //render pause
 				pauseRenderer.update();
 			} else { //render in game
-				if (DisplayManager.myo_use) {
+				if (SettingHolder.get("cp_myo_enabled").getValueB()) {
 					MyoSetup.update(DisplayManager.getFrameTimeSeconds());
 				}
 				player.move();
@@ -189,7 +192,6 @@ public class Mift {
 				
 				//pe.generateParticles(player.getPosition());
 				
-				//have all enemies in the map move around, even the ones spawned by player
 				for (Enemy e : enemies) {
 					if (e != null) {
 						e.move(player);
@@ -197,26 +199,30 @@ public class Mift {
 				}
 				GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
 				if (player.isOverhead() == false) {
-					renderer.renderCallStandardView(topBuffers, camera, defaultMouse, topWaterRenderer, topWater, lights, entities, null, sunLight);
-					attackRenderer.render(camera, fireballHolder.getAll(), waterballHolder.getAll());
+					renderer.renderCallStandardView(topBuffers, camera, defaultMouse, waterRenderer, water, lights, entities, null, sunLight);
 					ParticleHolder.renderParticles(camera);
-					hudCreator.update(camera);
+					attackRenderer.render(camera, fireballHolder.getAll(), waterballHolder.getAll());
+					if (!SettingHolder.get("cg_theatrical").getValueB()) {hudCreator.update(camera);}
 				} else {
-					renderer.renderCallOverheadView(topBuffers, overheadCamera, overheadMouse, topWaterRenderer, topWater, lights, entities, null, sunLight);
-					attackRenderer.render(overheadCamera, fireballHolder.getAll(), waterballHolder.getAll());
+					renderer.renderCallOverheadView(topBuffers, overheadCamera, overheadMouse, waterRenderer, water, lights, entities, null, sunLight);
 					ParticleHolder.renderParticles(overheadCamera);
-					hudCreator.update(overheadCamera);
+					attackRenderer.render(overheadCamera, fireballHolder.getAll(), waterballHolder.getAll());
+					if (!SettingHolder.get("cg_theatrical").getValueB()) {hudCreator.update(overheadCamera);}
 				}
-				guiRenderer.render(guiTextures);
-				guiRenderer.render(hudCreator.getTextures());
-				fpsCounter.updateCounter();
-				texts.get(0).setText(Mift.NAME + " Alpha Build " + Mift.RELEASE + "." + Mift.BUILD);
-				texts.get(1).setText((int) (fpsCounter.getFPS()) + "");
-				texts.get(2).setText(DisplayManager.cg_developer_status ? updateDebugText(player) : "");
-				texts.get(3).setText(player.isOverhead() ? updateModelPlacerText(entityTypeHolder, moveTypeHolder, player) : "");
-				texts.get(4).setText(camera.isFPS() ? updateAttackText(attackHolder, player) : "");
-				texts.get(5).setText("Day " + sunLight.getDay() + "  ~" + sunLight.getCurrentTimeDebug());
-				textRenderer.render(texts);
+				if (SettingHolder.get("cg_fps").getValueB()) fpsCounter.updateCounter();
+				
+				if (!SettingHolder.get("cg_theatrical").getValueB()) {
+					guiRenderer.render(guiTextures);
+					hudRenderer.render(hudCreator.getTextures(), hudCreator.getCompass());
+					texts.get(0).setText(Mift.NAME + " Alpha Build " + Mift.RELEASE + "." + Mift.BUILD);
+					texts.get(1).setText((SettingHolder.get("cg_fps").getValueB() ? (int)(fpsCounter.getFPS()) + "" : ""));
+					texts.get(2).setText(SettingHolder.get("cg_developer").getValueB() ? updateDebugText(player) : "");
+					texts.get(3).setText(player.isOverhead() ? updateModelPlacerText(entityTypeHolder, moveTypeHolder, player) : "");
+					texts.get(4).setText(camera.isFPS() ? updateAttackText(attackHolder, player) : "");
+					texts.get(5).setText("Day " + sunLight.getDay() + "  ~" + sunLight.getCurrentTimeDebug());
+					textRenderer.render(texts);
+				}
+				
 				if (textsDissabled) {
 					enableAllTexts(true);
 				}
@@ -238,9 +244,9 @@ public class Mift {
 	
 	private static String updateDebugText(Player player) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(" Developer Mode: " + DisplayManager.cg_debug_polygons);
+		sb.append(" Developer Mode: " + SettingHolder.get("cg_developer").getValueB());
 		sb.append("  ~ Resolution: " + DisplayManager.getRes());
-		sb.append("  ~ Fullscreened: " + DisplayManager.cg_fullscreened);
+		sb.append("  ~ Fullscreened: " + SettingHolder.get("cg_fullscreened").getValueB());
 		sb.append("  ~ Camera Distance: " + (player.isOverhead() ? Integer.toString((int)overheadCamera.distanceFromPlayer) : Integer.toString((int)camera.distanceFromPlayer)));
 		sb.append("  ~ Camera POV: " + (player.isOverhead() ? "Over Head Perspective" : (camera.distanceFromPlayer == 0 ? "First Person Perspective" : "Third Person Perspective")));
 		sb.append("  ~ Camera Position : " + (player.isOverhead() ? overheadCamera.getPositionDebug() : camera.getPositionDebug()));
@@ -248,8 +254,6 @@ public class Mift {
 		sb.append("  ~ Player Position: " + player.getPositionDebug());
 		sb.append("  ~ Player Rotation: " + player.getRotationDebug());
 		sb.append("  ~ Instances Within World: " + instance_count);
-		sb.append("  ~ Sun Pos: " + sunLight.getPositionDebug());
-		sb.append("  ~ Sun Time: " + sunLight.getCurrentTimeInt() + " ~ " + SkyboxRenderer.getCurrentTimeInt());
 		return sb.toString();
 	}
 	
