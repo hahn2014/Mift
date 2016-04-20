@@ -181,6 +181,7 @@ public class Camera {
 	private void calculateAngleAroundPlayer(int diff) {
 		float angleChange = diff * horizontalSensitivity;
 		player.setRotY(player.getRotY() - angleChange);
+		Mift.player_legs.setRotY(player.getRotY() - angleChange);
 	}
 
 	public boolean isFPS() {

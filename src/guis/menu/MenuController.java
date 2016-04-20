@@ -2,50 +2,45 @@ package guis.menu;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.Display;
 
-import io.SettingHolder;
 import main.Mift;
-import renderEngine.DisplayManager;
 import terrains.TerrainCreator;
 
 public class MenuController {
 	public static int selected = 1;
+	private int min = 1;
+	private int max = 5;
 	
 	public void checkInputs() {
 		while (Keyboard.next()) {
 			if (Keyboard.getEventKeyState()) { //pressed
 			} else { //released
 				if (Keyboard.getEventKey() == Keyboard.KEY_RETURN) {
-					if (selected == 1) {
-						//new world
+					if (selected == 1) { //new world
 						TerrainCreator.newWorld();
-					} else if (selected == 2) {
-						//continue
-						if (Mift.hasMadeWorld) {
+					} else if (selected == 2) { //load world
+						Mift.menuIndex = 2;
+					} else if (selected == 3) { //continue world
+						if (Mift.hasMadeWorld) { //they can continue loaded world
 							Mift.setPaused(false);
-						} else {
-							//show they're retarded
+						} else { //show they're retarded
 							MenuRenderer.continueError.setRenderable(true);
 						}
-					} else if (selected == 3) {
-						//settings
+					} else if (selected == 4) { //settings
 						Mift.menuIndex = 1;
 						SettingsController.changed = false;
-					} else if (selected == 4) {
-						//quit
+					} else if (selected == 5) { //quit
 						System.exit(0);
-					} else {
-						//call 0
+					} else { //call 0
 						selected = 0;
 					}
 				}
 				if (Keyboard.getEventKey() == Keyboard.KEY_UP) {
 					MenuRenderer.continueError.setRenderable(false);
-					if (selected - 1 >= 1) {
+					if (selected - 1 >= min) {
 						selected--;
 					} else {
-						selected = 4;
+						selected = max;
 					}
 					for (int i = 1; i < MenuRenderer.getTexts().size(); i++) {
 						if (i == selected) {
@@ -57,10 +52,10 @@ public class MenuController {
 				}
 				if (Keyboard.getEventKey() == Keyboard.KEY_DOWN) {
 					MenuRenderer.continueError.setRenderable(false);
-					if (selected + 1 <= 4) {
+					if (selected + 1 <= max) {
 						selected++;
 					} else {
-						selected = 1;
+						selected = min;
 					}
 					for (int i = 1; i < MenuRenderer.getTexts().size(); i++) {
 						if (i == selected) {
@@ -71,13 +66,7 @@ public class MenuController {
 					}
 				}
 				if (Keyboard.getEventKey() == Keyboard.KEY_F1) {
-					DisplayManager.setFullscreened(!SettingHolder.get("cg_fullscreened").getValueB());
-				}
-				if (Keyboard.getEventKey() == Keyboard.KEY_F2) {
 					Mouse.setGrabbed(!Mouse.isGrabbed());
-				}
-				if (Keyboard.getEventKey() == Keyboard.KEY_F3) {
-					Display.destroy();
 				}
 			}
 		}

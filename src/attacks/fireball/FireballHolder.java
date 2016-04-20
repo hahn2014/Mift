@@ -2,10 +2,21 @@ package attacks.fireball;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.lwjgl.util.vector.Vector3f;
+
+import entities.EntityType;
+import entities.EntityType.entityType;
+import entities.MoveType.move_factor;
+import entities.EntityTypeHolder;
+import main.Mift;
+import models.TexturedModel;
+import renderEngine.OBJLoader;
+import textures.ModelTexture;
 
 public class FireballHolder {
 	List<Fireball> fireballs = new ArrayList<Fireball>();
+	private EntityTypeHolder eth = new EntityTypeHolder();
 	
 	public List<Fireball> getAll() {
 		return fireballs;
@@ -15,15 +26,19 @@ public class FireballHolder {
 		return fireballs.get(index);
 	}
 	
-	public void createFireball(Vector3f pos) {
-		add(new Fireball(pos));
-	}
-	
-	private void add(Fireball fb) {
-		fireballs.add(fb);
+	public void createFireball(Vector3f pos, Vector3f gotoPos, Vector3f rot) {
+		EntityType e = eth.get(entityType.ATK_FIREBALL);
+		TexturedModel texturedModel = new TexturedModel(OBJLoader.loadObjModel("models/" + e.getObjName()),
+				new ModelTexture(Mift.loader.loadTexture(e.getTextureName())));
+		Mift.instance_count++;
+		Fireball f = new Fireball(texturedModel, pos, gotoPos, rot, e.getScale(), move_factor.NOTHING);
+		f.setRenderable(true);
+		fireballs.add(f);
+		Mift.entities.add(f);
 	}
 	
 	public void remove(Fireball ball) {
 		fireballs.remove(ball);
+		Mift.entities.remove(ball);
 	}
 }

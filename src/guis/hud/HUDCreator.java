@@ -3,6 +3,8 @@ package guis.hud;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.lwjgl.util.vector.Vector2f;
+
 import entities.Camera;
 import entities.OverheadCamera;
 import guis.GuiTexture;
@@ -10,7 +12,7 @@ import renderEngine.Loader;
 
 public class HUDCreator {
 	private Compass compass;
-	private Target target;
+	private static Target target;
 	private List<GuiTexture> textures = new ArrayList<GuiTexture>();
 	
 	public HUDCreator(Loader loader, boolean enemiesOnly) {
@@ -34,5 +36,9 @@ public class HUDCreator {
 	
 	public List<GuiTexture> getTextures() {
 		return textures;
+	}
+	
+	public static Vector2f getTargetPos() {
+		return new Vector2f(target.x, target.y);
 	}
 }

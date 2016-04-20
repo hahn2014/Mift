@@ -4,12 +4,15 @@ public class EntityType {
 	public enum entityType {
 		DEFAULT,
 		PLAYER,
+		PLAYER_LEGS,
 		ENEMY,
 		TREE,
 		BARREL,
 		PINE,
 		FERN,
-		GRASS
+		GRASS,
+		ATK_FIREBALL,
+		ATK_WATERBALL
 	};
 	
 	private entityType id = entityType.DEFAULT;

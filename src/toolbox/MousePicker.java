@@ -7,10 +7,10 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
-import terrains.Terrain;
 import entities.Camera;
 import entities.OverheadCamera;
 import main.Mift;
+import terrains.Terrain;
 
 public class MousePicker {
 
@@ -43,6 +43,10 @@ public class MousePicker {
 	public Vector3f getCurrentTerrainPoint() {
 		return currentTerrainPoint;
 	}
+	
+	public Vector3f getTerrainPoint(Vector2f pos) {
+		return binarySearch(0, 0, RAY_RANGE, calculatePointerRay(pos.x, pos.y), false);
+	}
 
 	public Vector3f getCurrentRay() {
 		return currentRay;
@@ -60,6 +64,14 @@ public class MousePicker {
 		} else {
 			currentTerrainPoint = null;
 		}
+	}
+	
+	private Vector3f calculatePointerRay(float mouseX, float mouseY) {
+		Vector2f normalizedCoords = getNormalisedDeviceCoordinates(mouseX, mouseY);
+		Vector4f clipCoords = new Vector4f(normalizedCoords.x, normalizedCoords.y, -1.0f, 1.0f);
+		Vector4f eyeCoords = toEyeCoords(clipCoords);
+		Vector3f worldRay = toWorldCoords(eyeCoords);
+		return worldRay;
 	}
 
 	private Vector3f calculateMouseRay() {

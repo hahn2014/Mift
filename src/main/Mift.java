@@ -11,9 +11,7 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 import attacks.AttackHolder;
-import attacks.AttacksRenderer;
-import attacks.fireball.FireballHolder;
-import attacks.waterball.WaterballHolder;
+import attacks.AttackUpdater;
 import entities.Camera;
 import entities.Enemy;
 import entities.Entity;
@@ -33,6 +31,7 @@ import guis.hud.HUDCreator;
 import guis.hud.HUDRenderer;
 import guis.menu.MenuRenderer;
 import guis.menu.SettingsRenderer;
+import guis.menu.WorldLoadRenderer;
 import io.Logger;
 import io.SettingHolder;
 import io.Settings;
@@ -56,15 +55,15 @@ import water.WaterTile;
 
 /**
  * Already surpassed 14k lines of
- * cumulative code! - Mift Build 59
+ * cumulative code! - Mift Build 60
  * 
  * @author Bryce Hahn, Mason Cluff
  * @since 1.0 - 06/12/2015
  */
 public class Mift {
-	public static final String BUILD = "59";
+	public static final String BUILD = "60";
 	public static final String RELEASE = "1";
-	public static final String RELEASE_TITLE = "Alpha";
+	public static final String RELEASE_TITLE = "Pre-Alpha";
 	public static final String NAME = "Mift";
 	
 	private static boolean isPaused = true;
@@ -98,9 +97,8 @@ public class Mift {
 	public static EntityTypeHolder entityTypeHolder;
 	public static MoveTypeHolder moveTypeHolder;
 	public static AttackHolder attackHolder;
-	public static FireballHolder fireballHolder;
-	public static WaterballHolder waterballHolder;
 	public static Player player;
+	public static Entity player_legs;
 	
 	private static DisplayManager dm;
 	
@@ -122,8 +120,6 @@ public class Mift {
 		entityTypeHolder = new EntityTypeHolder();
 		moveTypeHolder = new MoveTypeHolder();
 		attackHolder = new AttackHolder();
-		fireballHolder = new FireballHolder();
-		waterballHolder = new WaterballHolder();
 		textRenderer = new TextRenderer();
 		
 		// ******************* LIGHT SETUP ***************
@@ -176,13 +172,14 @@ public class Mift {
 		pe.randomizeRotation();
 
 		// **************** ATTACKS *****************************
-		AttacksRenderer attackRenderer = new AttacksRenderer();
+		AttackUpdater attackUpdater = new AttackUpdater();
 		
 		// **************** HUD *********************************
 		HUDRenderer hudRenderer = new HUDRenderer();
 		hudCreator = new HUDCreator(loader, false);
 		MenuRenderer pauseRenderer = new MenuRenderer();
 		SettingsRenderer settingRenderer = new SettingsRenderer();
+		WorldLoadRenderer worldLoadingRenderer = new WorldLoadRenderer();
 		
 		// ******************POST PROCESSING ********************
 		FBO fbo1 = new FBO(Display.getWidth(), Display.getHeight(), FBO.DEPTH_RENDER_BUFFER);
@@ -195,6 +192,8 @@ public class Mift {
 					pauseRenderer.update();
 				} else if (menuIndex == 1) { //render settings
 					settingRenderer.update();
+				} else if (menuIndex == 2) {
+					worldLoadingRenderer.update();
 				} else { //render load world
 					Logger.error("Something went wrong when rendering menu index of " + menuIndex);
 					Display.destroy();
@@ -221,16 +220,17 @@ public class Mift {
 				}
 				//render calls
 				if (player.isOverhead() == false) { //3rd to 1st person view
-					renderer.renderCallStandardView(topBuffers, camera, defaultMouse, waterRenderer, water, lights, entities, null, sunLight);
+					renderer.renderCallStandardView(topBuffers, camera, defaultMouse, waterRenderer, water, lights, entities, null, sunLight, attackHolder);
 					ParticleHolder.renderParticles(camera);
-					attackRenderer.render(camera, fireballHolder.getAll(), waterballHolder.getAll());
 					if (!SettingHolder.get("cg_theatrical").getValueB()) {hudCreator.update(camera);}
 				} else { //overhead view
-					renderer.renderCallOverheadView(topBuffers, overheadCamera, overheadMouse, waterRenderer, water, lights, entities, null, sunLight);
+					renderer.renderCallOverheadView(topBuffers, overheadCamera, overheadMouse, waterRenderer, water, lights, entities, null, sunLight, attackHolder);
 					ParticleHolder.renderParticles(overheadCamera);
-					attackRenderer.render(overheadCamera, fireballHolder.getAll(), waterballHolder.getAll());
 					if (!SettingHolder.get("cg_theatrical").getValueB()) {hudCreator.update(overheadCamera);}
 				}
+				
+				attackUpdater.update(attackHolder);
+				
 				//post processing effects
 				if (SettingHolder.get("cg_post_processing").getValueB()) {
 					fbo1.unbindFrameBuffer();
@@ -244,7 +244,7 @@ public class Mift {
 					
 					if (camera.distanceFromPlayer == 0) {hudRenderer.render(hudCreator.getTextures(), hudCreator.getCompass());}
 					
-					texts.get(0).setText(Mift.NAME + " Alpha Build " + Mift.RELEASE + "." + Mift.BUILD);
+					texts.get(0).setText(Mift.NAME + " " + Mift.RELEASE_TITLE + " Build " + Mift.RELEASE + "." + Mift.BUILD);
 					texts.get(1).setText((SettingHolder.get("cg_fps").getValueB() ? (int)(fpsCounter.getFPS()) + "" : ""));
 					texts.get(2).setText(SettingHolder.get("cg_developer").getValueB() ? updateDebugText(player) : "");
 					texts.get(3).setText(player.isOverhead() ? updateModelPlacerText(entityTypeHolder, moveTypeHolder, player) : "");
@@ -334,8 +334,10 @@ public class Mift {
 		// remove the player so it doesn't get drawn and we can see it in first person view
 		if (camera.distanceFromPlayer < 1) {
 			player.setRenderable(false);
+			player_legs.setRenderable(true);
 		} else {
 			player.setRenderable(true);
+			player_legs.setRenderable(false);
 		}
 	}
 	

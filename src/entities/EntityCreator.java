@@ -64,7 +64,7 @@ public class EntityCreator {
 	 * @return TexturedModel
 	 */
 	public TexturedModel createTexturedModel(String objName, float shineDamper, float reflectivity) {
-		texturedModel = new TexturedModel(OBJFileLoader.loadOBJ(objName, Mift.loader),
+		texturedModel = new TexturedModel(OBJFileLoader.loadOBJ(objName),
 				new ModelTexture(Mift.loader.loadTexture(objName)));
 		texturedModel.getTexture().setShineDamper(shineDamper);
 		texturedModel.getTexture().setReflectivity(reflectivity);
@@ -84,7 +84,7 @@ public class EntityCreator {
 	public TexturedModel createAtlasTexturedModel(String objName, int atlasRows) {
 		modelTexture = new ModelTexture(Mift.loader.loadTexture(objName));
 		modelTexture.setNumberOfRows(atlasRows);
-		texturedModel = new TexturedModel(OBJFileLoader.loadOBJ(objName, Mift.loader), modelTexture);
+		texturedModel = new TexturedModel(OBJFileLoader.loadOBJ(objName), modelTexture);
 		return texturedModel;
 	}
 
@@ -108,6 +108,15 @@ public class EntityCreator {
 		Mift.instance_count++;
 		return new Player(texturedModel, location, rotation.getX(), rotation.getY() + 180, rotation.getZ(),
 				p.getScale());
+	}
+	
+	public Entity createPlayerLegs(Vector3f location, Vector3f rotation) {
+		EntityType p = eth.get(entityType.PLAYER_LEGS);
+		texturedModel = new TexturedModel(OBJLoader.loadObjModel("models/" + p.getObjName()),
+				new ModelTexture(Mift.loader.loadTexture(p.getTextureName())));
+		Mift.instance_count++;
+		return new Entity(texturedModel, location, rotation.getX(), rotation.getY() + 180, rotation.getZ(),
+				p.getScale(), entityType.PLAYER_LEGS);
 	}
 
 	/**
