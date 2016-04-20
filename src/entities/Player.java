@@ -11,7 +11,7 @@ import com.thalmic.myo.enums.PoseType;
 import attacks.Attack.AttackType;
 import attacks.AttackHolder;
 import entities.EntityType.entityType;
-import io.Logger;
+import guis.hud.HUDCreator;
 import io.SettingHolder;
 import main.Mift;
 import models.TexturedModel;
@@ -74,6 +74,7 @@ public class Player extends Entity {
 			upwardsSpeed += GRAVITY * DisplayManager.getFrameTimeSeconds() / 1000;
 		}
 		super.increasePosition(dx, upwardsSpeed * DisplayManager.getFrameTimeSeconds(), dz);
+		Mift.player_legs.increasePosition(dx, upwardsSpeed * DisplayManager.getFrameTimeSeconds(), dz);
 		
 		if (!SettingHolder.get("player_ufo").getValueB()) {
 			float terrainHeight = Mift.terrain.getHeightOfTerrain(x, z);
@@ -222,11 +223,8 @@ public class Player extends Entity {
 					}
 					if (Keyboard.getEventKey() == Keyboard.KEY_RETURN) {
 						if (attackType == AttackType.fireball) {
-							Mift.fireballHolder.createFireball(super.getPosition());
-							Logger.debug("Firing a fireball!");
-						} else if (attackType == AttackType.waterball) {
-							Mift.waterballHolder.createWaterball(super.getPosition());
-							Logger.debug("Firing a waterball!");
+							Vector3f pos = new Vector3f(super.getPosition().x, super.getPosition().y + 8, super.getPosition().z + 3);
+							Mift.attackHolder.getFireballHolder().createFireball(pos, Mift.getMousePicker(false).getTerrainPoint(HUDCreator.getTargetPos()), super.getRotation());
 						}
 					}
 				}

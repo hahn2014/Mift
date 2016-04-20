@@ -12,15 +12,15 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 import io.Logger;
+import main.Mift;
 import models.RawModel;
-import renderEngine.Loader;
 
 public class OBJFileLoader {
 
 	private static final String RES_LOC = "res/models/";
 
 	@SuppressWarnings("unused")
-	public static RawModel loadOBJ(String objFileName, Loader loader) {
+	public static RawModel loadOBJ(String objFileName) {
 		FileReader isr = null;
 		File objFile = new File(RES_LOC + objFileName + ".obj");
 		try {
@@ -84,7 +84,7 @@ public class OBJFileLoader {
 		// ModelData data = new ModelData(verticesArray, texturesArray,
 		// normalsArray, tangentsArray, indicesArray,
 		// furthest);
-		return loader.loadToVAO(verticesArray, texturesArray, normalsArray, indicesArray);
+		return Mift.loader.loadToVAO(verticesArray, texturesArray, normalsArray, indicesArray);
 	}
 
 	private static void calculateTangents(Vertex v0, Vertex v1, Vertex v2, List<Vector2f> textures) {

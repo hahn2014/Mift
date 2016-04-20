@@ -59,7 +59,7 @@ public class SettingsController {
 				}
 				if (Keyboard.getEventKey() == Keyboard.KEY_ESCAPE) {
 					Mift.menuIndex = 0;
-					MenuController.selected = 3;
+					MenuController.selected = 4;
 				}
 				if (Keyboard.getEventKey() == Keyboard.KEY_UP) {
 					if (selected - 1 >= min) {
@@ -103,7 +103,7 @@ public class SettingsController {
 						//apply changes and save then go back to main menu
 						Settings.saveSettings();
 						Mift.menuIndex = 0;
-						MenuController.selected = 3;
+						MenuController.selected = 4;
 					}
 				}
 			}

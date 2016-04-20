@@ -4,20 +4,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import attacks.Attack.AttackType;
+import attacks.fireball.FireballHolder;
 
 public class AttackHolder {
 	private List<Attack> attacks = new ArrayList<Attack>();
+	private static FireballHolder fireHolder = new FireballHolder();
 	
 	public AttackHolder() {
-		attacks.add(new Attack(AttackType.fireball, "Fire Ball", "Throws a average sized fireball in the direction you are facing", 100));
-		attacks.add(new Attack(AttackType.waterball, "Water Ball", "Throws a average sized waterball in the direction you are facing", 100));
-		attacks.add(new Attack(AttackType.groundpound, "Ground Pound", "Super powerfull earth trembling smash that will obliterate any enemy around", 100));
-		attacks.add(new Attack(AttackType.lightning, "Lightning Strike", "Summon the powers of Thor with a powerful lightning bolt to electrocute your opponents", 100));
-		attacks.add(new Attack(AttackType.airblast, "Air Blast", "Shoot a blast of powerful wind at an enemy to inflict damage upon them", 100));
+		attacks.add(new Attack(AttackType.fireball, "Fire Ball", "Sends a ball of fire towards you enemies, burning anything it touches.", 200));
+		attacks.add(new Attack(AttackType.waterball, "Water Ball", "Sends a gravity defying ball of water towards your enemies, downing them.", 100));
+		attacks.add(new Attack(AttackType.lightning, "Lightning Strike", "Sends a bolt of lightning towards your enemies, electrocuting them.", 400));
 	}
 	
 	public Attack get(int id) {
 		return attacks.get(id);
+	}
+	
+	public FireballHolder getFireballHolder() {
+		return fireHolder;
 	}
 	
 	public Attack get(AttackType type) {

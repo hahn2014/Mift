@@ -8,8 +8,8 @@ import myo.MyoManager;
 import renderEngine.Loader;
 
 public class Target {
-	private float x;
-	private float y;
+	public float x;
+	public float y;
 	
 	public GuiTexture texture = null;
 	

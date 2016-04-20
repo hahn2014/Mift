@@ -25,7 +25,7 @@ public class SettingsRenderer {
 	private List<GuiTexture> guis = new ArrayList<GuiTexture>();
 	
 	public SettingsRenderer() {
-		texts.add(new GUIText(textRenderer, Mift.NAME + " Alpha Build " + Mift.RELEASE + "." + Mift.BUILD + " Settings", 2.5f, FontHolder.getCandara(), new Vector2f(0.35f, 0f), 0.55f, ALIGNMENT.LEFT));
+		texts.add(new GUIText(textRenderer, Mift.NAME + " " + Mift.RELEASE_TITLE + " Build " + Mift.RELEASE + "." + Mift.BUILD + " Settings", 2.5f, FontHolder.getCandara(), new Vector2f(0.25f, 0f), 0.55f, ALIGNMENT.LEFT));
 		texts.get(0).setColor(100, 0, 200);
 		
 		texts.add(new GUIText(textRenderer, "Fullscreen [" + SettingHolder.get("cg_fullscreened").getValueDebug()+ "]",
@@ -62,11 +62,13 @@ public class SettingsRenderer {
 		
 		staticTexts.add(new GUIText(textRenderer, "OGPC v9 Participant", 1f, FontHolder.getCandara(), new Vector2f(0f, .97f), 0.35f, ALIGNMENT.LEFT));
 		staticTexts.get(0).setColor(255, 170, 67);
-		staticTexts.add(new GUIText(textRenderer, "F - Save Settings to File", 1f, FontHolder.getCandara(), new Vector2f(.86f, .97f), 0.35f, ALIGNMENT.LEFT));
-		staticTexts.get(1).setColor(100, 0, 200);
+		staticTexts.add(new GUIText(textRenderer, "[F] Return to Main Menu And Save", 1f, FontHolder.getCandara(), new Vector2f(.78f, .97f), 0.35f, ALIGNMENT.LEFT));
+		staticTexts.get(1).setColor(160, 0, 200);
+		staticTexts.add(new GUIText(textRenderer, "[ESC] Return To Main Menu Without Saving", 1f, FontHolder.getCandara(), new Vector2f(.13f, .97f), 0.35f, ALIGNMENT.LEFT));
+		staticTexts.get(2).setColor(160, 0, 200);
 
-		guis.add(new GuiTexture(Mift.loader.loadTexture("menuBG"), new Vector2f(0f, -1f), new Vector2f(1.20f, 2f)));
-		guis.add(new GuiTexture(Mift.loader.loadTexture("ogpc-logo"), new Vector2f(-0.9f, -0.82f), new Vector2f(0.08f, 0.1f)));
+		guis.add(new GuiTexture(Mift.loader.loadTexture("menuguis/menuBG"), new Vector2f(0f, -1f), new Vector2f(1.20f, 2f)));
+		guis.add(new GuiTexture(Mift.loader.loadTexture("menuguis/ogpc-logo"), new Vector2f(-0.9f, -0.82f), new Vector2f(0.08f, 0.1f)));
 	}
 	
 	public void update() {

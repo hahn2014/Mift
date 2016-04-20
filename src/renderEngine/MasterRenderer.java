@@ -12,6 +12,8 @@ import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector4f;
 
+import attacks.AttackHolder;
+import attacks.fireball.Fireball;
 import entities.Camera;
 import entities.Entity;
 import entities.Light;
@@ -52,7 +54,7 @@ public class MasterRenderer {
 	private SkyboxRenderer skyboxRenderer;
 	private ShadowMapMasterRenderer shadowRenderer;
 
-	private Map<TexturedModel, List<Entity>> entities = new HashMap<TexturedModel, List<Entity>>();
+	private static Map<TexturedModel, List<Entity>> entities = new HashMap<TexturedModel, List<Entity>>();
 	private Map<TexturedModel, List<Entity>> normalMapEntities = new HashMap<TexturedModel, List<Entity>>();
 	private List<Terrain> terrains = new ArrayList<Terrain>();
 
@@ -72,7 +74,7 @@ public class MasterRenderer {
 
 	public void renderCallOverheadView(WaterFrameBuffers buffers, OverheadCamera camera, MousePicker mouse,
 			WaterRenderer waterRenderer, WaterTile water, List<Light> lights, List<Entity> entities,
-			List<Entity> normalMapEntities, Light sun) {
+			List<Entity> normalMapEntities, Light sun, AttackHolder attackHolder) {
 
 		camera.move();
 		camera.rotate();
@@ -88,24 +90,24 @@ public class MasterRenderer {
 		camera.getPosition().y -= distance;
 		camera.invertPitch();
 		renderScene(entities, normalMapEntities, lights, camera,
-				new Vector4f(0, 1, 0, -WaterTile.height + 2.0f));
+				new Vector4f(0, 1, 0, -WaterTile.height + 2.0f), attackHolder);
 		camera.getPosition().y += distance;
 		camera.invertPitch();
 
 		// render refraction texture
 		buffers.bindRefractionFrameBuffer();
-		renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, WaterTile.height + 1.0f));
+		renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, WaterTile.height + 1.0f), attackHolder);
 
 		// render to screen
 		GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
 		buffers.unbindCurrentFrameBuffer();
-		renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000));
+		renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000), attackHolder);
 		waterRenderer.render(water, camera, sun);
 	}
 
 	public void renderCallStandardView(WaterFrameBuffers buffers, Camera camera, MousePicker mouse,
 			WaterRenderer waterRenderer, WaterTile water, List<Light> lights, List<Entity> entities,
-			List<Entity> normalMapEntities, Light sun) {
+			List<Entity> normalMapEntities, Light sun, AttackHolder attackHolder) {
 		camera.move();
 		camera.getKeys();
 		camera.getClicks();
@@ -120,23 +122,23 @@ public class MasterRenderer {
 		camera.getPosition().y -= distance;
 		camera.invertPitch();
 		renderScene(entities, normalMapEntities, lights, camera,
-				new Vector4f(0, 1, 0, -WaterTile.height + 2.0f));
+				new Vector4f(0, 1, 0, -WaterTile.height + 2.0f), attackHolder);
 		camera.getPosition().y += distance;
 		camera.invertPitch();
 
 		// render refraction texture
 		buffers.bindRefractionFrameBuffer();
-		renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, WaterTile.height + 1.0f));
+		renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, WaterTile.height + 1.0f), attackHolder);
 
 		// render to screen
 		GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
 		buffers.unbindCurrentFrameBuffer();
-		renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000));
+		renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000), attackHolder);
 		waterRenderer.render(water, camera, sun);
 	}
 
 	public void renderScene(List<Entity> entities, List<Entity> normalEntities,
-			List<Light> lights, Camera camera, Vector4f clipPlane) {
+			List<Light> lights, Camera camera, Vector4f clipPlane, AttackHolder attackHolder) {
 		for (Terrain terrain : terrains) {
 			processTerrain(terrain);
 		}
@@ -150,11 +152,12 @@ public class MasterRenderer {
 				processNormalMapEntity(entity);
 			}
 		}
+		processAttacks(attackHolder);
 		render(lights, camera, clipPlane);
 	}
 
 	public void renderScene(List<Entity> entities, List<Entity> normalEntities,
-			List<Light> lights, OverheadCamera camera, Vector4f clipPlane) {
+			List<Light> lights, OverheadCamera camera, Vector4f clipPlane, AttackHolder attackHolder) {
 		for (Terrain terrain : terrains) {
 			processTerrain(terrain);
 		}
@@ -168,6 +171,7 @@ public class MasterRenderer {
 				processNormalMapEntity(entity);
 			}
 		}
+		processAttacks(attackHolder);
 		render(lights, camera, clipPlane);
 	}
 
@@ -215,6 +219,24 @@ public class MasterRenderer {
 		terrains.clear();
 		entities.clear();
 		normalMapEntities.clear();
+	}
+	
+	public static void processAttacks(AttackHolder attackHolder) {
+		//fireballs
+		if (attackHolder.getFireballHolder().getAll() != null) {
+			for (Fireball fire : attackHolder.getFireballHolder().getAll()) {
+				TexturedModel attackModel = fire.getModel();
+				List<Entity> batch = entities.get(attackModel);
+				if (batch != null) {
+					batch.add(fire);
+				} else {
+					List<Entity> newBatch = new ArrayList<Entity>();
+					newBatch.add(fire);
+					entities.put(attackModel, newBatch);
+				}
+			}
+		}
+		//other attacks
 	}
 
 	public static void enableCulling() {

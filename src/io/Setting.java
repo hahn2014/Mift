@@ -78,21 +78,21 @@ public class Setting {
 		String spacer = "";
 		for (int i = 0; i < spaceLength - variable.length(); i++) {spacer += " ";}
 		valueS = value;
-		Logger.info(variable + ":" + spacer + "-> " + value);
+		Logger.debug(variable + ":" + spacer + "-> " + value);
 	}
 	
 	public void setValueB(boolean value) {
 		String spacer = "";
 		for (int i = 0; i < spaceLength - variable.length(); i++) {spacer += " ";}
 		valueB = value;
-		Logger.info(variable + ":" + spacer + "-> " + value);
+		Logger.debug(variable + ":" + spacer + "-> " + value);
 	}
 	
 	public void setValueI(int value) {
 		String spacer = "";
 		for (int i = 0; i < spaceLength - variable.length(); i++) {spacer += " ";}
 		valueI = value;
-		Logger.info(variable + ":" + spacer + "-> " + value);
+		Logger.debug(variable + ":" + spacer + "-> " + value);
 	}
 	
 	public String getValueDebug() {
