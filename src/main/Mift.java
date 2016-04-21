@@ -113,7 +113,7 @@ public class Mift {
 		settings = new Settings();
 		dm.createDisplay();
 
-		MyoSetup.init(SettingHolder.get("cp_myo_enabled").getValueB());
+		MyoSetup.init(true);
 		
 		//init main objects
 		FPSCounter fpsCounter = new FPSCounter();

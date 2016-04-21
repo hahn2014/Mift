@@ -223,13 +223,17 @@ public class Player extends Entity {
 					}
 					if (Keyboard.getEventKey() == Keyboard.KEY_RETURN) {
 						if (attackType == AttackType.fireball) {
-							Vector3f pos = new Vector3f(super.getPosition().x, super.getPosition().y + 8, super.getPosition().z + 3);
-							Mift.attackHolder.getFireballHolder().createFireball(pos, Mift.getMousePicker(false).getTerrainPoint(HUDCreator.getTargetPos()), super.getRotation());
+							attack();
 						}
 					}
 				}
 			}
 		}
+	}
+	
+	public void attack() {
+		Vector3f pos = new Vector3f(super.getPosition().x, super.getPosition().y + 8, super.getPosition().z + 3);
+		Mift.attackHolder.getFireballHolder().createFireball(pos, Mift.getMousePicker(false).getTerrainPoint(HUDCreator.getTargetPos()), super.getRotation());
 	}
 	
 	public boolean isOverhead() {

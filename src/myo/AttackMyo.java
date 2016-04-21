@@ -77,6 +77,7 @@ public class AttackMyo extends MyoDevice {
 		
 		if (currentPose.getType() == PoseType.FINGERS_SPREAD || currentPose.getType() == PoseType.FIST) {
 			Logger.info(Mift.player.attackType.name());
+			Mift.player.attack();
 		}
 		
 		if (currentPose.getType() == PoseType.WAVE_IN) {
