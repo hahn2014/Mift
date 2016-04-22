@@ -11,3 +11,4 @@ player_sprint_unlimited: false;
 player_ufo: false;
 cp_myo_enabled: false;
 cg_quality: 1;
+cg_fov: 70;

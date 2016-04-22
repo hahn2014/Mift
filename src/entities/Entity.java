@@ -147,6 +147,18 @@ public class Entity {
 		this.position.z = z;
 	}
 	
+	public void increaseXPos(float x) {
+		this.position.x += x;
+	}
+	
+	public void increaseYPos(float y) {
+		this.position.y += y;
+	}
+	
+	public void increaseZPos(float z) {
+		this.position.z += z;
+	}
+	
 	public String getPositionDebug() {
 		return "[" + (int)this.getPosition().getX() + ", " + (int)this.getPosition().getY() + ", " + (int)this.getPosition().getZ() + "]";
 	}

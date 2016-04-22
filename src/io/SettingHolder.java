@@ -23,6 +23,7 @@ public class SettingHolder {
 		settings.add(new Setting("player_ufo",					SettingType.bool, 		false));
 		settings.add(new Setting("cp_myo_enabled", 				SettingType.bool,		false));
 		settings.add(new Setting("cg_quality", 					SettingType.integer,	2));
+		settings.add(new Setting("cg_fov", 						SettingType.integer,	70));
 	}
 	
 	public static Setting get(int id) {

@@ -23,7 +23,7 @@ public class MousePicker {
 	private Matrix4f viewMatrix;
 	private Camera camera;
 	private OverheadCamera overheadCamera;
-	
+
 	private Vector3f currentTerrainPoint;
 
 	public MousePicker(OverheadCamera cam, Matrix4f projection) {
@@ -31,21 +31,28 @@ public class MousePicker {
 		projectionMatrix = projection;
 		viewMatrix = Maths.createViewMatrix(overheadCamera);
 	}
-	
+
 	public MousePicker(Camera cam, Matrix4f projection) {
 		camera = cam;
 		projectionMatrix = projection;
 		viewMatrix = Maths.createViewMatrix(camera);
 	}
-	
-	public MousePicker() {}
 
 	public Vector3f getCurrentTerrainPoint() {
 		return currentTerrainPoint;
 	}
-	
+
 	public Vector3f getTerrainPoint(Vector2f pos) {
-		return binarySearch(0, 0, RAY_RANGE, calculatePointerRay(pos.x, pos.y), false);
+		viewMatrix = Maths.createViewMatrix(camera);
+		currentRay = calculateMouseRay();
+		return binarySearch(0, 0, RAY_RANGE, calculateAttackMouseRay(pos), false);
+	}
+
+	public String getTerrainPointDebug(Vector2f pos) {
+		viewMatrix = Maths.createViewMatrix(camera);
+		currentRay = calculateMouseRay();
+		Vector3f a = binarySearch(0, 0, RAY_RANGE, calculateAttackMouseRay(pos), false);
+		return "[" + (int) a.x + ", " + (int) a.y + ", " + (int) a.z + "]";
 	}
 
 	public Vector3f getCurrentRay() {
@@ -65,9 +72,9 @@ public class MousePicker {
 			currentTerrainPoint = null;
 		}
 	}
-	
-	private Vector3f calculatePointerRay(float mouseX, float mouseY) {
-		Vector2f normalizedCoords = getNormalisedDeviceCoordinates(mouseX, mouseY);
+
+	private Vector3f calculateAttackMouseRay(Vector2f pos) {
+		Vector2f normalizedCoords = getNormalisedDeviceCoordinates(pos.x, pos.y);
 		Vector4f clipCoords = new Vector4f(normalizedCoords.x, normalizedCoords.y, -1.0f, 1.0f);
 		Vector4f eyeCoords = toEyeCoords(clipCoords);
 		Vector3f worldRay = toWorldCoords(eyeCoords);

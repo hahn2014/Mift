@@ -12,10 +12,10 @@ import renderEngine.MasterRenderer;
 
 public class ShadowBox {
 
-	private static final float OFFSET = 18;
+	public static float OFFSET = 140;
 	private static final Vector4f UP = new Vector4f(0, 1, 0, 0);
 	private static final Vector4f FORWARD = new Vector4f(0, 0, -1, 0);
-	private static float SHADOW_DISTANCE = 100;
+	private static float SHADOW_DISTANCE = 120;
 
 	private float minX, maxX;
 	private float minY, maxY;
@@ -28,14 +28,12 @@ public class ShadowBox {
 
 	protected ShadowBox(Matrix4f lightViewMatrix) {
 		this.lightViewMatrix = lightViewMatrix;
-		calculateWidthsAndHeights();
 		setQuality();
+		calculateWidthsAndHeights();
 	}
 	
 	private void setQuality() {
-		if (SettingHolder.get("cg_quality").getValueI() >= 1 && SettingHolder.get("cg_quality").getValueI() <= 4) {
-			SHADOW_DISTANCE = 50 * SettingHolder.get("cg_quality").getValueI();
-		}
+		SHADOW_DISTANCE = 50 * SettingHolder.get("cg_quality").getValueI();
 	}
 
 	protected void update(Camera camera) {
@@ -199,8 +197,8 @@ public class ShadowBox {
 	}
 
 	private void calculateWidthsAndHeights() {
-		farWidth = (float) (SHADOW_DISTANCE * Math.tan(Math.toRadians(MasterRenderer.FOV)));
-		nearWidth = (float) (MasterRenderer.NEAR_PLANE * Math.tan(Math.toRadians(MasterRenderer.FOV)));
+		farWidth = (float) (SHADOW_DISTANCE * Math.tan(Math.toRadians(SettingHolder.get("cg_fov").getValueI())));
+		nearWidth = (float) (MasterRenderer.NEAR_PLANE * Math.tan(Math.toRadians(SettingHolder.get("cg_fov").getValueI())));
 		farHeight = farWidth / getAspectRatio();
 		nearHeight = nearWidth / getAspectRatio();
 	}

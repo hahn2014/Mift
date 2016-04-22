@@ -4,6 +4,8 @@ import java.util.Random;
 
 import org.lwjgl.Sys;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
 import com.thalmic.myo.enums.PoseType;
@@ -11,7 +13,7 @@ import com.thalmic.myo.enums.PoseType;
 import attacks.Attack.AttackType;
 import attacks.AttackHolder;
 import entities.EntityType.entityType;
-import guis.hud.HUDCreator;
+import io.Logger;
 import io.SettingHolder;
 import main.Mift;
 import models.TexturedModel;
@@ -26,6 +28,7 @@ public class Player extends Entity {
 	private static final float RUN_SPEED = (!SettingHolder.get("player_ufo").getValueB() ? 20.0f : 50.0f);
 	private static final float MAX_RUN_TIME = 200.0f;
 	private static final float RUN_COOLDOWN = 400f;
+	private static final float ATTACK_COOLDOWN = 20f;
 	private static final float GRAVITY = -50;
 	private static final float JUMP_POWER = 20;
 
@@ -33,6 +36,7 @@ public class Player extends Entity {
 	private float upwardsSpeed = 0f;
 	private float currentRunTime = 0f;
 	private float currentRunCooldown = RUN_COOLDOWN;
+	private float attackCooldownTime = 0f;
 	
 	private float x;
 	private float z;
@@ -74,7 +78,11 @@ public class Player extends Entity {
 			upwardsSpeed += GRAVITY * DisplayManager.getFrameTimeSeconds() / 1000;
 		}
 		super.increasePosition(dx, upwardsSpeed * DisplayManager.getFrameTimeSeconds(), dz);
-		Mift.player_legs.increasePosition(dx, upwardsSpeed * DisplayManager.getFrameTimeSeconds(), dz);
+		Mift.player_legs.setPosition(new Vector3f(getPosition().x, getPosition().y, getPosition().z));
+		
+		if (attackCooldownTime > 0) {
+			attackCooldown();
+		}
 		
 		if (!SettingHolder.get("player_ufo").getValueB()) {
 			float terrainHeight = Mift.terrain.getHeightOfTerrain(x, z);
@@ -85,6 +93,10 @@ public class Player extends Entity {
 				isInAir = false;
 			}
 		}
+	}
+	
+	private void attackCooldown() {
+		attackCooldownTime--;
 	}
 	
 	private void jump() {
@@ -222,9 +234,7 @@ public class Player extends Entity {
 						attackType = at.rotateReverse(attackType);
 					}
 					if (Keyboard.getEventKey() == Keyboard.KEY_RETURN) {
-						if (attackType == AttackType.fireball) {
-							attack();
-						}
+						attack();
 					}
 				}
 			}
@@ -232,8 +242,21 @@ public class Player extends Entity {
 	}
 	
 	public void attack() {
-		Vector3f pos = new Vector3f(super.getPosition().x, super.getPosition().y + 8, super.getPosition().z + 3);
-		Mift.attackHolder.getFireballHolder().createFireball(pos, Mift.getMousePicker(false).getTerrainPoint(HUDCreator.getTargetPos()), super.getRotation());
+		if (attackCooldownTime != 0) {
+			return;
+		}
+		
+		if (attackType == AttackType.fireball) {
+			Vector3f curPos = new Vector3f(getPosition().x, getPosition().y + 9, getPosition().z);
+			Vector3f gotoPos = Mift.getMousePicker(false).getTerrainPoint(new Vector2f(Display.getWidth() / 2, Display.getHeight() / 2));
+			
+			if (gotoPos != null) {
+				Mift.attackHolder.getFireballHolder().createFireball(curPos, gotoPos);
+				attackCooldownTime = ATTACK_COOLDOWN;
+			} else {
+				Logger.error("Unable to create fireball at location. Position calulated is " + gotoPos);
+			}
+		}
 	}
 	
 	public boolean isOverhead() {

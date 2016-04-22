@@ -12,7 +12,7 @@ public class MyoSetup {
 	private static MyoManager myoManager;
 	
 	public static void init(boolean initialize) {
-		if (initialize == true) {
+		if (initialize) {
 			try {
 				hub = new Hub("");
 				Myo myo = hub.waitForMyo(10000);

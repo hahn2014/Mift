@@ -46,8 +46,10 @@ public class SettingsController {
 					} else if (selected == 7) {//myo armband
 						SettingHolder.get("cp_myo_enabled").setValueB(!SettingHolder.get("cp_myo_enabled").getValueB());
 						SettingsRenderer.getTexts().get(7).setText("Myo Armband Connection [" + SettingHolder.get("cp_myo_enabled").getValueDebug()+ "]");
-						Logger.info("Attempting to create connection with Myo Armband");
-						MyoSetup.init(SettingHolder.get("cp_myo_enabled").getValueB());
+						if (SettingHolder.get("cp_myo_enabled").getValueB()) {
+							Logger.info("Attempting to create connection with Myo Armband");
+							MyoSetup.init(true);
+						}
 					} else if (selected == 8) {//quality options
 						//DisplayManager.setQuality(SettingHolder.get("cg_quality").getValueI() + 1, true);
 						Logger.error("This option has been dissabled due to an improperly implemented quality changing system.");

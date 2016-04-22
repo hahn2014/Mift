@@ -16,8 +16,8 @@ public class EntityTypeHolder {
 		entities.add(new EntityType(entityType.BARREL, 			"Barrel", 			"barrel", 		"barrel", 		0.5f));
 		entities.add(new EntityType(entityType.PINE, 			"Pine Tree", 		"pine", 		"pine", 		1.3f));
 		entities.add(new EntityType(entityType.FERN, 			"Fern", 			"fern", 		"fern", 		1.0f));
-		entities.add(new EntityType(entityType.ATK_FIREBALL, 	"Fireball Attack", 	"attackSphere", "fireball", 	1.5f));
-		entities.add(new EntityType(entityType.ATK_WATERBALL, 	"Waterball Attack", "attackSphere", "waterball", 	1.5f));
+		entities.add(new EntityType(entityType.ATK_FIREBALL, 	"Fireball Attack", 	"attackSphere", "fireball", 	1f));
+		entities.add(new EntityType(entityType.ATK_WATERBALL, 	"Waterball Attack", "attackSphere", "waterball", 	1f));
 	}
 	
 	public EntityType get(int id) {

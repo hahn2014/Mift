@@ -144,4 +144,8 @@ public class Maths {
 			return 0;
 		}
 	}
+	
+	public static String Vector3fToString(Vector3f toString) {
+		return new String("[" + toString.x + ", " + toString.y + ", " + toString.z + "]");
+	}
 }

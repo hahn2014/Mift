@@ -30,17 +30,15 @@ public class ShadowMapMasterRenderer {
 	private ShadowMapEntityRenderer entityRenderer;
 
 	public ShadowMapMasterRenderer() {
+		setQuality();
 		shader = new ShadowShader();
 		shadowBox = new ShadowBox(lightViewMatrix);
-		setQuality();
 		shadowFbo = new ShadowFrameBuffer(SHADOW_MAP_SIZE, SHADOW_MAP_SIZE);
 		entityRenderer = new ShadowMapEntityRenderer(shader, projectionViewMatrix);
 	}
 	
 	private void setQuality() {
-		if (SettingHolder.get("cg_quality").getValueI() >= 1 && SettingHolder.get("cg_quality").getValueI() <= 4) {
-			SHADOW_MAP_SIZE = 4100 * SettingHolder.get("cg_quality").getValueI();
-		}
+		SHADOW_MAP_SIZE = 4100 * SettingHolder.get("cg_quality").getValueI();
 	}
 
 	public void render(Map<TexturedModel, List<Entity>> entities, Light sun, Camera camera) {
