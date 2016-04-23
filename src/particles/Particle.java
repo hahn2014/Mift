@@ -1,5 +1,6 @@
 package particles;
 
+import java.io.Serializable;
 import java.util.Random;
 
 import org.lwjgl.Sys;
@@ -10,8 +11,8 @@ import entities.Camera;
 import entities.OverheadCamera;
 import renderEngine.DisplayManager;
 
-public class Particle {
-
+public class Particle implements Serializable {
+	private static final long serialVersionUID = -3600969004502065623L;
 	private Vector3f position;
 	private Vector3f velocity;
 	private Vector3f color;

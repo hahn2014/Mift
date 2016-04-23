@@ -1,5 +1,7 @@
 package entities;
 
+import java.io.Serializable;
+
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
@@ -18,8 +20,8 @@ import renderEngine.DisplayManager;
  * @author Bryce Hahn
  * @since 1.1
  */
-public class Camera {
-	
+public class Camera implements Serializable {
+	private static final long serialVersionUID = 1655268997354170393L;
 	public float distanceFromPlayer = 14, maxDistFromPlayer = 50;
 	public int zoomFactor = 120;
 	private float angleAroundPlayer = 0;
@@ -181,7 +183,6 @@ public class Camera {
 	private void calculateAngleAroundPlayer(int diff) {
 		float angleChange = diff * horizontalSensitivity;
 		player.setRotY(player.getRotY() - angleChange);
-		Mift.player_legs.setRotY(player.getRotY() - angleChange);
 	}
 
 	public boolean isFPS() {

@@ -1,5 +1,6 @@
 package particles;
 
+import java.io.Serializable;
 import java.util.Random;
 
 import org.lwjgl.util.vector.Matrix4f;
@@ -8,7 +9,8 @@ import org.lwjgl.util.vector.Vector4f;
 
 import renderEngine.DisplayManager;
 
-public class ParticleEmitter {
+public class ParticleEmitter implements Serializable {
+	private static final long serialVersionUID = 3854569438345868132L;
 
 	private float particlesPerSecond, averageSpeed, gravityComplient, averageLifeLength, averageScale;
 

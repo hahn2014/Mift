@@ -1,11 +1,13 @@
 package entities;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import entities.MoveType.move_factor;
 
-public class MoveTypeHolder {
+public class MoveTypeHolder implements Serializable {
+	private static final long serialVersionUID = -1861027802355749443L;
 	private List<MoveType> moves = new ArrayList<MoveType>();
 	
 	public MoveTypeHolder() {
@@ -14,6 +16,7 @@ public class MoveTypeHolder {
 		moves.add(new MoveType(move_factor.FACE_TOWARDS, "Face Towards Player", "Entity will menacingly stare at the player"));
 		moves.add(new MoveType(move_factor.FACE_AWAY, "Face Away From Player", "Entity will face the complete oposite direction of the player"));
 		moves.add(new MoveType(move_factor.MOVE_TOWARDS, "Move Towards Player", "Entity will move towards player and stare at them"));
+		moves.add(new MoveType(move_factor.MOVE_TOWARDS_WHEN_CLOSE, "Move Towards Player When Close", "Entity will move towards player and stare at them when the player breaches their circle"));
 		moves.add(new MoveType(move_factor.FOLLOW_NOT_LOOKING, "Follow When Not Looking", "Entity will follow player when his back is turned to it"));
 	}
 	

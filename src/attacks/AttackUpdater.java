@@ -1,6 +1,7 @@
 package attacks;
 
 import attacks.fireball.Fireball;
+import attacks.waterball.Waterball;
 
 public class AttackUpdater {
 
@@ -13,6 +14,15 @@ public class AttackUpdater {
 				break;
 			} else {
 				fire.update();
+			}
+		}
+		//check for deletables
+		for (Waterball water : holder.getWaterballHolder().getAll()) {
+			if (water.isRenderable() == false) {
+				holder.getWaterballHolder().remove(water);
+				break;
+			} else {
+				water.update();
 			}
 		}
 	}

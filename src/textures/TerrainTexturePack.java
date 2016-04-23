@@ -1,7 +1,9 @@
 package textures;
 
-public class TerrainTexturePack {
+import java.io.Serializable;
 
+public class TerrainTexturePack implements Serializable {
+	private static final long serialVersionUID = -8888638382390340571L;
 	private TerrainTexture backgroundTexture;
 	private TerrainTexture texture1;
 	private TerrainTexture texture2;

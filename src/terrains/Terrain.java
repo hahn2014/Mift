@@ -1,5 +1,6 @@
 package terrains;
 
+import java.io.Serializable;
 import java.util.List;
 
 import org.lwjgl.util.vector.Vector2f;
@@ -15,7 +16,8 @@ import textures.TerrainTexture;
 import textures.TerrainTexturePack;
 import toolbox.Maths;
 
-public class Terrain {
+public class Terrain implements Serializable {
+	private static final long serialVersionUID = -6815004546209370137L;
 
 	public static final float SIZE = 1000;
 
@@ -87,7 +89,7 @@ public class Terrain {
 	}
 	
 	public List<Entity> generateEnemies(move_factor factor, List<Entity> entities) {
-		for (int i = 0; i < 50 * SettingHolder.get("cg_quality").getValueI(); i++) {
+		for (int i = 0; i < 10 * SettingHolder.get("cg_quality").getValueI(); i++) {
 			Mift.enemies.add(new EntityCreator().createRandomEnemy(factor, i));
 			entities.add(Mift.enemies.get(i));
 		}

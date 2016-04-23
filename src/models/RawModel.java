@@ -1,7 +1,10 @@
 package models;
 
-public class RawModel {
+import java.io.Serializable;
 
+public class RawModel implements Serializable {
+	private static final long serialVersionUID = -8038214700484157582L;
+	
 	private int vaoID;
 	private int vertexCount;
 

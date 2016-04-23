@@ -1,10 +1,13 @@
 package entities;
 
-public class EntityType {
+import java.io.Serializable;
+
+public class EntityType implements Serializable {
+	private static final long serialVersionUID = 6851197098852087987L;
+
 	public enum entityType {
 		DEFAULT,
 		PLAYER,
-		PLAYER_LEGS,
 		ENEMY,
 		TREE,
 		BARREL,

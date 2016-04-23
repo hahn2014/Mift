@@ -1,14 +1,18 @@
 package attacks;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import attacks.Attack.AttackType;
 import attacks.fireball.FireballHolder;
+import attacks.waterball.WaterballHolder;
 
-public class AttackHolder {
+public class AttackHolder implements Serializable {
+	private static final long serialVersionUID = -219459632414844752L;
 	private List<Attack> attacks = new ArrayList<Attack>();
 	private static FireballHolder fireHolder = new FireballHolder();
+	private static WaterballHolder waterHolder = new WaterballHolder();
 	
 	public AttackHolder() {
 		attacks.add(new Attack(AttackType.fireball, "Fire Ball", "Sends a ball of fire towards you enemies, burning anything it touches.", 200));
@@ -22,6 +26,10 @@ public class AttackHolder {
 	
 	public FireballHolder getFireballHolder() {
 		return fireHolder;
+	}
+	
+	public WaterballHolder getWaterballHolder() {
+		return waterHolder;
 	}
 	
 	public Attack get(AttackType type) {

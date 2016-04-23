@@ -11,15 +11,22 @@ import terrains.Terrain;
 import toolbox.Maths;
 
 public class Enemy extends Entity {
-	private static float RUN_SPEED = 15.0f;
+	private static final long serialVersionUID = -3799383640463312689L;
+
+	private static float RUN_SPEED = 10.0f;
 	
+	private static int attackCooldown = 100;
+	private static int cooldownTime = 0;
+	
+	private int health = 0;
 	private move_factor _move_factor = move_factor.FACE_TOWARDS;
 	private Terrain terrain;
 	private int id;
 	
-	public Enemy(TexturedModel model, Vector3f position, Vector3f rotation, float scale, move_factor move, int id) {
+	public Enemy(TexturedModel model, Vector3f position, Vector3f rotation, float scale, move_factor move, int id, int health) {
 		super(model, position, rotation.getX(), rotation.getY(), rotation.getZ(), scale, entityType.ENEMY);
 		_move_factor = move;
+		this.health = health;
 		this.terrain = Mift.terrain;
 		this.id = id;
 	}
@@ -39,12 +46,37 @@ public class Enemy extends Entity {
 			moveInCircles(60);
 		} else if (_move_factor == move_factor.FOLLOW_NOT_LOOKING) {
 			followWhenNotLooking(player);
+		} else if (_move_factor == move_factor.MOVE_TOWARDS_WHEN_CLOSE) {
+			moveTowardsPlayerWhenClose(player);
+		}
+		if (Maths.distanceFormula3D(getPosition(), player.getPosition()) < 15) {
+			if (cooldownTime == 0) {
+				player.collideWithEnemy();
+				cooldownTime = 1;
+			}					
+		}
+		if (cooldownTime > 0) {
+			if (cooldownTime < attackCooldown) {
+				cooldownTime++;
+			} else {
+				cooldownTime = 0;
+			}
 		}
 	}
 	
-	private void moveTowardsPlayer(Player player) {
+	public void attackCollision(int damage) {
+		health -= damage;
+		if (health <= 0) {
+			Mift.enemies.remove(this);
+		}
+	}
+	
+	private void moveTowardsPlayer(Player player) {  //fixed
 		//rotate enemy to face player menacingly
-		super.setRotation(Maths.getRotationFromPoint(this, player));
+		Vector3f rot = Maths.getRotationFromPoint(this, player);
+		super.setRotX(rot.x);
+		super.setRotY(rot.y);
+		super.setRotZ(rot.z);
 		
 		float speed = (RUN_SPEED) * DisplayManager.getFrameTimeSeconds();
 		float dx = (float) 	(speed * Math.sin(Math.toRadians(super.getRotY())));
@@ -55,9 +87,23 @@ public class Enemy extends Entity {
 		super.getPosition().y = terrainHeight;
 	}
 	
-	private void followWhenNotLooking(Player player) {
+	private void moveTowardsPlayerWhenClose(Player player) {  //fixed
+		double distanceToPlayer = Maths.distanceFormula3D(
+				new Vector3f(player.getPosition().x, player.getPosition().y, player.getPosition().z),
+				new Vector3f(getPosition().x, getPosition().y, getPosition().z));
+		if (distanceToPlayer <= 300 && distanceToPlayer > 100) {
+			faceTowardsPlayer(player);
+		} else if (distanceToPlayer <= 100) {
+			moveTowardsPlayer(player);
+		}
+	}
+	
+	private void followWhenNotLooking(Player player) {  //fixed
 		//rotate enemy to face player menacingly
-		super.setRotation(Maths.getRotationFromPoint(this, player));
+		Vector3f rot = Maths.getRotationFromPoint(this, player);
+		super.setRotX(rot.x);
+		super.setRotY(rot.y);
+		super.setRotZ(rot.z);
 		
 		//check if player rotation is away from entity
 		if (Maths.isWithinScreen(player.getRotation(), this.getRotation())) {
@@ -71,9 +117,13 @@ public class Enemy extends Entity {
 		super.getPosition().y = terrainHeight;
 	}
 	
-	private void faceTowardsPlayer(Player player) {
+	private void faceTowardsPlayer(Player player) {  //fixed
 		//rotate enemy to face player menacingly
-		super.setRotation(Maths.getRotationFromPoint(this, player));
+		Vector3f rot = Maths.getRotationFromPoint(this, player);
+		super.setRotX(rot.x);
+		super.setRotY(rot.y);
+		super.setRotZ(rot.z);
+		
 		float terrainHeight = terrain.getHeightOfTerrain(super.getPosition().x, super.getPosition().z);
 		super.getPosition().y = terrainHeight;
 	}
@@ -85,9 +135,9 @@ public class Enemy extends Entity {
 		super.getPosition().y = terrainHeight;
 	}
 	
-	private void moveInCircles(float radius) {
+	private void moveInCircles(float radius) {  //fixed
 		float increaseAngle = (360 / radius) / 5;
-		super.increaseRotation(0, increaseAngle, 0);
+		super.setRotY(getRotY() + increaseAngle);
 		
 		float speed = (RUN_SPEED) * DisplayManager.getFrameTimeSeconds();
 		float dx = (float) 	(speed * Math.sin(Math.toRadians(super.getRotY())));

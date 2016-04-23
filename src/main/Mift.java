@@ -29,6 +29,7 @@ import guis.GuiRenderer;
 import guis.GuiTexture;
 import guis.hud.HUDCreator;
 import guis.hud.HUDRenderer;
+import guis.menu.DeadRenderer;
 import guis.menu.MenuRenderer;
 import guis.menu.SettingsRenderer;
 import guis.menu.WorldLoadRenderer;
@@ -54,31 +55,31 @@ import water.WaterShader;
 import water.WaterTile;
 
 /**
- * Already surpassed 14k lines of
- * cumulative code! - Mift Build 61
- *
+ * Already surpassed 16k lines of
+ * cumulative code! - Mift Build 62
+ * 
  * @author Bryce Hahn, Mason Cluff
  * @since 1.0 - 06/12/2015
  */
 public class Mift {
-	public static final String BUILD = "61";
+	public static final String BUILD = "62";
 	public static final String RELEASE = "1";
 	public static final String RELEASE_TITLE = "Pre-Alpha";
 	public static final String NAME = "Mift";
-
+	
 	private static boolean isPaused = true;
 	private static SecureRandom random;
 	public static boolean hasMadeWorld = false;
 	private static boolean textsDissabled = false;
-
+	
 	public static int instance_count = 0;
 	public static final int dayTimeMultiplier = 1;
 	public static int menuIndex = 0;
-
+	
 	//camera stuff
 	public static Camera camera;
 	public static OverheadCamera overheadCamera;
-
+	
 	public static Sun sunLight;
 	private static MousePicker defaultMouse;
 	private static MousePicker overheadMouse;
@@ -98,10 +99,9 @@ public class Mift {
 	public static MoveTypeHolder moveTypeHolder;
 	public static AttackHolder attackHolder;
 	public static Player player;
-	public static Entity player_legs;
-
+	
 	private static DisplayManager dm;
-
+	
 	@SuppressWarnings("static-access")
 	public static void main(String[] args) {
 		new ImportLibs(); //link the natives for lwjgl
@@ -112,41 +112,41 @@ public class Mift {
 		dm = new DisplayManager();
 		settings = new Settings();
 		dm.createDisplay();
-
+		
 		MyoSetup.init(false);
-
+		
 		//init main objects
 		FPSCounter fpsCounter = new FPSCounter();
 		entityTypeHolder = new EntityTypeHolder();
 		moveTypeHolder = new MoveTypeHolder();
 		attackHolder = new AttackHolder();
 		textRenderer = new TextRenderer();
-
+		
 		// ******************* LIGHT SETUP ***************
 		List<Light> lights = new ArrayList<Light>();
 		sunLight = new Sun(new Vector3f(Terrain.SIZE, 50, Terrain.SIZE / 2), 203, 133, 173, 1.0f); //about 12:00am
 		Mift.instance_count++;
 		lights.add(sunLight);
-
+		
 		// ******************* PLAYER SETUP ***************
 		camera = new Camera();
 		overheadCamera = new OverheadCamera();
 		renderer = new MasterRenderer();
-
+		
 		// ******************* EXTRAS ****************
 		GuiRenderer guiRenderer = new GuiRenderer();
 		defaultMouse = new MousePicker(camera, renderer.getProjectionMatrix());
 		overheadMouse = new MousePicker(overheadCamera, renderer.getProjectionMatrix());
-
+		
 		// ********** Water Renderer Top Side ************************
 		WaterFrameBuffers topBuffers = new WaterFrameBuffers();
 		WaterShader waterShaderTop = new WaterShader();
 		WaterRenderer waterRenderer = new WaterRenderer(waterShaderTop, renderer.getProjectionMatrix(), topBuffers);
 		WaterTile water = new WaterTile(500, 500);
 		instance_count++;
-
+		
 		Display.setTitle(NAME + " Release " + RELEASE + " b" + BUILD);
-
+		
 		// **************** Text Rendering *********************
 		texts.add(new GUIText(textRenderer, "", 1.25f, FontHolder.getBerlinSans(), new Vector2f(0, 0), 0.25f, ALIGNMENT.LEFT));
 			texts.get(0).setColor(255, 255, 255);
@@ -160,10 +160,10 @@ public class Mift {
 			texts.get(4).setColor(220, 220, 220);
 		texts.add(new GUIText(textRenderer, "", 1.25f, FontHolder.getBerlinSans(), new Vector2f(0.5f, 0), 0.25f, ALIGNMENT.LEFT));
 			texts.get(5).setColor(100, 100, 255);
-
+		
 		// **************** PARTICLE SYSTEM *********************
 		ParticleHolder.init(loader, renderer.getProjectionMatrix());
-
+		
 		ParticleTexture pt = new ParticleTexture(loader.loadParticleTexture("star"), 4, true);
 		ParticleEmitter pe = new ParticleEmitter(pt, 120, 10, 0.1f, 1, 1.6f);
 		pe.setLifeError(0.1f);
@@ -173,30 +173,33 @@ public class Mift {
 
 		// **************** ATTACKS *****************************
 		AttackUpdater attackUpdater = new AttackUpdater();
-
+		
 		// **************** HUD *********************************
 		HUDRenderer hudRenderer = new HUDRenderer();
 		hudCreator = new HUDCreator(loader, false);
-
+		
 		//****************** Menu Rendering *******************
 		MenuRenderer pauseRenderer = new MenuRenderer();
 		SettingsRenderer settingRenderer = new SettingsRenderer();
 		WorldLoadRenderer worldLoadingRenderer = new WorldLoadRenderer();
-
+		DeadRenderer deadRenderer = new DeadRenderer();
+		
 		// ******************POST PROCESSING ********************
 		FBO fbo1 = new FBO(Display.getWidth(), Display.getHeight(), FBO.DEPTH_RENDER_BUFFER);
 		PostProcessing.init(loader);
-
+		
 		// **************** Game Loop Below *********************
 		while (!Display.isCloseRequested()) {
-			if (isPaused) {
+			if (isPaused) { 
 				if (menuIndex == 0) {//render pause main menu
 					pauseRenderer.update();
 				} else if (menuIndex == 1) { //render settings
 					settingRenderer.update();
-				} else if (menuIndex == 2) {
+				} else if (menuIndex == 2) { //render load world
 					worldLoadingRenderer.update();
-				} else { //render load world
+				} else if (menuIndex == 3) { //render death
+					deadRenderer.update();
+				} else {
 					Logger.error("Something went wrong when rendering menu index of " + menuIndex);
 					Display.destroy();
 				}
@@ -207,9 +210,9 @@ public class Mift {
 				player.move();
 				sunLight.move();
 				SkyboxRenderer.move();
-
+				
 				//pe.generateParticles(player.getPosition());
-
+				
 				for (Enemy e : enemies) {
 					if (e != null) {
 						e.move(player);
@@ -230,22 +233,22 @@ public class Mift {
 					ParticleHolder.renderParticles(overheadCamera);
 					if (!SettingHolder.get("cg_theatrical").getValueB()) {hudCreator.update(overheadCamera);}
 				}
-
+				
 				attackUpdater.update(attackHolder);
-
+				
 				//post processing effects
 				if (SettingHolder.get("cg_post_processing").getValueB()) {
 					fbo1.unbindFrameBuffer();
 					PostProcessing.doPostProcessing(fbo1.getColorTexture());
 				}
-
+				
 				if (SettingHolder.get("cg_fps").getValueB()) fpsCounter.updateCounter();
-
+				
 				if (!SettingHolder.get("cg_theatrical").getValueB()) {
 					guiRenderer.render(guiTextures);
-
+					
 					if (camera.distanceFromPlayer == 0) {hudRenderer.render(hudCreator.getTextures(), hudCreator.getCompass());}
-
+					
 					texts.get(0).setText(Mift.NAME + " " + Mift.RELEASE_TITLE + " Build " + Mift.RELEASE + "." + Mift.BUILD);
 					texts.get(1).setText((SettingHolder.get("cg_fps").getValueB() ? (int)(fpsCounter.getFPS()) + "" : ""));
 					texts.get(2).setText(SettingHolder.get("cg_developer").getValueB() ? updateDebugText(player) : "");
@@ -254,13 +257,13 @@ public class Mift {
 					texts.get(5).setText("Day " + sunLight.getDay() + "  ~" + sunLight.getCurrentTimeDebug());
 					textRenderer.render(texts);
 				}
-
+				
 				if (textsDissabled) {
 					enableAllTexts(true);
 				}
 			}
 			DisplayManager.updateDisplay();
-
+			
 		}
 
 		// ********* Clean Up Below **************
@@ -275,7 +278,7 @@ public class Mift {
 		loader.cleanUp();
 		DisplayManager.closeDisplay();
 	}
-
+	
 	private static String updateDebugText(Player player) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(" Developer Mode: " + SettingHolder.get("cg_developer").getValueB());
@@ -292,7 +295,7 @@ public class Mift {
 		sb.append("  ~ Instances Within World: " + instance_count);
 		return sb.toString();
 	}
-
+	
 	private static String updateAttackText(AttackHolder at, Player player) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(at.get(at.rotateReverse(player.attackType)).getName());
@@ -304,7 +307,7 @@ public class Mift {
 		sb.append(at.get(player.attackType).getDefinition());
 		return sb.toString();
 	}
-
+	
 	private static String updateModelPlacerText(EntityTypeHolder eth, MoveTypeHolder mth, Player player) {
 		StringBuilder sb = new StringBuilder();
 		sb.append(eth.get(eth.rotateReverse(overheadCamera.placerType)).getName());
@@ -323,32 +326,30 @@ public class Mift {
 		sb.append(")");
 		return sb.toString();
 	}
-
+	
 	public static MousePicker getMousePicker(boolean isOverhead) {
 		return (isOverhead ? overheadMouse : defaultMouse);
 	}
-
+	
 	public static void addEnemy(Enemy e) {
 		entities.add(e);
 		enemies.add(e);
 	}
-
+	
 	public static void hidePlayerInFPS() {
 		// If we're drawing close to the camera, or the top of the player's head,
 		// remove the player so it doesn't get drawn and we can see it in first person view
 		if (camera.distanceFromPlayer < 1) {
 			player.setRenderable(false);
-			player_legs.setRenderable(true);
 		} else {
 			player.setRenderable(true);
-			player_legs.setRenderable(false);
 		}
 	}
-
+	
 	public static boolean isPaused() {
 		return isPaused;
 	}
-
+	
 	public static void setPaused(Boolean paused) {
 		if (paused) {
 			//dissable all texts then re-enable
@@ -360,7 +361,7 @@ public class Mift {
 			isPaused = false;
 		}
 	}
-
+	
 	private static void enableAllTexts(boolean pause) {
 		for (int i = 0; i < texts.size(); i++) {
 			texts.get(i).setRenderable(true);

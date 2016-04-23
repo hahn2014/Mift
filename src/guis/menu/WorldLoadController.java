@@ -3,6 +3,8 @@ package guis.menu;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
 
+import loader.WorldLoader;
+import loader.WorldSaver;
 import main.Mift;
 
 public class WorldLoadController {
@@ -50,6 +52,12 @@ public class WorldLoadController {
 				if (Keyboard.getEventKey() == Keyboard.KEY_ESCAPE) {
 					Mift.menuIndex = 0;
 					MenuRenderer.selected = 2;
+				}
+				if (Keyboard.getEventKey() == Keyboard.KEY_S) {
+					WorldSaver.saveCurrentWorld();
+				}
+				if (Keyboard.getEventKey() == Keyboard.KEY_L) {
+					WorldLoader.loadWorld("159984");
 				}
 			}
 		}

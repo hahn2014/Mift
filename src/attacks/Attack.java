@@ -1,12 +1,14 @@
 package attacks;
 
-public class Attack {
+import java.io.Serializable;
+
+public class Attack implements Serializable {
+	private static final long serialVersionUID = -7689675181070152534L;
+
 	public enum AttackType {
 		fireball,
 		waterball,
-		groundpound,
-		lightning,
-		airblast
+		lightning
 	};
 	private int damage = 100;
 	private AttackType id = AttackType.fireball;

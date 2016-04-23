@@ -1,4 +1,4 @@
-package attacks.fireball;
+package attacks.waterball;
 
 import org.lwjgl.util.vector.Vector3f;
 
@@ -12,7 +12,7 @@ import objConverter.OBJFileLoader;
 import textures.ModelTexture;
 import toolbox.Maths;
 
-public class Fireball extends Entity {
+public class Waterball extends Entity {
 	private static final long serialVersionUID = -5761273687900548386L;
 	
 	private final int speed = 8;
@@ -23,11 +23,11 @@ public class Fireball extends Entity {
 	
 	private TexturedModel model;
 	
-	public Fireball(TexturedModel model, Vector3f curPos, Vector3f gotoPos, float scale) {
-		super(model, curPos, 0, 0, 0, scale, entityType.ATK_FIREBALL);
+	public Waterball(TexturedModel model, Vector3f curPos, Vector3f gotoPos, float scale) {
+		super(model, curPos, 0, 0, 0, scale, entityType.ATK_WATERBALL);
 		this.isRenderable = true;
 		this.gotoPos = gotoPos;
-		this.model = new TexturedModel(OBJFileLoader.loadOBJ("attackSphere"), new ModelTexture(Mift.loader.loadTexture("fireball")));
+		this.model = new TexturedModel(OBJFileLoader.loadOBJ("attackSphere"), new ModelTexture(Mift.loader.loadTexture("waterball")));
 	}
 	
 	public void update() {
@@ -57,7 +57,7 @@ public class Fireball extends Entity {
 		//check entity collision
 		Entity entitytodel = null;
 		for (Entity e : Mift.entities) {
-			if (e.getType() != entityType.ATK_FIREBALL) {
+			if (e.getType() != entityType.ATK_WATERBALL) {
 				if (Maths.distanceFormula3D(getCurrentPosition(), e.getPosition()) <= 10) {
 					entitytodel = e;
 				}
@@ -72,7 +72,7 @@ public class Fireball extends Entity {
 		for (Enemy e : Mift.enemies) {
 			if (Maths.distanceFormula3D(getCurrentPosition(), e.getPosition()) <= 10) {
 				enemytodel = e;
-				e.attackCollision(Mift.attackHolder.get(AttackType.fireball).getDamage());
+				e.attackCollision(Mift.attackHolder.get(AttackType.waterball).getDamage());
 			}
 		}
 		if (enemytodel != null) {

@@ -24,13 +24,15 @@ import particles.ParticleTexture;
 import renderEngine.DisplayManager;
 
 public class Player extends Entity {
-
-	private static final float RUN_SPEED = (!SettingHolder.get("player_ufo").getValueB() ? 20.0f : 50.0f);
+	private static final long serialVersionUID = 2332101620227041812L;
+	
+	private static final float RUN_SPEED = (!SettingHolder.get("player_ufo").getValueB() ? 16.0f : 50.0f);
 	private static final float MAX_RUN_TIME = 200.0f;
 	private static final float RUN_COOLDOWN = 400f;
 	private static final float ATTACK_COOLDOWN = 20f;
 	private static final float GRAVITY = -50;
 	private static final float JUMP_POWER = 20;
+	private static int		   HEALTH = 500;
 
 	private float currentSpeed = 0f;
 	private float upwardsSpeed = 0f;
@@ -74,11 +76,12 @@ public class Player extends Entity {
 		float distance = currentSpeed * DisplayManager.getFrameTimeSeconds();
 		float dx = (float) (distance * Math.sin(Math.toRadians(super.getRotY())));
 		float dz = (float) (distance * Math.cos(Math.toRadians(super.getRotY())));
+		
 		if (!SettingHolder.get("player_ufo").getValueB()) {
 			upwardsSpeed += GRAVITY * DisplayManager.getFrameTimeSeconds() / 1000;
 		}
+		
 		super.increasePosition(dx, upwardsSpeed * DisplayManager.getFrameTimeSeconds(), dz);
-		Mift.player_legs.setPosition(new Vector3f(getPosition().x, getPosition().y, getPosition().z));
 		
 		if (attackCooldownTime > 0) {
 			attackCooldown();
@@ -92,6 +95,17 @@ public class Player extends Entity {
 				super.getPosition().setY(terrainHeight);
 				isInAir = false;
 			}
+		}
+	}
+	
+	public void collideWithEnemy() {
+		Logger.debug("Took damage");
+		HEALTH -= 100;
+		if (HEALTH <= 0) {
+			Logger.debug("Player has died!");
+			Mift.setPaused(true);
+			Mift.menuIndex = 3; //dead scene
+			Mift.hasMadeWorld = false;
 		}
 	}
 	
@@ -255,6 +269,16 @@ public class Player extends Entity {
 				attackCooldownTime = ATTACK_COOLDOWN;
 			} else {
 				Logger.error("Unable to create fireball at location. Position calulated is " + gotoPos);
+			}
+		} else if (attackType == AttackType.waterball) {
+			Vector3f curPos = new Vector3f(getPosition().x, getPosition().y + 9, getPosition().z);
+			Vector3f gotoPos = Mift.getMousePicker(false).getTerrainPoint(new Vector2f(Display.getWidth() / 2, Display.getHeight() / 2));
+			
+			if (gotoPos != null) {
+				Mift.attackHolder.getWaterballHolder().createWaterball(curPos, gotoPos);
+				attackCooldownTime = ATTACK_COOLDOWN;
+			} else {
+				Logger.error("Unable to create waterball at location. Position calulated is " + gotoPos);
 			}
 		}
 	}

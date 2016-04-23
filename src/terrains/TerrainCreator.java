@@ -1,8 +1,14 @@
 package terrains;
 
+import java.util.List;
+
 import org.lwjgl.util.vector.Vector3f;
 
+import entities.Enemy;
+import entities.Entity;
 import entities.EntityCreator;
+import entities.MoveType.move_factor;
+import entities.Player;
 import main.Mift;
 import textures.TerrainTexture;
 import textures.TerrainTexturePack;
@@ -32,17 +38,28 @@ public class TerrainCreator {
 		Mift.entities.clear();
 		Mift.enemies.clear();
 		Mift.entities = Mift.terrain.generateEntities(Mift.entities); //spawn the entities on it
-		//Mift.entities = Mift.terrain.generateEnemies(move_factor.NOTHING, Mift.entities); // spawn the enemies on it
+		Mift.entities = Mift.terrain.generateEnemies(move_factor.MOVE_TOWARDS_WHEN_CLOSE, Mift.entities); // spawn the enemies on it
 		Mift.player = new EntityCreator().createPlayer(new Vector3f(500, Mift.terrain.getHeightOfTerrain(500,  500), 500), new Vector3f(0, 90, 0));
-		Mift.player_legs = new EntityCreator().createPlayerLegs(Mift.player.getPosition(), Mift.player.getRotation());
-		Mift.player_legs.setRotY(-30);
 		Mift.entities.add(Mift.player);
-		Mift.entities.add(Mift.player_legs);
 		Mift.camera.setPlayer(Mift.player);
 		Mift.overheadCamera.setPlayer(Mift.player);
 		Mift.setPaused(false);
 		Mift.hasMadeWorld = true;
 		Mift.sunLight.resetWorldTime();
+	}
+	
+	public static void loadWorld(Terrain terrain, List<Entity> entities, List<Enemy> enemies, Player player, int day, int time) {
+		Mift.terrain = terrain;
+		Mift.entities = entities;
+		Mift.enemies = enemies;
+		Mift.player = player;
+		Mift.entities.add(Mift.player);
+		Mift.camera.setPlayer(Mift.player);
+		Mift.overheadCamera.setPlayer(Mift.player);
+		Mift.setPaused(false);
+		Mift.hasMadeWorld = true;
+		Mift.sunLight.setDay(day);
+		Mift.sunLight.setDayTime(time);
 	}
 	
 	public Terrain getTerrain() {

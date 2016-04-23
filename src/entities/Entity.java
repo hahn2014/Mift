@@ -1,12 +1,15 @@
 package entities;
 
+import java.io.Serializable;
+
 import org.lwjgl.util.vector.Vector3f;
 
 import entities.EntityType.entityType;
 import models.TexturedModel;
 
-public class Entity {
-
+public class Entity implements Serializable {
+	private static final long serialVersionUID = -7978871822365409699L;
+	
 	private TexturedModel model;
 	private Vector3f position;
 	private float rotX, rotY, rotZ;

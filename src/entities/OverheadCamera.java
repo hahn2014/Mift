@@ -1,5 +1,6 @@
 package entities;
 
+import java.io.Serializable;
 import java.util.Random;
 
 import org.lwjgl.Sys;
@@ -21,8 +22,8 @@ import renderEngine.DisplayManager;
  * @author Bryce Hahn
  * @since 1.1
  */
-public class OverheadCamera {
-	
+public class OverheadCamera implements Serializable {
+	private static final long serialVersionUID = -7302478949741494643L;
 	public float distanceFromPlayer = 50;
 	private float angleAroundPlayer = 0;
 
@@ -77,7 +78,7 @@ public class OverheadCamera {
 		        	random.setSeed(Sys.getTime());
 		        	EntityCreator e = new EntityCreator(); //spawn a new model of the current model selection
 		        	Mift.addEnemy(e.createEnemy(placerType, Mift.getMousePicker(true).getCurrentTerrainPoint(), 
-		        			player.getRotation(), move_type, random.nextInt(99999999)));
+		        			player.getRotation(), move_type, random.nextInt(99999999), 1000));
 		        }
 		        if (Mouse.getEventButton() == 1) {
 		            //RIGHT BUTTON RELEASED

@@ -1,16 +1,17 @@
 package entities;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import entities.EntityType.entityType;
 
-public class EntityTypeHolder {
+public class EntityTypeHolder implements Serializable {
+	private static final long serialVersionUID = 3658828953549257689L;
 	private List<EntityType> entities = new ArrayList<EntityType>();
 	
 	public EntityTypeHolder() {
 		entities.add(new EntityType(entityType.PLAYER, 			"Player", 			"player", 		"player", 		3.0f));
-		entities.add(new EntityType(entityType.PLAYER_LEGS, 	"Player Legs", 		"player_legs", 	"player", 		4.0f));
 		entities.add(new EntityType(entityType.ENEMY, 			"Enemy", 			"dino", 		"dino", 		3.8f));
 		entities.add(new EntityType(entityType.TREE, 			"Low Poly Tree", 	"lowPolyTree", 	"lowPolyTree", 	0.75f));
 		entities.add(new EntityType(entityType.BARREL, 			"Barrel", 			"barrel", 		"barrel", 		0.5f));

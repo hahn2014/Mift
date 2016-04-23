@@ -118,8 +118,15 @@ public class Sun extends Light {
 		daysLived = day;
 	}
 	
+	public void setDayTime(int time) {
+		if (time < dayStart || time > dayEnd) {
+			time = dayStart;
+		}
+		currentTime = time;
+	}
+	
 	public void resetWorldTime() {
 		daysLived = 1;
-		currentTime = dayStart;
+		currentTime = dayMid;
 	}
 }

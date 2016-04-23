@@ -1,12 +1,21 @@
 package entities;
 
+import java.io.Serializable;
 import java.util.Random;
 
 import org.lwjgl.Sys;
 
-public class MoveType {
+public class MoveType implements Serializable {
+	private static final long serialVersionUID = 8565078985858354561L;
+
 	public enum move_factor {
-		NOTHING, MOVE_TOWARDS, FACE_TOWARDS, FACE_AWAY, MOVE_CIRCLES, FOLLOW_NOT_LOOKING
+		NOTHING,
+		MOVE_TOWARDS,
+		FACE_TOWARDS,
+		FACE_AWAY,
+		MOVE_CIRCLES,
+		FOLLOW_NOT_LOOKING,
+		MOVE_TOWARDS_WHEN_CLOSE
 	}
 
 	private static Random random = new Random();

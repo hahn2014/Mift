@@ -1,6 +1,9 @@
 package particles;
 
-public class ParticleTexture {
+import java.io.Serializable;
+
+public class ParticleTexture implements Serializable {
+	private static final long serialVersionUID = -7475307025585293010L;
 	private int textureID;
 	private int numberOfRows;
 	private boolean additive;

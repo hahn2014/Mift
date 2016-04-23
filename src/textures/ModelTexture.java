@@ -1,7 +1,9 @@
 package textures;
 
-public class ModelTexture {
+import java.io.Serializable;
 
+public class ModelTexture implements Serializable {
+	private static final long serialVersionUID = -7999115713450320899L;
 	private int textureID;
 	private int normalMap;
 

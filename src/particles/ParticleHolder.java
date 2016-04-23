@@ -1,5 +1,6 @@
 package particles;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -13,7 +14,8 @@ import entities.Camera;
 import entities.OverheadCamera;
 import renderEngine.Loader;
 
-public class ParticleHolder {
+public class ParticleHolder implements Serializable {
+	private static final long serialVersionUID = 443023771041833906L;
 	private static Map<ParticleTexture, List<Particle>> particles = new HashMap<ParticleTexture, List<Particle>>();
 	private static ParticleRenderer renderer;
 	
