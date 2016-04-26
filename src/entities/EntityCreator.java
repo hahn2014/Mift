@@ -1,5 +1,6 @@
 package entities;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -15,6 +16,7 @@ import objConverter.OBJFileLoader;
 import renderEngine.OBJLoader;
 import terrains.Terrain;
 import textures.ModelTexture;
+import toolbox.Maths;
 import water.WaterTile;
 
 public class EntityCreator {
@@ -129,32 +131,22 @@ public class EntityCreator {
 		return new Enemy(texturedModel, location, rotation, e.getScale(), move, id, health);
 	}
 
-	/**
-	 * Create an entity to be used in game efficiently and in one line of code!
-	 * Created an enemy to be returned and used as either the an enemy or
-	 * another player online! This method is the exact same as it's predecessor,
-	 * but instead of setting parameters for the enemy location and rotation, it
-	 * is all randomly chosen within the call method. No need for all the pesky
-	 * random calls.
-	 * 
-	 * @param loader
-	 * @param objName
-	 * @param textureName
-	 * @param scale
-	 * @param runSpeed
-	 * @param move
-	 * @return Textured Model
-	 */
-	public Enemy createRandomEnemy(move_factor move, int id) {
+	public List<Enemy> createRandomEnemy(move_factor move, int quantity) {
+		List<Enemy> enemies = new ArrayList<Enemy>();
 		EntityType e = eth.get(entityType.ENEMY);
 		random.setSeed(System.currentTimeMillis());
 		texturedModel = new TexturedModel(OBJLoader.loadObjModel("models/" + e.getObjName()),
 				new ModelTexture(Mift.loader.loadTexture(e.getTextureName())));
-		int x = random.nextInt(1000);
-		int z = random.nextInt(1000);
-		Mift.instance_count++;
-		return new Enemy(texturedModel, new Vector3f(x, Mift.terrain.getHeightOfTerrain(x, z), z),
-				new Vector3f(0, random.nextInt(360), 0), e.getScale(), move, id, 1000);
+		for (int i = 0; i < quantity; i++) {
+			int x = random.nextInt(1000);
+			int z = random.nextInt(1000);
+			if (Maths.distanceFormula3D(new Vector3f(x, 0, z), Mift.player.getPosition()) > 100) {
+				Mift.instance_count++;
+				enemies.add(new Enemy(texturedModel, new Vector3f(x, Mift.terrain.getHeightOfTerrain(x, z), z),
+						new Vector3f(0, random.nextInt(360), 0), e.getScale(), move, i, 1000));
+			}
+		}
+		return enemies;
 	}
 	
 	public List<Entity> generateObjects(List<Entity> entities, int generationLuck, Terrain terrain, int gridX, int gridZ) {
@@ -174,8 +166,10 @@ public class EntityCreator {
 					Entity e = new Entity(fern, 3, new Vector3f(x, y, z), 0, random.nextFloat() * 360, 0,
 							random.nextFloat() * 0.6f + 0.8f, entityType.FERN);
 					e.getModel().getTexture().setHasTransparency(false);
-					entities.add(e);
-					Mift.instance_count++;
+					if (e != null) {
+						entities.add(e);
+						Mift.instance_count++;
+					}
 				}
 			}
 			if (i % 2 == 0) {
@@ -183,9 +177,12 @@ public class EntityCreator {
 				float z = random.nextInt(1000) + gridZ;
 				float y = terrain.getHeightOfTerrain(x, z);
 				if (y >= WaterTile.height) {
-					entities.add(new Entity(pine, 1, new Vector3f(x, y, z), 0, random.nextFloat() * 360, 0,
-							random.nextFloat() * 0.6f + 0.8f, entityType.PINE));
-					Mift.instance_count++;
+					Entity e = new Entity(pine, 1, new Vector3f(x, y, z), 0, random.nextFloat() * 360, 0,
+							random.nextFloat() * 0.6f + 0.8f, entityType.PINE);
+					if (e != null) {
+						entities.add(e);
+						Mift.instance_count++;
+					}
 				}
 			}
 		}

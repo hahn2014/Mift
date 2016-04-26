@@ -15,7 +15,9 @@ public class MyoSetup {
 		if (initialize) {
 			try {
 				hub = new Hub("");
+				Logger.info("hub done");
 				Myo myo = hub.waitForMyo(10000);
+				Logger.info("wait done");
 				SettingHolder.get("cp_myo_enabled").setValueB(myo != null);
 				if (SettingHolder.get("cp_myo_enabled").getValueB()) {
 					Logger.info("Using Myo for input");

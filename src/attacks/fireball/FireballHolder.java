@@ -17,6 +17,7 @@ public class FireballHolder {
 	List<Fireball> fireballs = new ArrayList<Fireball>();
 	private EntityTypeHolder eth = new EntityTypeHolder();
 	
+	
 	public List<Fireball> getAll() {
 		return fireballs;
 	}

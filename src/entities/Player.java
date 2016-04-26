@@ -8,8 +8,6 @@ import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
-import com.thalmic.myo.enums.PoseType;
-
 import attacks.Attack.AttackType;
 import attacks.AttackHolder;
 import entities.EntityType.entityType;
@@ -17,16 +15,15 @@ import io.Logger;
 import io.SettingHolder;
 import main.Mift;
 import models.TexturedModel;
-import myo.MoveMyo;
-import myo.MyoManager;
 import particles.ParticleEmitter;
 import particles.ParticleTexture;
 import renderEngine.DisplayManager;
+import toolbox.Maths;
 
 public class Player extends Entity {
 	private static final long serialVersionUID = 2332101620227041812L;
 	
-	private static final float RUN_SPEED = (!SettingHolder.get("player_ufo").getValueB() ? 16.0f : 50.0f);
+	public static final float RUN_SPEED = (!SettingHolder.get("player_ufo").getValueB() ? 16.0f : 25.0f);
 	private static final float MAX_RUN_TIME = 200.0f;
 	private static final float RUN_COOLDOWN = 400f;
 	private static final float ATTACK_COOLDOWN = 20f;
@@ -54,6 +51,10 @@ public class Player extends Entity {
 	private Camera camera;
 	private OverheadCamera overheadCamera;
 	public ParticleEmitter particleEmitter;
+	
+	public int getSpeed() {
+		return (int) currentSpeed;
+	}
 
 	public Player(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
 		super(model, position, rotX, rotY, rotZ, scale, entityType.PLAYER);
@@ -81,10 +82,15 @@ public class Player extends Entity {
 			upwardsSpeed += GRAVITY * DisplayManager.getFrameTimeSeconds() / 1000;
 		}
 		
-		super.increasePosition(dx, upwardsSpeed * DisplayManager.getFrameTimeSeconds(), dz);
-		
+		if (!collideWithEntity() && !SettingHolder.get("player_ufo").getValueB()) {
+			super.increasePosition(dx, upwardsSpeed * DisplayManager.getFrameTimeSeconds(), dz);
+		}
 		if (attackCooldownTime > 0) {
-			attackCooldown();
+			if (SettingHolder.get("player_fire_unlimited").getValueB() == false) {
+				attackCooldown();
+			} else {
+				attackCooldownTime = 0;
+			}
 		}
 		
 		if (!SettingHolder.get("player_ufo").getValueB()) {
@@ -99,14 +105,27 @@ public class Player extends Entity {
 	}
 	
 	public void collideWithEnemy() {
-		Logger.debug("Took damage");
-		HEALTH -= 100;
-		if (HEALTH <= 0) {
-			Logger.debug("Player has died!");
-			Mift.setPaused(true);
-			Mift.menuIndex = 3; //dead scene
-			Mift.hasMadeWorld = false;
+		if (SettingHolder.get("player_god").getValueB() == false) {
+			Logger.debug("Took damage");
+			HEALTH -= 100;
+			if (HEALTH <= 0) {
+				Logger.debug("Player has died!");
+				Mift.setPaused(true);
+				Mift.menuIndex = 3; //dead scene
+				Mift.hasMadeWorld = false;
+			}
 		}
+	}
+	
+	public boolean collideWithEntity() {
+		for (Entity e : Mift.entities) {
+			if (e.getType() != entityType.PLAYER && e.getType() != entityType.FERN) {
+				if (Maths.distanceFormula3D(getPosition(), e.getPosition()) <= 20) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
 	
 	private void attackCooldown() {
@@ -149,15 +168,7 @@ public class Player extends Entity {
 	}
 	
 	public void updateMyo() {
-		MoveMyo myo = MyoManager.getMoveMyo();
-		if (myo.getPose() == PoseType.FIST) {
-			isRunning = !isRunning;
-			if (isRunning) {
-				currentSpeed = RUN_SPEED;
-			} else {
-				currentSpeed = 0;
-			}
-		}
+		//
 	}
 	
 	private void checkInputs() {
@@ -289,5 +300,13 @@ public class Player extends Entity {
 
 	public void setOverhead(boolean overhead) {
 		this.isOverhead = overhead;
+	}
+
+	public int getHealth() {
+		return HEALTH;
+	}
+	
+	public void resetHealth() {
+		HEALTH = 500;
 	}
 }

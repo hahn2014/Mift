@@ -1,22 +1,22 @@
-package postProcessing.contrast;
+package postProcessing.DOF;
 
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 
 import postProcessing.ImageRenderer;
 
-public class ContrastChanger {
+public class DOFChanger {
 	private ImageRenderer renderer;
-	private ContrastShader shader;
+	private DOFShader shader;
 	
-	public ContrastChanger() {
-		shader = new ContrastShader();
+	public DOFChanger() {
+		shader = new DOFShader();
 		renderer = new ImageRenderer();
 	}
 	
 	public void render(int texture) {
 		shader.start();
-		shader.loadContrast(0.25f);
+		shader.loadDepthDistance(200f);
 		GL13.glActiveTexture(GL13.GL_TEXTURE0);
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture);
 		renderer.renderQuad();

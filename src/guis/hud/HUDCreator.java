@@ -16,13 +16,13 @@ public class HUDCreator {
 	private List<GuiTexture> textures = new ArrayList<GuiTexture>();
 	
 	public HUDCreator(Loader loader, boolean enemiesOnly) {
-		compass = new Compass(loader);
+		//compass = new Compass(loader);
 		target = new Target(loader);
 		textures.add(target.texture);
 	}
 	
 	public void update(Camera camera) {
-		compass.update(camera);
+		//compass.update(camera);
 		target.update();
 	}
 	

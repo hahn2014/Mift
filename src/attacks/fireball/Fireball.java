@@ -27,7 +27,7 @@ public class Fireball extends Entity {
 		super(model, curPos, 0, 0, 0, scale, entityType.ATK_FIREBALL);
 		this.isRenderable = true;
 		this.gotoPos = gotoPos;
-		this.model = new TexturedModel(OBJFileLoader.loadOBJ("attackSphere"), new ModelTexture(Mift.loader.loadTexture("fireball")));
+		this.model = new TexturedModel(OBJFileLoader.loadOBJ("attackSphere"), new ModelTexture(Mift.loader.loadTexture("sphere")));
 	}
 	
 	public void update() {

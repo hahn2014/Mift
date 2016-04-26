@@ -26,14 +26,14 @@ public class DeadRenderer extends MenuController {
 	private List<GuiTexture> guis = new ArrayList<GuiTexture>();
 	
 	public DeadRenderer() {
-		texts.add(new GUIText(textRenderer, Mift.NAME + " " + Mift.RELEASE_TITLE + " Build " + Mift.RELEASE + "." + Mift.BUILD, 2.5f, FontHolder.getCandara(), new Vector2f(0.20f, 0f), 0.70f, ALIGNMENT.LEFT));
+		texts.add(new GUIText(textRenderer, Mift.NAME + " " + Mift.RELEASE_TITLE + " Build " + Mift.RELEASE + "." + Mift.BUILD, 2.5f, FontHolder.getCandara(), new Vector2f(0.36f, 0f), 0.70f, ALIGNMENT.LEFT));
 		texts.get(0).setColor(100, 0, 200);
 		
 		staticTexts.add(new GUIText(textRenderer, "OGPC v9 Participant", 1f, FontHolder.getCandara(), new Vector2f(0f, .97f), 0.35f, ALIGNMENT.LEFT));
 		staticTexts.get(0).setColor(255, 170, 67);
-		staticTexts.add(new GUIText(textRenderer, "YOU DIED!", 2.5f, FontHolder.getCandara(), new Vector2f(0.4f, 0.4f), 0.5f, ALIGNMENT.LEFT));
+		staticTexts.add(new GUIText(textRenderer, "YOU DIED!", 2.5f, FontHolder.getCandara(), new Vector2f(0.46f, 0.4f), 0.5f, ALIGNMENT.LEFT));
 		staticTexts.get(1).setColor(255, 50, 50);
-		staticTexts.add(new GUIText(textRenderer, "[ESC] Return To Main Menu", 1f, FontHolder.getCandara(), new Vector2f(.13f, .97f), 0.35f, ALIGNMENT.LEFT));
+		staticTexts.add(new GUIText(textRenderer, "[ESC] Continue To Credits", 1f, FontHolder.getCandara(), new Vector2f(.13f, .97f), 0.35f, ALIGNMENT.LEFT));
 		staticTexts.get(2).setColor(160, 0, 200);
 		
 		guis.add(new GuiTexture(Mift.loader.loadTexture("menuguis/menuBG"), new Vector2f(0f, -1f), new Vector2f(1.20f, 2f)));
@@ -58,8 +58,7 @@ public class DeadRenderer extends MenuController {
 					Mouse.setGrabbed(!Mouse.isGrabbed());
 				}
 				if (Keyboard.getEventKey() == Keyboard.KEY_ESCAPE) {
-					Mift.menuIndex = 0;
-					MenuRenderer.selected = 1;
+					Mift.menuIndex = 4; //send the user to credits
 				}
 			}
 		}

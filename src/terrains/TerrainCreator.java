@@ -37,22 +37,23 @@ public class TerrainCreator {
 		Mift.terrain = new TerrainCreator(0, 0, "deadGrass1", "grassy2", "path", "path", "blendMap2").getTerrain(); //create the terrain
 		Mift.entities.clear();
 		Mift.enemies.clear();
-		Mift.entities = Mift.terrain.generateEntities(Mift.entities); //spawn the entities on it
-		Mift.entities = Mift.terrain.generateEnemies(move_factor.MOVE_TOWARDS_WHEN_CLOSE, Mift.entities); // spawn the enemies on it
 		Mift.player = new EntityCreator().createPlayer(new Vector3f(500, Mift.terrain.getHeightOfTerrain(500,  500), 500), new Vector3f(0, 90, 0));
+		Mift.entities = Mift.terrain.generateEntities(Mift.entities); //spawn the entities on it
+		Mift.terrain.generateEnemies(move_factor.MOVE_TOWARDS_WHEN_CLOSE, Mift.entities); // spawn the enemies on it
 		Mift.entities.add(Mift.player);
 		Mift.camera.setPlayer(Mift.player);
 		Mift.overheadCamera.setPlayer(Mift.player);
 		Mift.setPaused(false);
 		Mift.hasMadeWorld = true;
 		Mift.sunLight.resetWorldTime();
+		Mift.player.resetHealth();
 	}
 	
 	public static void loadWorld(Terrain terrain, List<Entity> entities, List<Enemy> enemies, Player player, int day, int time) {
 		Mift.terrain = terrain;
+		Mift.player = player;
 		Mift.entities = entities;
 		Mift.enemies = enemies;
-		Mift.player = player;
 		Mift.entities.add(Mift.player);
 		Mift.camera.setPlayer(Mift.player);
 		Mift.overheadCamera.setPlayer(Mift.player);

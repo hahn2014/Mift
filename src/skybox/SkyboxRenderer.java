@@ -60,8 +60,8 @@ private static final float SIZE = 500f;
 	     SIZE, -SIZE,  SIZE
 	};
 	
-	private static String[] DAY_TEXTURE_FILES = { "right", "left", "top", "bottom", "back", "front" };
-	private static String[] NIGHT_TEXTURE_FILES = { "nightRight", "nightLeft", "nightTop", "nightBottom", "nightBack", "nightFront" };
+	private static String[] NIGHT_TEXTURE_FILES = { "right", "left", "top", "bottom", "back", "front" };
+	private static String[] DAY_TEXTURE_FILES = { "nightRight", "nightLeft", "nightTop", "nightBottom", "nightBack", "nightFront" };
 
 	private RawModel cube;
 	//private int texture;

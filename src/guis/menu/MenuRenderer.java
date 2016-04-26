@@ -35,8 +35,10 @@ public class MenuRenderer extends MenuController {
 		texts.get(3).setColor(255, 255, 255);
 		texts.add(new GUIText(textRenderer, "Settings", 1f, FontHolder.getCandara(), new Vector2f(0.475f, 0.55f), 0.35f, ALIGNMENT.LEFT));
 		texts.get(4).setColor(255, 255, 255);
-		texts.add(new GUIText(textRenderer, "Quit", 1f, FontHolder.getCandara(), new Vector2f(0.487f, 0.65f), 0.35f, ALIGNMENT.LEFT));
+		texts.add(new GUIText(textRenderer, "Credits", 1f, FontHolder.getCandara(), new Vector2f(0.475f, 0.65f), 0.35f, ALIGNMENT.LEFT));
 		texts.get(5).setColor(255, 255, 255);
+		texts.add(new GUIText(textRenderer, "Quit", 1f, FontHolder.getCandara(), new Vector2f(0.487f, 0.75f), 0.35f, ALIGNMENT.LEFT));
+		texts.get(6).setColor(255, 255, 255);
 		
 		staticTexts.add(new GUIText(textRenderer, "OGPC v9 Participant", 1f, FontHolder.getCandara(), new Vector2f(0f, .97f), 0.35f, ALIGNMENT.LEFT));
 		staticTexts.get(0).setColor(255, 170, 67);

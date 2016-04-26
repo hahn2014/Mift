@@ -31,6 +31,8 @@ public class Enemy extends Entity {
 		this.id = id;
 	}
 	
+	public Enemy() {}
+	
 	public int getID() {
 		return id;
 	}

@@ -78,10 +78,20 @@ public class MyoManager extends AbstractDeviceListener {
 	public void onArmSync(Myo myo, long timestamp, Arm arm, XDirection xDirection, float rotation, WarmupState warmupState) {
 		if (arm == Arm.ARM_RIGHT) {
 			Logger.info("Myo on right arm synced");
-			moveMyoMyo = myo;
+			if (moveMyoMyo == null) {
+				moveMyoMyo = myo;
+			} else {
+				Logger.warn("Already synced the right arm!");
+				attackMyoMyo = myo;
+			}
 		} else if (arm == Arm.ARM_LEFT) {
 			Logger.info("Myo on left arm synced");
-			attackMyoMyo = myo;
+			if (attackMyoMyo == null) {
+				attackMyoMyo = myo;
+			} else {
+				Logger.warn("Already synced the left arm!");
+				moveMyoMyo = myo;
+			}
 		} else if (arm == Arm.ARM_UNKNOWN) {
 			Logger.error("Unknown arm state");
 		} else {

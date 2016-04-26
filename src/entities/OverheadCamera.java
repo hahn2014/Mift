@@ -64,9 +64,6 @@ public class OverheadCamera implements Serializable {
 		if (Keyboard.isKeyDown(Keyboard.KEY_F1)) {
 			DisplayManager.setFullscreened(!SettingHolder.get("cg_fullscreened").getValueB());
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_F2)) { //unlock the mouse from the screen
-			Mouse.setGrabbed(false);
-		}
 	}
 	
 	public void getClicks() {

@@ -4,8 +4,12 @@ import com.thalmic.myo.Myo;
 import com.thalmic.myo.Pose;
 import com.thalmic.myo.Quaternion;
 import com.thalmic.myo.enums.Arm;
+import com.thalmic.myo.enums.PoseType;
 import com.thalmic.myo.enums.WarmupState;
 import com.thalmic.myo.enums.XDirection;
+
+import entities.Player;
+import main.Mift;
 
 public class MoveMyo extends MyoDevice {
 	private static final int SCALE = 18;
@@ -70,6 +74,20 @@ public class MoveMyo extends MyoDevice {
 	@Override
 	public void onPose(Myo myo, long timestamp, Pose pose) {
 		super.onPose(myo, timestamp, pose);
+		if (pose.getType() == PoseType.FIST) {
+			if (Mift.player.getSpeed() > 0) {
+				Mift.player.setSpeed(0);
+			} else {
+				Mift.player.setSpeed((int)Player.RUN_SPEED);
+			}
+		}
+		if (pose.getType() == PoseType.FINGERS_SPREAD) {
+			if (Mift.player.getSpeed() < 0) {
+				Mift.player.setSpeed(0);
+			} else {
+				Mift.player.setSpeed(-1 * (int)Player.RUN_SPEED);
+			}
+		}
 	}
 
 	@Override

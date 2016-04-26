@@ -6,6 +6,7 @@ import java.util.List;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
+import entities.Enemy;
 import entities.Entity;
 import entities.EntityCreator;
 import entities.MoveType.move_factor;
@@ -88,12 +89,14 @@ public class Terrain implements Serializable {
 		return entities;
 	}
 	
-	public List<Entity> generateEnemies(move_factor factor, List<Entity> entities) {
-		for (int i = 0; i < 10 * SettingHolder.get("cg_quality").getValueI(); i++) {
-			Mift.enemies.add(new EntityCreator().createRandomEnemy(factor, i));
-			entities.add(Mift.enemies.get(i));
+	public void generateEnemies(move_factor factor, List<Entity> enemies) {
+		List<Enemy> enies = new EntityCreator().createRandomEnemy(factor, 10 * SettingHolder.get("cg_quality").getValueI());
+		if (enies != null) {
+			for (Enemy e : enies) {
+				Mift.enemies.add(e);
+				Mift.entities.add(e);
+			}
 		}
-		return entities;
 	}
 
 	private RawModel generateTerrain() {

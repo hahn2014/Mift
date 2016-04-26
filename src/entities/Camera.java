@@ -4,7 +4,6 @@ import java.io.Serializable;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.Display;
 import org.lwjgl.util.vector.Vector3f;
 
 import io.SettingHolder;
@@ -22,7 +21,7 @@ import renderEngine.DisplayManager;
  */
 public class Camera implements Serializable {
 	private static final long serialVersionUID = 1655268997354170393L;
-	public float distanceFromPlayer = 14, maxDistFromPlayer = 50;
+	public float distanceFromPlayer = SettingHolder.get("camera_distance").getValueI(), maxDistFromPlayer = 50;
 	public int zoomFactor = 120;
 	private float angleAroundPlayer = 0;
 
@@ -76,13 +75,6 @@ public class Camera implements Serializable {
 		if (Keyboard.isKeyDown(Keyboard.KEY_F1)) {
 			DisplayManager.setFullscreened(!SettingHolder.get("cg_fullscreened").getValueB());
 		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_F2)) { //unlock the mouse from the screen
-			Mouse.setGrabbed(false);
-		}
-		if (Keyboard.isKeyDown(Keyboard.KEY_F3)) {
-			//DisplayManager.setQuality(DisplayManager.cg_quality, true);
-			Display.destroy();
-		}
 	}
 	
 	public void getClicks() {
@@ -90,20 +82,10 @@ public class Camera implements Serializable {
 		    if (Mouse.getEventButtonState()) {
 		        if (Mouse.getEventButton() == 0) {
 		            //LEFT BUTTON PRESSED
-		        }
-		    } else {
-		        if (Mouse.getEventButton() == 0) {
-		            //LEFT BUTTON RELEASED
-		        	if (Mouse.isGrabbed() == false) {
-		        		Mouse.setGrabbed(true);
-		        	}
-		        	if (isFPS()) {
-		        		//attack with the current selected
-		        		
-		        	}
+		        	player.attack();
 		        }
 		    }
-		}
+	    }
 	}
 	
 	public void setGrabbed(boolean grabbed) {

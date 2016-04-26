@@ -172,4 +172,20 @@ public class DisplayManager {
 			setDisplayMode(WIDTH, HEIGHT);
 		}
 	}
+
+	public static int getWidth() {
+		return WIDTH;
+	}
+
+	public static void setWidth(int wIDTH) {
+		WIDTH = wIDTH;
+	}
+
+	public static int getHeight() {
+		return HEIGHT;
+	}
+
+	public static void setHEIGHT(int hEIGHT) {
+		HEIGHT = hEIGHT;
+	}
 }

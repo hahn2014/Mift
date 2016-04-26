@@ -22,6 +22,8 @@ import io.SettingHolder;
 import main.Mift;
 import models.TexturedModel;
 import normalMappingRenderer.NormalMappingRenderer;
+import postProcessing.FBO;
+import postProcessing.PostProcessing;
 import shaders.StaticShader;
 import shaders.TerrainShader;
 import shadows.ShadowMapMasterRenderer;
@@ -74,17 +76,17 @@ public class MasterRenderer {
 
 	public void renderCallOverheadView(WaterFrameBuffers buffers, OverheadCamera camera, MousePicker mouse,
 			WaterRenderer waterRenderer, WaterTile water, List<Light> lights, List<Entity> entities,
-			List<Entity> normalMapEntities, Light sun, AttackHolder attackHolder) {
+			List<Entity> normalMapEntities, Light sun, AttackHolder attackHolder, FBO contrastFBO) {
 
 		camera.move();
 		camera.rotate();
 		camera.getClicks();
 		mouse.update(true);
 		
-		//render the shadows
+		//************render the shadows*****************
 		renderShadowMap(entities, sun, camera);
 
-		// render reflection texture
+		//************render reflection texture**********
 		buffers.bindReflectionFrameBuffer();
 		float distance = 2 * (camera.getPosition().y - WaterTile.height);
 		camera.getPosition().y -= distance;
@@ -94,29 +96,37 @@ public class MasterRenderer {
 		camera.getPosition().y += distance;
 		camera.invertPitch();
 
-		// render refraction texture
+		//**************render refraction texture********
 		buffers.bindRefractionFrameBuffer();
 		renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, WaterTile.height + 1.0f), attackHolder);
-
-		// render to screen
 		GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
 		buffers.unbindCurrentFrameBuffer();
+		
+		//*********render with or without ppe************
+		if (SettingHolder.get("cg_post_processing").getValueB()) {
+			contrastFBO.bindFrameBuffer();
+			renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000), attackHolder);
+			contrastFBO.unbindFrameBuffer();
+			PostProcessing.doPostProcessing(contrastFBO.getColorTexture());
+		}
+
+		//***************render all scenes***************
 		renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000), attackHolder);
 		waterRenderer.render(water, camera, sun);
 	}
 
 	public void renderCallStandardView(WaterFrameBuffers buffers, Camera camera, MousePicker mouse,
 			WaterRenderer waterRenderer, WaterTile water, List<Light> lights, List<Entity> entities,
-			List<Entity> normalMapEntities, Light sun, AttackHolder attackHolder) {
+			List<Entity> normalMapEntities, Light sun, AttackHolder attackHolder, FBO contrastFBO) {
 		camera.move();
 		camera.getKeys();
 		camera.getClicks();
 		mouse.update(false);
 
-		//render the shadows
+		//************render the shadows*****************
 		renderShadowMap(entities, sun, camera);
 
-		// render reflection texture
+		//************render reflection texture**********
 		buffers.bindReflectionFrameBuffer();
 		float distance = 2 * (camera.getPosition().y - WaterTile.height);
 		camera.getPosition().y -= distance;
@@ -126,15 +136,23 @@ public class MasterRenderer {
 		camera.getPosition().y += distance;
 		camera.invertPitch();
 
-		// render refraction texture
+		//**************render refraction texture********
 		buffers.bindRefractionFrameBuffer();
 		renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, WaterTile.height + 1.0f), attackHolder);
-
-		// render to screen
 		GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
 		buffers.unbindCurrentFrameBuffer();
+		
+		//***************render all scenes***************
 		renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000), attackHolder);
 		waterRenderer.render(water, camera, sun);
+		
+		//*********render with or without ppe************
+		if (SettingHolder.get("cg_post_processing").getValueB()) {
+			contrastFBO.bindFrameBuffer();
+			renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000), attackHolder);
+			contrastFBO.unbindFrameBuffer();
+			PostProcessing.doPostProcessing(contrastFBO.getColorTexture());
+		}
 	}
 
 	public void renderScene(List<Entity> entities, List<Entity> normalEntities,

@@ -29,6 +29,7 @@ import guis.GuiRenderer;
 import guis.GuiTexture;
 import guis.hud.HUDCreator;
 import guis.hud.HUDRenderer;
+import guis.menu.CreditsRenderer;
 import guis.menu.DeadRenderer;
 import guis.menu.MenuRenderer;
 import guis.menu.SettingsRenderer;
@@ -56,13 +57,13 @@ import water.WaterTile;
 
 /**
  * Already surpassed 16k lines of
- * cumulative code! - Mift Build 62
+ * cumulative code! - Mift Build 63
  * 
  * @author Bryce Hahn, Mason Cluff
  * @since 1.0 - 06/12/2015
  */
 public class Mift {
-	public static final String BUILD = "62";
+	public static final String BUILD = "63";
 	public static final String RELEASE = "1";
 	public static final String RELEASE_TITLE = "Pre-Alpha";
 	public static final String NAME = "Mift";
@@ -102,7 +103,7 @@ public class Mift {
 	
 	private static DisplayManager dm;
 	
-	@SuppressWarnings("static-access")
+	@SuppressWarnings({ "static-access", "unused" })
 	public static void main(String[] args) {
 		new ImportLibs(); //link the natives for lwjgl
 		new SettingHolder(); //generate and import settings
@@ -113,6 +114,7 @@ public class Mift {
 		settings = new Settings();
 		dm.createDisplay();
 		
+		// LOOK HERE MASON
 		MyoSetup.init(false);
 		
 		//init main objects
@@ -183,6 +185,7 @@ public class Mift {
 		SettingsRenderer settingRenderer = new SettingsRenderer();
 		WorldLoadRenderer worldLoadingRenderer = new WorldLoadRenderer();
 		DeadRenderer deadRenderer = new DeadRenderer();
+		CreditsRenderer creditsRenderer = new CreditsRenderer();
 		
 		// ******************POST PROCESSING ********************
 		FBO fbo1 = new FBO(Display.getWidth(), Display.getHeight(), FBO.DEPTH_RENDER_BUFFER);
@@ -199,6 +202,8 @@ public class Mift {
 					worldLoadingRenderer.update();
 				} else if (menuIndex == 3) { //render death
 					deadRenderer.update();
+				} else if (menuIndex == 4) { //render credits
+					creditsRenderer.update();
 				} else {
 					Logger.error("Something went wrong when rendering menu index of " + menuIndex);
 					Display.destroy();
@@ -219,35 +224,25 @@ public class Mift {
 					}
 				}
 				GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
-				//post processing effects
-				if (SettingHolder.get("cg_post_processing").getValueB()) {
-					fbo1.bindFrameBuffer();
-				}
 				//render calls
 				if (player.isOverhead() == false) { //3rd to 1st person view
-					renderer.renderCallStandardView(topBuffers, camera, defaultMouse, waterRenderer, water, lights, entities, null, sunLight, attackHolder);
+					renderer.renderCallStandardView(topBuffers, camera, defaultMouse, waterRenderer, water, lights, entities, null, sunLight, attackHolder, fbo1);
 					ParticleHolder.renderParticles(camera);
 					if (!SettingHolder.get("cg_theatrical").getValueB()) {hudCreator.update(camera);}
 				} else { //overhead view
-					renderer.renderCallOverheadView(topBuffers, overheadCamera, overheadMouse, waterRenderer, water, lights, entities, null, sunLight, attackHolder);
+					renderer.renderCallOverheadView(topBuffers, overheadCamera, overheadMouse, waterRenderer, water, lights, entities, null, sunLight, attackHolder, fbo1);
 					ParticleHolder.renderParticles(overheadCamera);
 					if (!SettingHolder.get("cg_theatrical").getValueB()) {hudCreator.update(overheadCamera);}
 				}
 				
 				attackUpdater.update(attackHolder);
 				
-				//post processing effects
-				if (SettingHolder.get("cg_post_processing").getValueB()) {
-					fbo1.unbindFrameBuffer();
-					PostProcessing.doPostProcessing(fbo1.getColorTexture());
-				}
-				
 				if (SettingHolder.get("cg_fps").getValueB()) fpsCounter.updateCounter();
 				
 				if (!SettingHolder.get("cg_theatrical").getValueB()) {
 					guiRenderer.render(guiTextures);
 					
-					if (camera.distanceFromPlayer == 0) {hudRenderer.render(hudCreator.getTextures(), hudCreator.getCompass());}
+					//if (camera.distanceFromPlayer == 0) {hudRenderer.render(hudCreator.getTextures(), hudCreator.getCompass());}
 					
 					texts.get(0).setText(Mift.NAME + " " + Mift.RELEASE_TITLE + " Build " + Mift.RELEASE + "." + Mift.BUILD);
 					texts.get(1).setText((SettingHolder.get("cg_fps").getValueB() ? (int)(fpsCounter.getFPS()) + "" : ""));
@@ -292,6 +287,7 @@ public class Mift {
 		sb.append("  ~ Pointer Terrain Pos: " + (player.isOverhead() ? ("null") : (camera.distanceFromPlayer == 0 ? defaultMouse.getTerrainPointDebug(new Vector2f(Display.getWidth() / 2, Display.getHeight() / 2)) : "null")));
 		sb.append("  ~ Player Position: " + player.getPositionDebug());
 		sb.append("  ~ Player Rotation: " + player.getRotationDebug());
+		sb.append("  ~ Player Health: " + player.getHealth());
 		sb.append("  ~ Instances Within World: " + instance_count);
 		return sb.toString();
 	}

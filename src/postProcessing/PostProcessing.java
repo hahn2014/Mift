@@ -5,6 +5,7 @@ import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
 import models.RawModel;
+import postProcessing.DOF.DOFChanger;
 import postProcessing.contrast.ContrastChanger;
 import renderEngine.Loader;
 
@@ -12,16 +13,21 @@ public class PostProcessing {
 
 	private static final float[] POSITIONS = { -1, 1, -1, -1, 1, 1, 1, -1 };
 	private static RawModel quad;
+	
+	//post processing effects
 	private static ContrastChanger contrastChanger;
+	private static DOFChanger depthOfFieldChanger;
 
 	public static void init(Loader loader) {
 		quad = loader.loadToVAO(POSITIONS, 2);
 		contrastChanger = new ContrastChanger();
+		depthOfFieldChanger = new DOFChanger();
 	}
 
 	public static void doPostProcessing(int colorTexture) {
 		start();
 		contrastChanger.render(colorTexture);
+		depthOfFieldChanger.render(colorTexture);
 		end();
 	}
 
