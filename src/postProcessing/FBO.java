@@ -41,7 +41,6 @@ public class FBO {
 	}
 
 	public void bindFrameBuffer() {
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, 0);
 		GL30.glBindFramebuffer(GL30.GL_DRAW_FRAMEBUFFER, frameBuffer);
 		GL11.glViewport(0, 0, width, height);
 	}

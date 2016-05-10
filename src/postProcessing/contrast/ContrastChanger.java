@@ -9,22 +9,35 @@ public class ContrastChanger {
 	private ImageRenderer renderer;
 	private ContrastShader shader;
 	
-	public ContrastChanger() {
+	private boolean render = false;
+	
+	public ContrastChanger(ImageRenderer renderer, boolean render) {
+		setRender(render);
 		shader = new ContrastShader();
-		renderer = new ImageRenderer();
+		this.renderer = renderer;
 	}
 	
 	public void render(int texture) {
 		shader.start();
-		shader.loadContrast(0.25f);
-		GL13.glActiveTexture(GL13.GL_TEXTURE0);
-		GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture);
-		renderer.renderQuad();
+			if (render) {
+				shader.loadContrast(0.25f);
+			}
+			GL13.glActiveTexture(GL13.GL_TEXTURE0);
+			GL11.glBindTexture(GL11.GL_TEXTURE_2D, texture);
+			renderer.renderQuad();
 		shader.stop();
 	}
 	
 	public void cleanUp() {
 		renderer.cleanUp();
 		shader.cleanUp();
+	}
+	
+	public boolean getRender() {
+		return render;
+	}
+	
+	public void setRender(boolean render) {
+		this.render = render;
 	}
 }

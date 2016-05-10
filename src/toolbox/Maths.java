@@ -148,4 +148,30 @@ public class Maths {
 	public static String Vector3fToString(Vector3f toString) {
 		return new String("[" + toString.x + ", " + toString.y + ", " + toString.z + "]");
 	}
+	
+	public static float intSizeToFloatSize(int value, int devider) {
+		return (float)(value) / (float)(devider);
+	}
+	
+	public static float intCoordToFloatCoord(float value, float devider, boolean y) {
+		float toRet = (float)(value) / (float)(devider);
+		if (toRet < 0.5f) { //less than half, so make it negative coord
+			if (y) {
+				toRet = 0 + (1 - (toRet / 2));
+			} else {
+				toRet = 0 - (1 - (toRet * 2));
+			}
+		}
+		if (toRet > 0.5f) { //greater than half, so make it positive coord
+			if (y) {
+				toRet = 0 - (1 - (toRet * 2));
+			} else {
+				toRet = 0 + (1 - (toRet / 2));
+			}
+		}
+		if (toRet == 0.5f) { //exactly in the middle
+			toRet = 0;
+		}
+		return toRet;
+	}
 }

@@ -57,7 +57,7 @@ public class WorldLoadController {
 					WorldSaver.saveCurrentWorld();
 				}
 				if (Keyboard.getEventKey() == Keyboard.KEY_L) {
-					WorldLoader.loadWorld("159984");
+					WorldLoader.loadWorld("249975");
 				}
 			}
 		}

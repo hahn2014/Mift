@@ -20,9 +20,12 @@ public class DisplayManager {
 	private static int WIDTH = 1920 / downscale;
 	private static int HEIGHT = 1080 / downscale;
 	private static final double FPS_CAP = 59.999998;
+	private static final double MAX_FPS_CAP = 9999.999998;
 	
 	private static long lastFrameTime;
-	private static float delta; // Measured in nanoseconds
+	private static float delta; // Measured in microseconds
+	
+	private static long currentFrameTime;
 
 	public static void createDisplay() {
 		Display.destroy();
@@ -31,12 +34,12 @@ public class DisplayManager {
 		try {
 			setDisplayMode(WIDTH, HEIGHT);
 			if (SettingHolder.get("cg_antialiasing_filtering").getValueB() == true) {
-				Display.create(new PixelFormat().withSamples(4 * SettingHolder.get("cg_quality").getValueI()), attribs);
+				Display.create(new PixelFormat().withSamples(1 * SettingHolder.get("cg_quality").getValueI()), attribs);
+				GL11.glEnable(GL13.GL_MULTISAMPLE);
 			} else {
 				Display.create(new PixelFormat(), attribs);
 			}
 			Display.setTitle(Mift.NAME + " Release " + Mift.RELEASE + " is initializing");
-			GL11.glEnable(GL13.GL_MULTISAMPLE);
 		} catch (LWJGLException e) {
 			e.printStackTrace();
 		}
@@ -44,24 +47,13 @@ public class DisplayManager {
 		GL11.glViewport(0, 0, (int)(WIDTH * Display.getPixelScaleFactor()), 
 	             (int)(HEIGHT * Display.getPixelScaleFactor()));
 		lastFrameTime = getCurrentTime();
-		testDelta();
 	}
 	
-	public static void testDelta() {
-		lastFrameTime = getCurrentTime();
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-		Logger.info((getCurrentTime() - lastFrameTime) + "");
-	}
-
 	public static void updateDisplay() {
-		Display.sync((int) FPS_CAP);
+		Display.sync((int) (SettingHolder.get("cg_vsync").getValueB() ? (FPS_CAP) : (MAX_FPS_CAP)));
 		Display.update();
-		long currentFrameTime = getCurrentTime();
-		delta = (currentFrameTime - lastFrameTime);// / 1000f; // Measured in nanoseconds
+		currentFrameTime = getCurrentTime();
+		delta = (currentFrameTime - lastFrameTime); // Measured in nanoseconds
 		lastFrameTime = currentFrameTime;
 	}
 
@@ -122,14 +114,13 @@ public class DisplayManager {
 			}
 
 			if (targetDisplayMode == null) {
-				Logger.error("Failed to find value mode: " + width + "x" + height + " fs=" + SettingHolder.get("cg_fullscreened").getValueB());
+				Logger.error("Failed to find value mode: [" + width + "x" + height + "] fullscreened " + SettingHolder.get("cg_fullscreened").getValueB());
 				return;
 			}
 
 			Display.setDisplayMode(targetDisplayMode);
 			Display.setFullscreen(SettingHolder.get("cg_fullscreened").getValueB());
-			Display.setVSyncEnabled(true);
-
+			Display.setVSyncEnabled(SettingHolder.get("cg_vsync").getValueB());
 		} catch (LWJGLException e) {
 			Logger.error("Unable to setup mode " + width + "x" + height + " fullscreen=" + SettingHolder.get("cg_fullscreened").getValueB() + e);
 		}
@@ -158,7 +149,6 @@ public class DisplayManager {
 		SettingHolder.get("cg_quality").setValueI(quality);
 		getQuality();
 		if (ingame) {
-			Display.destroy();
 			createDisplay();
 		}
 	}

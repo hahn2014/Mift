@@ -48,7 +48,7 @@ public class GUIText {
 		this.textString = text;
 		this.fontSize = fontSize;
 		font = Font;
-		this.position = position;
+		setPosition(position);
 		this.lineMaxSize = maxLineLength;
 		this.alignment = align;
 		prepText();
@@ -60,6 +60,10 @@ public class GUIText {
 	
 	public void setRenderable(boolean renderable) {
 		this.renderable = renderable;
+	}
+	
+	public void setPosition(Vector2f pos) {
+		this.position = pos;
 	}
 
 	public FontType getFont() {

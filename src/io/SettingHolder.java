@@ -23,8 +23,9 @@ public class SettingHolder {
 		settings.add(new Setting("player_ufo",					SettingType.bool, 		false));
 		settings.add(new Setting("player_god", 					SettingType.bool,		false));
 		settings.add(new Setting("player_fire_unlimited", 		SettingType.bool, 		false));
-		settings.add(new Setting("camera_distance", 			SettingType.integer, 	0));
 		settings.add(new Setting("cp_myo_enabled", 				SettingType.bool,		false));
+		settings.add(new Setting("cg_vsync", 					SettingType.bool, 		true));
+		settings.add(new Setting("camera_distance", 			SettingType.integer, 	0));
 		settings.add(new Setting("cg_quality", 					SettingType.integer,	2));
 		settings.add(new Setting("cg_fov", 						SettingType.integer,	70));
 	}

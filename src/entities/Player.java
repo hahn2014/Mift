@@ -84,6 +84,10 @@ public class Player extends Entity {
 		
 		if (!collideWithEntity() && !SettingHolder.get("player_ufo").getValueB()) {
 			super.increasePosition(dx, upwardsSpeed * DisplayManager.getFrameTimeSeconds(), dz);
+		} else {
+			if (SettingHolder.get("player_ufo").getValueB()) {
+				super.increasePosition(dx, upwardsSpeed * DisplayManager.getFrameTimeSeconds(), dz);
+			}
 		}
 		if (attackCooldownTime > 0) {
 			if (SettingHolder.get("player_fire_unlimited").getValueB() == false) {
@@ -120,7 +124,7 @@ public class Player extends Entity {
 	public boolean collideWithEntity() {
 		for (Entity e : Mift.entities) {
 			if (e.getType() != entityType.PLAYER && e.getType() != entityType.FERN) {
-				if (Maths.distanceFormula3D(getPosition(), e.getPosition()) <= 20) {
+				if (Maths.distanceFormula3D(getPosition(), e.getPosition()) <= 5) {
 					return true;
 				}
 			}
@@ -232,6 +236,7 @@ public class Player extends Entity {
 		if (Keyboard.isKeyDown(Keyboard.KEY_SPACE)) {
 			jump();
 		}
+		
 		while (Keyboard.next()) {
 			if (Keyboard.getEventKeyState() == false) { //release
 				if (isOverhead == true) {

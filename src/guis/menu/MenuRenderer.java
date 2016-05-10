@@ -24,6 +24,7 @@ public class MenuRenderer extends MenuController {
 	private GuiRenderer guiRender = new GuiRenderer();
 	private List<GuiTexture> guis = new ArrayList<GuiTexture>();
 	
+	
 	public MenuRenderer() {
 		texts.add(new GUIText(textRenderer, Mift.NAME + " " + Mift.RELEASE_TITLE + " Build " + Mift.RELEASE + "." + Mift.BUILD, 2.5f, FontHolder.getCandara(), new Vector2f(0.33f, 0f), 0.40f, ALIGNMENT.LEFT));
 		texts.get(0).setColor(100, 0, 200);
@@ -35,13 +36,13 @@ public class MenuRenderer extends MenuController {
 		texts.get(3).setColor(255, 255, 255);
 		texts.add(new GUIText(textRenderer, "Settings", 1f, FontHolder.getCandara(), new Vector2f(0.475f, 0.55f), 0.35f, ALIGNMENT.LEFT));
 		texts.get(4).setColor(255, 255, 255);
-		texts.add(new GUIText(textRenderer, "Credits", 1f, FontHolder.getCandara(), new Vector2f(0.475f, 0.65f), 0.35f, ALIGNMENT.LEFT));
+		texts.add(new GUIText(textRenderer, "Quit", 1f, FontHolder.getCandara(), new Vector2f(0.487f, 0.65f), 0.35f, ALIGNMENT.LEFT));
 		texts.get(5).setColor(255, 255, 255);
-		texts.add(new GUIText(textRenderer, "Quit", 1f, FontHolder.getCandara(), new Vector2f(0.487f, 0.75f), 0.35f, ALIGNMENT.LEFT));
-		texts.get(6).setColor(255, 255, 255);
 		
 		staticTexts.add(new GUIText(textRenderer, "OGPC v9 Participant", 1f, FontHolder.getCandara(), new Vector2f(0f, .97f), 0.35f, ALIGNMENT.LEFT));
 		staticTexts.get(0).setColor(255, 170, 67);
+		staticTexts.add(new GUIText(textRenderer, "[C] To View Credits", 1f, FontHolder.getCandara(), new Vector2f(.78f, .97f), 0.35f, ALIGNMENT.LEFT));
+		staticTexts.get(1).setColor(160, 0, 200);
 		
 		continueError = new GUIText(textRenderer, "You need to Load a New World before continuing!", 1f, FontHolder.getCandara(), new Vector2f(0.357f, 0.47f), 0.4f, ALIGNMENT.LEFT);
 		continueError.setColor(255, 50, 50);

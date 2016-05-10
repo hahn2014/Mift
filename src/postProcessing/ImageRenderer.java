@@ -6,7 +6,7 @@ public class ImageRenderer {
 
 	private FBO fbo;
 
-	protected ImageRenderer(int width, int height) {
+	public ImageRenderer(int width, int height) {
 		this.fbo = new FBO(width, height, FBO.NONE);
 	}
 
@@ -23,7 +23,7 @@ public class ImageRenderer {
 		}
 	}
 
-	protected int getOutputTexture() {
+	public int getOutputTexture() {
 		return fbo.getColorTexture();
 	}
 

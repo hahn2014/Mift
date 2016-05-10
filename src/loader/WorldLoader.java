@@ -12,7 +12,6 @@ import entities.Enemy;
 import entities.Entity;
 import entities.Player;
 import io.Logger;
-import io.Settings;
 import main.Mift;
 import terrains.Terrain;
 
@@ -22,8 +21,7 @@ public class WorldLoader {
 	public static void loadWorld(String worldName) {
 		File worldSave = new File(SAVE_DIRECTORY + worldName + ".world");
 		Logger.debug("Attemping to load save file from " + worldSave.getAbsolutePath());
-		
-		Settings.saveSettings();
+		//Settings.saveSettings();
 
 		FileInputStream fin = null;
 		ObjectInputStream ois = null;
@@ -58,17 +56,23 @@ public class WorldLoader {
 	}
 	
 	private static void translateObjects(List<Object> objs) {
-		for (Object o : objs) {
-			if (o instanceof Player) {
-				Mift.player = (Player) o;
-			} else if (o instanceof Terrain) {
-				Mift.terrain = (Terrain) o;
-			} else if (o instanceof Entity) {
-				Mift.entities.add((Entity) o);
-			} else if (o instanceof Enemy) {
-				Mift.enemies.add((Enemy) o);
+		if (objs != null) {
+			Logger.debug("Loading World objects");
+			for (Object o : objs) {
+				if (o instanceof Player) {
+					Mift.player = (Player) o;
+				} else if (o instanceof Terrain) {
+					Mift.terrain = (Terrain) o;
+				} else if (o instanceof Entity) {
+					Mift.entities.add((Entity) o);
+				} else if (o instanceof Enemy) {
+					Mift.enemies.add((Enemy) o);
+				}
 			}
+			Logger.debug("Load World was successful");
+			Mift.hasMadeWorld = true;
+		} else {
+			Logger.error("Unable to load world. Something went wrong");
 		}
-		Mift.hasMadeWorld = true;
 	}
 }

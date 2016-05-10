@@ -57,13 +57,13 @@ import water.WaterTile;
 
 /**
  * Already surpassed 16k lines of
- * cumulative code! - Mift Build 63
+ * cumulative code! - Mift Build 64
  * 
  * @author Bryce Hahn, Mason Cluff
  * @since 1.0 - 06/12/2015
  */
 public class Mift {
-	public static final String BUILD = "63";
+	public static final String BUILD = "64";
 	public static final String RELEASE = "1";
 	public static final String RELEASE_TITLE = "Pre-Alpha";
 	public static final String NAME = "Mift";
@@ -189,7 +189,7 @@ public class Mift {
 		
 		// ******************POST PROCESSING ********************
 		FBO fbo1 = new FBO(Display.getWidth(), Display.getHeight(), FBO.DEPTH_RENDER_BUFFER);
-		PostProcessing.init(loader);
+		PostProcessing.init(false, true);
 		
 		// **************** Game Loop Below *********************
 		while (!Display.isCloseRequested()) {
@@ -206,7 +206,7 @@ public class Mift {
 					creditsRenderer.update();
 				} else {
 					Logger.error("Something went wrong when rendering menu index of " + menuIndex);
-					Display.destroy();
+					System.exit(-1);
 				}
 			} else { //render in game
 				if (SettingHolder.get("cp_myo_enabled").getValueB()) {

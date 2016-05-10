@@ -9,7 +9,7 @@ import terrains.TerrainCreator;
 public class MenuController {
 	public static int selected = 1;
 	private int min = 1;
-	private int max = 6;
+	private int max = 5;
 	
 	public void checkInputs() {
 		while (Keyboard.next()) {
@@ -29,9 +29,7 @@ public class MenuController {
 					} else if (selected == 4) { //settings
 						Mift.menuIndex = 1;
 						SettingsController.changed = false;
-					} else if (selected == 5) { //credits
-						Mift.menuIndex = 4;
-					} else if (selected == 6) { //quit
+					} else if (selected == 5) { //quit
 						System.exit(0);
 					} else { //call 0
 						selected = 0;
@@ -69,6 +67,9 @@ public class MenuController {
 				}
 				if (Keyboard.getEventKey() == Keyboard.KEY_F1) {
 					Mouse.setGrabbed(!Mouse.isGrabbed());
+				}
+				if (Keyboard.getEventKey() == Keyboard.KEY_C) {
+					Mift.menuIndex = 4;
 				}
 			}
 		}
