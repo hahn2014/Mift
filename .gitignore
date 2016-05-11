@@ -7,3 +7,5 @@ graphicsDetails.sysinf
 *.class
 bin
 .idea
+
+*.iml
