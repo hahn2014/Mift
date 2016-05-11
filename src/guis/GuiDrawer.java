@@ -9,15 +9,17 @@ import java.util.Arrays;
 import java.util.List;
 
 public class GuiDrawer {
+	// Where certain variables are stored in a .glsl file
 	public static final String TEXTURE_FIELD = "Texture";
 	public static final String PROJ_VIEW_FIELD = "ProjView";
-
 	public static final String COLOR_FIELD = "Color";
 	public static final String POSITION_FIELD = "Position";
 
+	// Default shaders to use
 	public static final String DEFAULT_VERT_SHADER = "";
 	public static final String DEFAULT_FRAG_SHADER = "";
 
+	// List of where each Attribute is
 	public static final List<VertexAttrib> ATTRIBUTES =
 			Arrays.asList(
 					new VertexAttrib(0, POSITION_FIELD, 2),
