@@ -1,26 +1,8 @@
 package main;
 
-import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.lwjgl.opengl.Display;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL30;
-import org.lwjgl.util.vector.Vector2f;
-import org.lwjgl.util.vector.Vector3f;
-
 import attacks.AttackHolder;
 import attacks.AttackUpdater;
-import entities.Camera;
-import entities.Enemy;
-import entities.Entity;
-import entities.EntityTypeHolder;
-import entities.Light;
-import entities.MoveTypeHolder;
-import entities.OverheadCamera;
-import entities.Player;
-import entities.Sun;
+import entities.*;
 import fontCreator.FontHolder;
 import fontCreator.GUIText;
 import fontCreator.GUIText.ALIGNMENT;
@@ -29,15 +11,16 @@ import guis.GuiRenderer;
 import guis.GuiTexture;
 import guis.hud.HUDCreator;
 import guis.hud.HUDRenderer;
-import guis.menu.CreditsRenderer;
-import guis.menu.DeadRenderer;
-import guis.menu.MenuRenderer;
-import guis.menu.SettingsRenderer;
-import guis.menu.WorldLoadRenderer;
+import guis.menu.*;
 import io.Logger;
 import io.SettingHolder;
 import io.Settings;
 import myo.MyoSetup;
+import org.lwjgl.opengl.Display;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL30;
+import org.lwjgl.util.vector.Vector2f;
+import org.lwjgl.util.vector.Vector3f;
 import particles.ParticleEmitter;
 import particles.ParticleHolder;
 import particles.ParticleTexture;
@@ -54,6 +37,10 @@ import water.WaterFrameBuffers;
 import water.WaterRenderer;
 import water.WaterShader;
 import water.WaterTile;
+
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Already surpassed 16k lines of
@@ -225,7 +212,7 @@ public class Mift {
 				}
 				GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
 				//render calls
-				if (player.isOverhead() == false) { //3rd to 1st person view
+				if (!player.isOverhead()) { //3rd to 1st person view
 					renderer.renderCallStandardView(topBuffers, camera, defaultMouse, waterRenderer, water, lights, entities, null, sunLight, attackHolder, fbo1);
 					ParticleHolder.renderParticles(camera);
 					if (!SettingHolder.get("cg_theatrical").getValueB()) {hudCreator.update(camera);}
@@ -256,6 +243,8 @@ public class Mift {
 				if (textsDissabled) {
 					enableAllTexts(true);
 				}
+
+				guiRenderer.drawRect(0, 0, 200, 200);
 			}
 			DisplayManager.updateDisplay();
 			

@@ -1,17 +1,16 @@
 package guis;
 
-import java.util.List;
-
+import main.Mift;
 import models.RawModel;
-
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Matrix4f;
-
-import main.Mift;
+import shaders.ShaderProgram;
 import toolbox.Maths;
+
+import java.util.List;
 
 public class GuiRenderer {
 
@@ -65,6 +64,46 @@ public class GuiRenderer {
 		GL30.glBindVertexArray(0);
 		shader.stop();
 	}
+
+	/**
+	 *
+	 */
+	public void drawRect(float x, float y, int width, int height) {
+		float[] vertices = {
+			0.0f, 0.5f,
+			0.5f, -0.5f,
+			-0.5f, -0.5f
+		};
+
+		shader.start();
+
+		int vert = ShaderProgram.loadShader("/guis/guiRectShader.glsl", GL20.GL_VERTEX_SHADER);
+		int frag = ShaderProgram.loadShader("/guis/guiRectFragment.glsl", GL20.GL_FRAGMENT_SHADER);
+
+		GL30.glBindVertexArray(quad.getVaoID());
+		GL20.glEnableVertexAttribArray(0);
+		GL11.glEnable(GL11.GL_BLEND);
+		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+		GL11.glDisable(GL11.GL_DEPTH_TEST);
+
+		int vertPos = GL20.glGetAttribLocation(vert, "position");
+
+		GL20.glVertexAttribPointer(vertPos, 2, GL11.GL_FLOAT, false, 0, 0);
+		GL20.glEnableVertexAttribArray(vertPos);
+
+		int vao = GL30.glGenVertexArrays();
+
+		GL30.glBindVertexArray(vao);
+
+		GL11.glDrawArrays(GL11.GL_TRIANGLE_STRIP, 0, quad.getVertexCount());
+		GL11.glEnable(GL11.GL_DEPTH_TEST);
+		GL11.glDisable(GL11.GL_BLEND);
+		GL20.glDisableVertexAttribArray(0);
+		GL30.glBindVertexArray(0);
+		shader.stop();
+
+	}
+
 
 	public void cleanUp() {
 		shader.cleanUp();

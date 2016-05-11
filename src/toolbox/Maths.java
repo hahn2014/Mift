@@ -1,14 +1,12 @@
 package toolbox;
 
-import org.lwjgl.util.vector.Matrix4f;
-import org.lwjgl.util.vector.Vector2f;
-import org.lwjgl.util.vector.Vector3f;
-
 import entities.Camera;
 import entities.Enemy;
 import entities.OverheadCamera;
 import entities.Player;
-import toolbox.Point;
+import org.lwjgl.util.vector.Matrix4f;
+import org.lwjgl.util.vector.Vector2f;
+import org.lwjgl.util.vector.Vector3f;
 
 public class Maths {
 
@@ -146,7 +144,7 @@ public class Maths {
 	}
 	
 	public static String Vector3fToString(Vector3f toString) {
-		return new String("[" + toString.x + ", " + toString.y + ", " + toString.z + "]");
+		return "[" + toString.x + ", " + toString.y + ", " + toString.z + "]";
 	}
 	
 	public static float intSizeToFloatSize(int value, int devider) {

@@ -1,11 +1,6 @@
 package shaders;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.FloatBuffer;
-
+import io.Logger;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
@@ -14,7 +9,11 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
-import io.Logger;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.FloatBuffer;
 
 public abstract class ShaderProgram {
 
@@ -99,7 +98,7 @@ public abstract class ShaderProgram {
 		GL20.glUniformMatrix4(location, false, matrixBuffer);
 	}
 
-	private static int loadShader(String file, int type) {
+	public static int loadShader(String file, int type) {
 		StringBuilder shaderSource = new StringBuilder();
 		try {
 			InputStream in = Class.class.getResourceAsStream(file);

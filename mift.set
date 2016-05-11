@@ -13,5 +13,5 @@ player_god: false;
 player_fire_unlimited: false;
 camera_distance: 0;
 cp_myo_enabled: false;
-cg_quality: 1;
+cg_quality: 2;
 cg_fov: 90;
