@@ -26,7 +26,7 @@ public class GuiDrawer {
 					new VertexAttrib(1, COLOR_FIELD, 4)
 			);
 
-	static ShaderProgram defaultShader;
+	static ShaderProg defaultShader;
 
 	protected FloatBuffer buffer;
 	protected Matrix4f projMatrix = new Matrix4f();
@@ -41,7 +41,7 @@ public class GuiDrawer {
 
 	private Color color = new Color();
 
-	public static ShaderProgram getDefaultShader() {
-		return defaultShader == null ? (defaultShader = new Sha)
+	public static ShaderProg getDefaultShader() {
+		return ((defaultShader == null) ? defaultShader = new ShaderProg() : defaultShader);
 	}
 }
