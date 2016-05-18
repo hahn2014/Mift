@@ -1,26 +1,44 @@
 package main;
 
-import attacks.AttackHolder;
-import attacks.AttackUpdater;
-import entities.*;
-import fontCreator.FontHolder;
-import fontCreator.GUIText;
-import fontCreator.GUIText.ALIGNMENT;
-import fontRender.TextRenderer;
-import guis.GuiRenderer;
-import guis.GuiTexture;
-import guis.hud.HUDCreator;
-import guis.hud.HUDRenderer;
-import guis.menu.*;
-import io.Logger;
-import io.SettingHolder;
-import io.Settings;
-import myo.MyoSetup;
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
+
+import attacks.AttackHolder;
+import attacks.AttackUpdater;
+import entities.Camera;
+import entities.Enemy;
+import entities.Entity;
+import entities.EntityTypeHolder;
+import entities.Light;
+import entities.MoveTypeHolder;
+import entities.OverheadCamera;
+import entities.Player;
+import entities.Sun;
+import fontCreator.FontHolder;
+import fontCreator.GUIText;
+import fontCreator.GUIText.ALIGNMENT;
+import fontRender.TextRenderer;
+import gui.GuiDrawer;
+import guis_old.GuiRenderer;
+import guis_old.GuiTexture;
+import guis_old.hud.HUDCreator;
+import guis_old.hud.HUDRenderer;
+import guis_old.menu.CreditsRenderer;
+import guis_old.menu.DeadRenderer;
+import guis_old.menu.MenuRenderer;
+import guis_old.menu.SettingsRenderer;
+import guis_old.menu.WorldLoadRenderer;
+import io.Logger;
+import io.SettingHolder;
+import io.Settings;
+import myo.MyoSetup;
 import particles.ParticleEmitter;
 import particles.ParticleHolder;
 import particles.ParticleTexture;
@@ -37,10 +55,6 @@ import water.WaterFrameBuffers;
 import water.WaterRenderer;
 import water.WaterShader;
 import water.WaterTile;
-
-import java.security.SecureRandom;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Already surpassed 16k lines of
@@ -174,12 +188,17 @@ public class Mift {
 		DeadRenderer deadRenderer = new DeadRenderer();
 		CreditsRenderer creditsRenderer = new CreditsRenderer();
 		
+		GuiDrawer.loadShader(guiRenderer.getShader());
+		
 		// ******************POST PROCESSING ********************
 		FBO fbo1 = new FBO(Display.getWidth(), Display.getHeight(), FBO.DEPTH_RENDER_BUFFER);
 		PostProcessing.init(false, true);
 		
 		// **************** Game Loop Below *********************
 		while (!Display.isCloseRequested()) {
+			
+			
+						
 			if (isPaused) { 
 				if (menuIndex == 0) {//render pause main menu
 					pauseRenderer.update();
@@ -210,9 +229,11 @@ public class Mift {
 						e.move(player);
 					}
 				}
+				
 				GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
+				
 				//render calls
-				if (!player.isOverhead()) { //3rd to 1st person view
+				if (player.isOverhead() == false) { //3rd to 1st person view
 					renderer.renderCallStandardView(topBuffers, camera, defaultMouse, waterRenderer, water, lights, entities, null, sunLight, attackHolder, fbo1);
 					ParticleHolder.renderParticles(camera);
 					if (!SettingHolder.get("cg_theatrical").getValueB()) {hudCreator.update(camera);}
@@ -244,7 +265,7 @@ public class Mift {
 					enableAllTexts(true);
 				}
 
-				guiRenderer.drawRect(0, 0, 200, 200);
+				guiRenderer.drawLine(0, 0, 200, 200);
 			}
 			DisplayManager.updateDisplay();
 			

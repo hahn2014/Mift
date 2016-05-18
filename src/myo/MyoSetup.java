@@ -3,7 +3,7 @@ package myo;
 import com.thalmic.myo.Hub;
 import com.thalmic.myo.Myo;
 
-import guis.menu.SettingsRenderer;
+import guis_old.menu.SettingsRenderer;
 import io.Logger;
 import io.SettingHolder;
 

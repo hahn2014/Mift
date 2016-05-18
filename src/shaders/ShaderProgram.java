@@ -1,6 +1,11 @@
 package shaders;
 
-import io.Logger;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.FloatBuffer;
+
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
@@ -9,11 +14,7 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.nio.FloatBuffer;
+import io.Logger;
 
 public abstract class ShaderProgram {
 
@@ -57,13 +58,32 @@ public abstract class ShaderProgram {
 		GL20.glDeleteShader(fragmentShaderID);
 		GL20.glDeleteProgram(programID);
 	}
+	
+	/**
+	 * Get the index of a specific attribute for a shader
+	 * @param attrib Name of the attribute found in the shader .glsl file
+	 * @return The index of the attribute from the shader .glsl file
+	 */
+	public int getAttribIndex(String attrib) {
+		return GL20.glGetAttribLocation(programID, attrib);
+	}
 
 	protected abstract void bindAttributes();
 
+	/**
+	 * Bind an attribute from a .glsl shader file
+	 * @param attribute Index of the attribute to bind to
+	 * @param variableName Name of the variable to bind to. It should match what is in the .glsl shader file
+	 */
 	protected void bindAttribute(int attribute, String variableName) {
 		GL20.glBindAttribLocation(programID, attribute, variableName);
 	}
 
+	/**
+	 * Load a float from a specific index 
+	 * @param location
+	 * @param value
+	 */
 	protected void loadFloat(int location, float value) {
 		GL20.glUniform1f(location, value);
 	}
@@ -98,7 +118,7 @@ public abstract class ShaderProgram {
 		GL20.glUniformMatrix4(location, false, matrixBuffer);
 	}
 
-	public static int loadShader(String file, int type) {
+	private static int loadShader(String file, int type) {
 		StringBuilder shaderSource = new StringBuilder();
 		try {
 			InputStream in = Class.class.getResourceAsStream(file);
