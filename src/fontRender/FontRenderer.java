@@ -63,6 +63,16 @@ public class FontRenderer {
 		//load the location vector into the shader program
 		//allows to change location mid render
 		shader.loadTranslation(text.getPosition());
+		//load the width and edge perams into the shader
+		//this will tell the shader how much to smooth the
+		//text rendering processes
+		if (text.getFontSize() < 25) {
+			shader.loadDistanceField(0.4f, 0.2f);
+			shader.loadBorderDistanceField(0.4f, 0.2f);
+		} else {
+			shader.loadDistanceField(0.5f, 0.02f);
+			shader.loadBorderDistanceField(0.5f, 0.02f);
+		}
 		//draw the vertices to the screen,
 		//in a ton of triangles
 		GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, text.getVertexCount());

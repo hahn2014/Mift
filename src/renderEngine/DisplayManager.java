@@ -33,12 +33,8 @@ public class DisplayManager {
 		ContextAttribs attribs = new ContextAttribs(3, 3).withForwardCompatible(true).withProfileCore(true);
 		try {
 			setDisplayMode(WIDTH, HEIGHT);
-			if (SettingHolder.get("cg_antialiasing_filtering").getValueB() == true) {
-				Display.create(new PixelFormat().withSamples(1 * SettingHolder.get("cg_quality").getValueI()), attribs);
-				GL11.glEnable(GL13.GL_MULTISAMPLE);
-			} else {
-				Display.create(new PixelFormat(), attribs);
-			}
+			Display.create(new PixelFormat().withDepthBits(24), attribs);
+			setAntialiasing(SettingHolder.get("cg_antialiasing_filtering").getValueB());
 			Display.setTitle(Mift.NAME + " Release " + Mift.RELEASE + " is initializing");
 		} catch (LWJGLException e) {
 			e.printStackTrace();
@@ -47,6 +43,15 @@ public class DisplayManager {
 		GL11.glViewport(0, 0, (int)(WIDTH * Display.getPixelScaleFactor()), 
 	             (int)(HEIGHT * Display.getPixelScaleFactor()));
 		lastFrameTime = getCurrentTime();
+	}
+	
+	public static void setAntialiasing(boolean val) {
+		SettingHolder.get("cg_antialiasing_filtering").setValueB(val);
+		if (val == true) {
+			GL11.glEnable(GL13.GL_MULTISAMPLE);
+		} else {
+			GL11.glDisable(GL13.GL_MULTISAMPLE);
+		}
 	}
 	
 	public static void updateDisplay() {

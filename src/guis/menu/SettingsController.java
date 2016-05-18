@@ -2,7 +2,6 @@ package guis.menu;
 
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.Display;
 
 import io.Logger;
 import io.SettingHolder;
@@ -94,13 +93,7 @@ public class SettingsController {
 					}
 				}
 				if (Keyboard.getEventKey() == Keyboard.KEY_F1) {
-					DisplayManager.setFullscreened(!SettingHolder.get("cg_fullscreened").getValueB());
-				}
-				if (Keyboard.getEventKey() == Keyboard.KEY_F2) {
 					Mouse.setGrabbed(!Mouse.isGrabbed());
-				}
-				if (Keyboard.getEventKey() == Keyboard.KEY_F3) {
-					Display.destroy();
 				}
 				if (Keyboard.getEventKey() == Keyboard.KEY_F) {
 					if (changed) {

@@ -24,7 +24,6 @@ import renderEngine.DisplayManager;
  */
 public class OverheadCamera implements Serializable {
 	private static final long serialVersionUID = -7302478949741494643L;
-	public float distanceFromPlayer = 50;
 	private float angleAroundPlayer = 0;
 
 	private Vector3f position = new Vector3f(0, 0, 0);
@@ -101,15 +100,13 @@ public class OverheadCamera implements Serializable {
 	
 	public void calculateZoom() {
 		float change = Mouse.getDWheel() / 140;
-		distanceFromPlayer -= change;
-		if (distanceFromPlayer < 50) {
-			distanceFromPlayer = 49;
-			Mift.camera.distanceFromPlayer = 49;
-			Mift.camera.setFPS(true);
+		Mift.camera.distanceFromPlayer -=change;
+		if (Mift.camera.distanceFromPlayer < Mift.camera.maxDistFromPlayer) {
+			Mift.camera.distanceFromPlayer = Mift.camera.maxDistFromPlayer - 1;
 			player.setOverhead(false);
 			Mouse.setGrabbed(true);
 		} else {
-			distanceFromPlayer = 50;
+			Mift.camera.distanceFromPlayer = Mift.camera.maxDistFromPlayer;
 		}
 	}
 	
@@ -156,7 +153,7 @@ public class OverheadCamera implements Serializable {
 	private void calculateCameraPosition(float horizDistance, float verticDistance) {
 		position.x = player.getPosition().x - 90;
 		position.z = player.getPosition().z;
-		position.y = player.getPosition().y + distanceFromPlayer + 7;
+		position.y = player.getPosition().y + Mift.camera.distanceFromPlayer + 7;
 	}
 	
 	@SuppressWarnings("unused")
@@ -167,10 +164,10 @@ public class OverheadCamera implements Serializable {
 	}
 	
 	private float calculateHorizontalDistance() {
-		return (float) (distanceFromPlayer * Math.cos(Math.toRadians(pitch)));
+		return (float) (Mift.camera.distanceFromPlayer * Math.cos(Math.toRadians(pitch)));
 	}
 
 	private float calculateVerticalDistance() {
-		return (float) (distanceFromPlayer * Math.sin(Math.toRadians(pitch)));
+		return (float) (Mift.camera.distanceFromPlayer * Math.sin(Math.toRadians(pitch)));
 	}
 }

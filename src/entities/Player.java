@@ -23,7 +23,7 @@ import toolbox.Maths;
 public class Player extends Entity {
 	private static final long serialVersionUID = 2332101620227041812L;
 	
-	public static final float RUN_SPEED = (!SettingHolder.get("player_ufo").getValueB() ? 16.0f : 25.0f);
+	public static final float  RUN_SPEED = (!SettingHolder.get("player_ufo").getValueB() ? 16.0f : 25.0f);
 	private static final float MAX_RUN_TIME = 200.0f;
 	private static final float RUN_COOLDOWN = 400f;
 	private static final float ATTACK_COOLDOWN = 20f;
@@ -51,10 +51,6 @@ public class Player extends Entity {
 	private Camera camera;
 	private OverheadCamera overheadCamera;
 	public ParticleEmitter particleEmitter;
-	
-	public int getSpeed() {
-		return (int) currentSpeed;
-	}
 
 	public Player(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
 		super(model, position, rotX, rotY, rotZ, scale, entityType.PLAYER);
@@ -111,7 +107,7 @@ public class Player extends Entity {
 	public void collideWithEnemy() {
 		if (SettingHolder.get("player_god").getValueB() == false) {
 			Logger.debug("Took damage");
-			HEALTH -= 100;
+			HEALTH -= 50;
 			if (HEALTH <= 0) {
 				Logger.debug("Player has died!");
 				Mift.setPaused(true);
@@ -163,23 +159,7 @@ public class Player extends Entity {
 		}
 	}
 	
-	/**
-	 * Set the current speed measured in Bryce Units
-	 * @param speed Speed
-	 */
-	public void setSpeed(int speed) {
-		this.currentSpeed = speed;
-	}
-	
-	public void updateMyo() {
-		//
-	}
-	
 	private void checkInputs() {
-		if (SettingHolder.get("cp_myo_enabled").getValueB()) {
-			updateMyo();
-			return;
-		}
 		if (Keyboard.isKeyDown(Keyboard.KEY_W)) {
 			if (this.isRunning == false) {
 				this.currentSpeed = RUN_SPEED; //not running
@@ -313,5 +293,13 @@ public class Player extends Entity {
 	
 	public void resetHealth() {
 		HEALTH = 500;
+	}
+	
+	public int getSpeed() {
+		return (int) currentSpeed;
+	}
+	
+	public void setSpeed(int speed) {
+		this.currentSpeed = speed;
 	}
 }

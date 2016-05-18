@@ -24,18 +24,18 @@ public class WorldLoadRenderer extends MenuController {
 	private List<GuiTexture> guis = new ArrayList<GuiTexture>();
 	
 	public WorldLoadRenderer() {
-		texts.add(new GUIText(textRenderer, Mift.NAME + " " + Mift.RELEASE_TITLE + " Build " + Mift.RELEASE + "." + Mift.BUILD + " World Loader", 2.5f, FontHolder.getCandara(), new Vector2f(0.20f, 0f), 0.70f, ALIGNMENT.LEFT));
+		texts.add(new GUIText(Mift.NAME + " " + Mift.RELEASE_TITLE + " Build " + Mift.RELEASE + "." + Mift.BUILD + " World Loader", 2.5f, FontHolder.getFreestyle(), new Vector2f(0f, 0f), 1f, ALIGNMENT.CENTER));
 		texts.get(0).setColor(100, 0, 200);
 		
-		staticTexts.add(new GUIText(textRenderer, "OGPC v9 Participant", 1f, FontHolder.getCandara(), new Vector2f(0f, .97f), 0.35f, ALIGNMENT.LEFT));
+		staticTexts.add(new GUIText("OGPC v9 Participant", 1f, FontHolder.getFreestyle(), new Vector2f(0f, .97f), 0.35f, ALIGNMENT.LEFT));
 		staticTexts.get(0).setColor(255, 170, 67);
-		staticTexts.add(new GUIText(textRenderer, "COMING SOON!", 2.5f, FontHolder.getCandara(), new Vector2f(0.4f, 0.4f), 0.5f, ALIGNMENT.LEFT));
+		staticTexts.add(new GUIText("COMING SOON!", 2.5f, FontHolder.getFreestyle(), new Vector2f(0f, 0.4f), 1, ALIGNMENT.CENTER));
 		staticTexts.get(1).setColor(255, 255, 255);
-		staticTexts.add(new GUIText(textRenderer, "[ESC] Return To Main Menu", 1f, FontHolder.getCandara(), new Vector2f(.13f, .97f), 0.35f, ALIGNMENT.LEFT));
+		staticTexts.add(new GUIText("[ESC] Return To Main Menu", 1f, FontHolder.getFreestyle(), new Vector2f(.07f, .97f), 0.35f, ALIGNMENT.CENTER));
 		staticTexts.get(2).setColor(160, 0, 200);
-		staticTexts.add(new GUIText(textRenderer, "[S] To Test Save System", 1f, FontHolder.getCandara(), new Vector2f(.8f, .97f), 0.35f, ALIGNMENT.LEFT));
+		staticTexts.add(new GUIText("[S] To Test Save System", 1f, FontHolder.getFreestyle(), new Vector2f(.85f, .97f), 0.35f, ALIGNMENT.LEFT));
 		staticTexts.get(3).setColor(160, 0, 200);
-		staticTexts.add(new GUIText(textRenderer, "[L] To Test Load System", 1f, FontHolder.getCandara(), new Vector2f(.4f, .97f), 0.35f, ALIGNMENT.LEFT));
+		staticTexts.add(new GUIText("[L] To Test Load System", 1f, FontHolder.getFreestyle(), new Vector2f(0f, .97f), 1f, ALIGNMENT.CENTER));
 		staticTexts.get(4).setColor(160, 0, 200);
 		
 		guis.add(new GuiTexture(Mift.loader.loadTexture("menuguis/menuBG"), new Vector2f(0f, -1f), new Vector2f(1.20f, 2f)));

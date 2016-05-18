@@ -42,6 +42,7 @@ public class TerrainCreator {
 		Mift.terrain.generateEnemies(move_factor.MOVE_TOWARDS_WHEN_CLOSE, Mift.entities); // spawn the enemies on it
 		Mift.entities.add(Mift.player);
 		Mift.camera.setPlayer(Mift.player);
+		Mift.camera.distanceFromPlayer = 0;
 		Mift.overheadCamera.setPlayer(Mift.player);
 		Mift.setPaused(false);
 		Mift.hasMadeWorld = true;

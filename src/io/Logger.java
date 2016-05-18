@@ -16,7 +16,11 @@ public class Logger {
 		System.out.println("[INFO] " + message);
 	}
 	
-	public static void error (String message) {
+	public static void error(String message) {
 		System.err.println("[ERRR] " + message);
+	}
+	
+	public static void set(String message) {
+		System.out.println("[SETV]" + message);
 	}
 }

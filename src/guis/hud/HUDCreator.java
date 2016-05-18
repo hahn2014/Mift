@@ -27,7 +27,7 @@ public class HUDCreator {
 	}
 	
 	public void update(OverheadCamera camera) {
-		compass.update(camera);
+		//compass.update(camera);
 	}
 	
 	public Compass getCompass() {

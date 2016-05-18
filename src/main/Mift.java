@@ -57,13 +57,13 @@ import water.WaterTile;
 
 /**
  * Already surpassed 16k lines of
- * cumulative code! - Mift Build 64
+ * cumulative code! - Mift Build 65
  * 
  * @author Bryce Hahn, Mason Cluff
  * @since 1.0 - 06/12/2015
  */
 public class Mift {
-	public static final String BUILD = "64";
+	public static final String BUILD = "65";
 	public static final String RELEASE = "1";
 	public static final String RELEASE_TITLE = "Pre-Alpha";
 	public static final String NAME = "Mift";
@@ -150,17 +150,17 @@ public class Mift {
 		Display.setTitle(NAME + " Release " + RELEASE + " b" + BUILD);
 		
 		// **************** Text Rendering *********************
-		texts.add(new GUIText(textRenderer, "", 1.25f, FontHolder.getBerlinSans(), new Vector2f(0, 0), 0.25f, ALIGNMENT.LEFT));
+		texts.add(new GUIText("", 1.25f, FontHolder.getBerlinSans(), new Vector2f(0, 0), 1f, ALIGNMENT.CENTER));
 			texts.get(0).setColor(255, 255, 255);
-		texts.add(new GUIText(textRenderer, "", 2.0f, FontHolder.getCandara(), new Vector2f(0.85f, 0.0f), 0.25f, ALIGNMENT.CENTER));
+		texts.add(new GUIText("", 2.0f, FontHolder.getFreestyle(), new Vector2f(0.85f, 0.0f), 0.25f, ALIGNMENT.CENTER));
 			texts.get(1).setColor(255, 223, 0);
-		texts.add(new GUIText(textRenderer, "", 0.75f, FontHolder.getArial(), new Vector2f(0.75f, 0.1f), 0.25f, ALIGNMENT.CENTER));
+		texts.add(new GUIText("", 0.75f, FontHolder.getArial(), new Vector2f(0.75f, 0.1f), 0.25f, ALIGNMENT.CENTER));
 			texts.get(2).setColor(200, 200, 200);
-		texts.add(new GUIText(textRenderer, "", 0.75f, FontHolder.getBerlinSans(), new Vector2f(0.27f, 0.93f), 0.5f, ALIGNMENT.CENTER));
+		texts.add(new GUIText("", 0.75f, FontHolder.getBerlinSans(), new Vector2f(0f, 0.93f), 1f, ALIGNMENT.CENTER));
 			texts.get(3).setColor(220, 220, 220);
-		texts.add(new GUIText(textRenderer, "", 0.75f, FontHolder.getBerlinSans(), new Vector2f(0.27f, 0.93f), 0.5f, ALIGNMENT.CENTER));
+		texts.add(new GUIText("", 0.75f, FontHolder.getBerlinSans(), new Vector2f(0f, 0.93f), 1f, ALIGNMENT.CENTER));
 			texts.get(4).setColor(220, 220, 220);
-		texts.add(new GUIText(textRenderer, "", 1.25f, FontHolder.getBerlinSans(), new Vector2f(0.5f, 0), 0.25f, ALIGNMENT.LEFT));
+		texts.add(new GUIText("", 1.25f, FontHolder.getBerlinSans(), new Vector2f(0f, 0f), 0.25f, ALIGNMENT.LEFT));
 			texts.get(5).setColor(100, 100, 255);
 		
 		// **************** PARTICLE SYSTEM *********************
@@ -188,8 +188,10 @@ public class Mift {
 		CreditsRenderer creditsRenderer = new CreditsRenderer();
 		
 		// ******************POST PROCESSING ********************
-		FBO fbo1 = new FBO(Display.getWidth(), Display.getHeight(), FBO.DEPTH_RENDER_BUFFER);
-		PostProcessing.init(false, true);
+		FBO multisampleFBO = new FBO(Display.getWidth(), Display.getHeight()); //fbo for antialiasing
+		FBO singlesampleFBO = new FBO(Display.getWidth(), Display.getHeight(), FBO.DEPTH_RENDER_BUFFER); //fbo for non-antialiasing
+		FBO outputFBO = new FBO(Display.getWidth(), Display.getHeight(), FBO.DEPTH_TEXTURE);
+		PostProcessing.init(true, false);
 		
 		// **************** Game Loop Below *********************
 		while (!Display.isCloseRequested()) {
@@ -226,11 +228,11 @@ public class Mift {
 				GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
 				//render calls
 				if (player.isOverhead() == false) { //3rd to 1st person view
-					renderer.renderCallStandardView(topBuffers, camera, defaultMouse, waterRenderer, water, lights, entities, null, sunLight, attackHolder, fbo1);
+					renderer.renderCallStandardView(topBuffers, camera, defaultMouse, waterRenderer, water, lights, entities, null, sunLight, attackHolder, multisampleFBO, singlesampleFBO, outputFBO);
 					ParticleHolder.renderParticles(camera);
 					if (!SettingHolder.get("cg_theatrical").getValueB()) {hudCreator.update(camera);}
 				} else { //overhead view
-					renderer.renderCallOverheadView(topBuffers, overheadCamera, overheadMouse, waterRenderer, water, lights, entities, null, sunLight, attackHolder, fbo1);
+					renderer.renderCallOverheadView(topBuffers, overheadCamera, overheadMouse, waterRenderer, water, lights, entities, null, sunLight, attackHolder, multisampleFBO, singlesampleFBO, outputFBO);
 					ParticleHolder.renderParticles(overheadCamera);
 					if (!SettingHolder.get("cg_theatrical").getValueB()) {hudCreator.update(overheadCamera);}
 				}
@@ -249,7 +251,7 @@ public class Mift {
 					texts.get(2).setText(SettingHolder.get("cg_developer").getValueB() ? updateDebugText(player) : "");
 					texts.get(3).setText(player.isOverhead() ? updateModelPlacerText(entityTypeHolder, moveTypeHolder, player) : "");
 					texts.get(4).setText(camera.isFPS() ? updateAttackText(attackHolder, player) : "");
-					texts.get(5).setText("Day " + sunLight.getDay() + "  ~" + sunLight.getCurrentTimeDebug());
+					texts.get(5).setText("Day " + sunLight.getDay() + "  |  " + sunLight.getCurrentTimeDebug());
 					textRenderer.render(texts);
 				}
 				
@@ -264,7 +266,8 @@ public class Mift {
 		// ********* Clean Up Below **************
 		PostProcessing.cleanUp();
 		ParticleHolder.cleanUp();
-		fbo1.cleanUp();
+		multisampleFBO.cleanUp();
+		outputFBO.cleanUp();
 		textRenderer.cleanUp();
 		topBuffers.cleanUp();
 		waterShaderTop.cleanUp();
@@ -279,7 +282,7 @@ public class Mift {
 		sb.append(" Developer Mode: " + SettingHolder.get("cg_developer").getValueB());
 		sb.append("  ~ Resolution: " + DisplayManager.getRes());
 		sb.append("  ~ Fullscreened: " + SettingHolder.get("cg_fullscreened").getValueB());
-		sb.append("  ~ Camera Distance: " + (player.isOverhead() ? Integer.toString((int)overheadCamera.distanceFromPlayer) : Integer.toString((int)camera.distanceFromPlayer)));
+		sb.append("  ~ Camera Distance: " + camera.distanceFromPlayer);
 		sb.append("  ~ Camera POV: " + (player.isOverhead() ? "Over Head Perspective" : (camera.distanceFromPlayer == 0 ? "First Person Perspective" : "Third Person Perspective")));
 		sb.append("  ~ Camera FOV: " + SettingHolder.get("cg_fov").getValueI());
 		sb.append("  ~ Camera Position : " + (player.isOverhead() ? overheadCamera.getPositionDebug() : camera.getPositionDebug()));
@@ -335,7 +338,7 @@ public class Mift {
 	public static void hidePlayerInFPS() {
 		// If we're drawing close to the camera, or the top of the player's head,
 		// remove the player so it doesn't get drawn and we can see it in first person view
-		if (camera.distanceFromPlayer < 1) {
+		if (camera.isFPS()) {
 			player.setRenderable(false);
 		} else {
 			player.setRenderable(true);

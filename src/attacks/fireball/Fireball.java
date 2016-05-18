@@ -57,7 +57,7 @@ public class Fireball extends Entity {
 		//check entity collision
 		Entity entitytodel = null;
 		for (Entity e : Mift.entities) {
-			if (e.getType() != entityType.ATK_FIREBALL) {
+			if (e.getType() != entityType.ATK_FIREBALL && e.getType() != entityType.PLAYER) {
 				if (Maths.distanceFormula3D(getCurrentPosition(), e.getPosition()) <= 10) {
 					entitytodel = e;
 				}

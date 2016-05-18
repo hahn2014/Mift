@@ -76,7 +76,8 @@ public class MasterRenderer {
 
 	public void renderCallOverheadView(WaterFrameBuffers buffers, OverheadCamera camera, MousePicker mouse,
 			WaterRenderer waterRenderer, WaterTile water, List<Light> lights, List<Entity> entities,
-			List<Entity> normalMapEntities, Light sun, AttackHolder attackHolder, FBO contrastFBO) {
+			List<Entity> normalMapEntities, Light sun, AttackHolder attackHolder,
+			FBO multisampledFBO, FBO singlesampleFBO, FBO outputFBO) {
 
 		camera.move();
 		camera.rotate();
@@ -102,14 +103,29 @@ public class MasterRenderer {
 		GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
 		buffers.unbindCurrentFrameBuffer();
 		
-		//*********render with or without ppe************
-		if (SettingHolder.get("cg_post_processing").getValueB()) {
-			contrastFBO.bindFrameBuffer();
-			renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000), attackHolder);
-			contrastFBO.unbindFrameBuffer();
-			PostProcessing.doPostProcessing(contrastFBO.getColorTexture());
+		//******************render with ppe***************
+		if (SettingHolder.get("cg_antialiasing_filtering").getValueB()) {
+			if (SettingHolder.get("cg_post_processing").getValueB()) {
+				multisampledFBO.bindFrameBuffer();
+				renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000), attackHolder);
+				multisampledFBO.unbindFrameBuffer();
+				multisampledFBO.resolveToFBO(outputFBO);
+				PostProcessing.doPostProcessing(outputFBO.getColorTexture());
+			} else {
+				multisampledFBO.bindFrameBuffer();
+				renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000), attackHolder);
+				multisampledFBO.unbindFrameBuffer();
+				multisampledFBO.resolveToScreen();
+			}
+		} else {
+			if (SettingHolder.get("cg_post_processing").getValueB()) {
+				singlesampleFBO.bindFrameBuffer();
+				renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000), attackHolder);
+				singlesampleFBO.unbindFrameBuffer();
+				PostProcessing.doPostProcessing(singlesampleFBO.getColorTexture());
+			}
 		}
-
+		
 		//***************render all scenes***************
 		renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000), attackHolder);
 		waterRenderer.render(water, camera, sun);
@@ -117,7 +133,8 @@ public class MasterRenderer {
 
 	public void renderCallStandardView(WaterFrameBuffers buffers, Camera camera, MousePicker mouse,
 			WaterRenderer waterRenderer, WaterTile water, List<Light> lights, List<Entity> entities,
-			List<Entity> normalMapEntities, Light sun, AttackHolder attackHolder, FBO contrastFBO) {
+			List<Entity> normalMapEntities, Light sun, AttackHolder attackHolder,
+			FBO multisampledFBO, FBO singlesampleFBO, FBO outputFBO) {
 		camera.move();
 		camera.getKeys();
 		camera.getClicks();
@@ -146,12 +163,27 @@ public class MasterRenderer {
 		renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000), attackHolder);
 		waterRenderer.render(water, camera, sun);
 		
-		//*********render with or without ppe************
-		if (SettingHolder.get("cg_post_processing").getValueB()) {
-			contrastFBO.bindFrameBuffer();
-			renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000), attackHolder);
-			contrastFBO.unbindFrameBuffer();
-			PostProcessing.doPostProcessing(contrastFBO.getColorTexture());
+		//****************render with ppe****************
+		if (SettingHolder.get("cg_antialiasing_filtering").getValueB()) {
+			if (SettingHolder.get("cg_post_processing").getValueB()) {
+				multisampledFBO.bindFrameBuffer();
+				renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000), attackHolder);
+				multisampledFBO.unbindFrameBuffer();
+				multisampledFBO.resolveToFBO(outputFBO);
+				PostProcessing.doPostProcessing(outputFBO.getColorTexture());
+			} else {
+				multisampledFBO.bindFrameBuffer();
+				renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000), attackHolder);
+				multisampledFBO.unbindFrameBuffer();
+				multisampledFBO.resolveToScreen();
+			}
+		} else {
+			if (SettingHolder.get("cg_post_processing").getValueB()) {
+				singlesampleFBO.bindFrameBuffer();
+				renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000), attackHolder);
+				singlesampleFBO.unbindFrameBuffer();
+				PostProcessing.doPostProcessing(singlesampleFBO.getColorTexture());
+			}
 		}
 	}
 

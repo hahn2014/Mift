@@ -8,6 +8,9 @@ import entities.Camera;
 import entities.Enemy;
 import entities.OverheadCamera;
 import entities.Player;
+import io.Logger;
+import main.Mift;
+import models.RawModel;
 import toolbox.Point;
 
 public class Maths {
@@ -173,5 +176,20 @@ public class Maths {
 			toRet = 0;
 		}
 		return toRet;
+	}
+	
+	public static RawModel rotateModel(float[] vertices, float degrees) {
+		float y = 0, x = 0;
+		for (int i = 0; i < vertices.length; i += 2) { //loop through all coords (length/2 cause theres an x and y)
+			x = vertices[i];
+			y = vertices[i + 1];
+
+			x = (float)((x * Math.cos(degrees)) + (y * Math.sin(degrees)));
+			y = (float)((y * Math.cos(degrees)) - (x * Math.sin(degrees)));
+			Logger.debug("[" + vertices[i] + ", " + vertices[i + 1] + "] -> [" + x + ", " + y + "]");
+			vertices[i]		= x;
+			vertices[i + 1] = y;
+		}
+		return Mift.loader.loadToVAO(vertices, 2);
 	}
 }

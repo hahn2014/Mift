@@ -5,7 +5,6 @@ import java.io.File;
 import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 
-import fontRender.TextRenderer;
 import main.Mift;
 
 public class GUIText {
@@ -43,7 +42,7 @@ public class GUIText {
 		prepText();
 	}
 	
-	public GUIText(TextRenderer textRenderer, String text, float fontSize, FontType Font, Vector2f position, float maxLineLength,
+	public GUIText(String text, float fontSize, FontType Font, Vector2f position, float maxLineLength,
 			ALIGNMENT align) {
 		this.textString = text;
 		this.fontSize = fontSize;
@@ -129,7 +128,7 @@ public class GUIText {
 		return this.vertexCount;
 	}
 
-	protected float getFontSize() {
+	public float getFontSize() {
 		return fontSize;
 	}
 

@@ -21,7 +21,7 @@ import renderEngine.DisplayManager;
  */
 public class Camera implements Serializable {
 	private static final long serialVersionUID = 1655268997354170393L;
-	public float distanceFromPlayer = SettingHolder.get("camera_distance").getValueI(), maxDistFromPlayer = 50;
+	public float distanceFromPlayer = 0, maxDistFromPlayer = 25;
 	public int zoomFactor = 120;
 	private float angleAroundPlayer = 0;
 
@@ -82,7 +82,9 @@ public class Camera implements Serializable {
 		    if (Mouse.getEventButtonState()) {
 		        if (Mouse.getEventButton() == 0) {
 		            //LEFT BUTTON PRESSED
-		        	player.attack();
+		        	if (isFPS()) {
+		        		player.attack();
+		        	}
 		        }
 		    }
 	    }
@@ -147,10 +149,9 @@ public class Camera implements Serializable {
 		if (distanceFromPlayer < 0) {
 			distanceFromPlayer = 0;
 		} else if (distanceFromPlayer >= maxDistFromPlayer) {
-			distanceFromPlayer = 50;
+			distanceFromPlayer = maxDistFromPlayer;
 			player.setOverhead(true);
 			Mouse.setGrabbed(false);
-			Mift.overheadCamera.distanceFromPlayer = 50;
 		}
 		Mift.hidePlayerInFPS();
 	}
@@ -169,9 +170,5 @@ public class Camera implements Serializable {
 
 	public boolean isFPS() {
 		return (distanceFromPlayer < 1);
-	}
-	
-	public void setFPS(boolean fps) {
-		distanceFromPlayer = (fps ? 50 : 48);
 	}
 }
