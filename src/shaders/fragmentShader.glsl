@@ -13,11 +13,13 @@ const int pcfCount = 3;
 const float totalTexels = (pcfCount * 2.0 + 1.0) * (pcfCount * 2.0 + 1.0);
 
 uniform sampler2D modelTexture;
+uniform sampler2D specularMap;
 uniform sampler2D shadowMap;
 uniform vec3 lightColour[4];
 uniform vec3 attenuation[4];
 uniform float shineDamper;
 uniform float reflectivity;
+uniform float usesSpecularMap;
 uniform vec3 skyColour;
 
 void main(void){
@@ -61,8 +63,16 @@ void main(void){
 	totalDiffuse = max(totalDiffuse * lightFactor, 0.2);
 	
 	vec4 textureColour = texture(modelTexture,pass_textureCoordinates);
-	if(textureColour.a<0.5){
+	if (textureColour.a < 0.5) {
 		discard;
+	}
+	
+	if (usesSpecularMap > 0.5) {
+		vec4 mapInfo = texture(specularMap, pass_textureCoordinates);
+		totalSpecular *= mapInfo.r;
+		if (mapInfo.g > 0.5) {
+			totalDiffuse = vec3(1.0, 1.0, 1.0);
+		}
 	}
 
 	out_Color =  vec4(totalDiffuse,1.0) * textureColour + vec4(totalSpecular,1.0);

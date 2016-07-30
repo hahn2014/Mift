@@ -197,23 +197,11 @@ public class Settings {
 
 	private void applyChanges(String var, String val) {
 		if (SettingHolder.get(var).getType() == SettingType.integer) {
-			try {
-				SettingHolder.get(var).setValueI(Integer.parseInt(val));
-			} catch (Exception e) {
-				SettingHolder.get(var).setValueI(SettingHolder.get(var).getDefaultInteger());
-			}
+			SettingHolder.get(var).setValueI(Integer.parseInt(val));
 		} else if (SettingHolder.get(var).getType() == SettingType.string) {
-			try {
-				SettingHolder.get(var).setValueS(val);
-			} catch (Exception e) {
-				SettingHolder.get(var).setValueS(SettingHolder.get(var).getDefaultString());
-			}
+			SettingHolder.get(var).setValueS(val);
 		} else if (SettingHolder.get(var).getType() == SettingType.bool) {
-			try {
-				SettingHolder.get(var).setValueB(Boolean.parseBoolean(val));
-			} catch (Exception e) {
-				SettingHolder.get(var).setValueB(SettingHolder.get(var).getDefaultBoolean());
-			}
+			SettingHolder.get(var).setValueB(Boolean.parseBoolean(val));
 		}
 	}
 }

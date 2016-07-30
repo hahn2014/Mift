@@ -29,7 +29,7 @@ public class MyoSetup {
 				Logger.error("Unable to initialize Myo Armband. -> ");
 				e.printStackTrace();
 				SettingHolder.get("cp_myo_enabled").setValueB(false);
-				SettingsRenderer.getTexts().get(7).setText("Myo Armband Connection [Off]");
+				SettingsRenderer.getDefaultTexts().get(7).setText("Myo Armband Connection [Off]");
 			}
 		}
 	}

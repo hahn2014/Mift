@@ -63,7 +63,7 @@ import water.WaterTile;
  * @since 1.0 - 06/12/2015
  */
 public class Mift {
-	public static final String BUILD = "65";
+	public static final String BUILD = "66";
 	public static final String RELEASE = "1";
 	public static final String RELEASE_TITLE = "Pre-Alpha";
 	public static final String NAME = "Mift";
@@ -191,7 +191,7 @@ public class Mift {
 		FBO multisampleFBO = new FBO(Display.getWidth(), Display.getHeight()); //fbo for antialiasing
 		FBO singlesampleFBO = new FBO(Display.getWidth(), Display.getHeight(), FBO.DEPTH_RENDER_BUFFER); //fbo for non-antialiasing
 		FBO outputFBO = new FBO(Display.getWidth(), Display.getHeight(), FBO.DEPTH_TEXTURE);
-		PostProcessing.init(true, false);
+		PostProcessing.init();
 		
 		// **************** Game Loop Below *********************
 		while (!Display.isCloseRequested()) {

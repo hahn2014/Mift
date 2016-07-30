@@ -4,6 +4,7 @@ import org.lwjgl.util.vector.Vector3f;
 
 import entities.EntityType.entityType;
 import entities.MoveType.move_factor;
+import io.SettingHolder;
 import main.Mift;
 import models.TexturedModel;
 import renderEngine.DisplayManager;
@@ -39,17 +40,27 @@ public class Enemy extends Entity {
 	
 	public void move(Player player) {
 		if (_move_factor == move_factor.MOVE_TOWARDS) {
-			moveTowardsPlayer(player);
+			if (SettingHolder.get("player_undetected").getValueB() == false) {
+				moveTowardsPlayer(player);
+			}
 		} else if (_move_factor == move_factor.FACE_TOWARDS) {
-			faceTowardsPlayer(player);
+			if (SettingHolder.get("player_undetected").getValueB() == false) {
+				faceTowardsPlayer(player);
+			}
 		} else if (_move_factor == move_factor.FACE_AWAY) {
-			faceAwayPlayer(player);
+			if (SettingHolder.get("player_undetected").getValueB() == false) {
+				faceAwayPlayer(player);
+			}
 		} else if (_move_factor == move_factor.MOVE_CIRCLES) {
 			moveInCircles(60);
 		} else if (_move_factor == move_factor.FOLLOW_NOT_LOOKING) {
-			followWhenNotLooking(player);
+			if (SettingHolder.get("player_undetected").getValueB() == false) {
+				followWhenNotLooking(player);
+			}
 		} else if (_move_factor == move_factor.MOVE_TOWARDS_WHEN_CLOSE) {
-			moveTowardsPlayerWhenClose(player);
+			if (SettingHolder.get("player_undetected").getValueB() == false) {
+				moveTowardsPlayerWhenClose(player);
+			}
 		}
 		if (Maths.distanceFormula3D(getPosition(), player.getPosition()) < 15) {
 			if (cooldownTime == 0) {

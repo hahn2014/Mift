@@ -5,6 +5,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
+import bloom.Bloom;
 import gaussianBlur.BlurRenderer;
 import main.Mift;
 import models.RawModel;
@@ -19,23 +20,27 @@ public class PostProcessing {
 	//post processing effects
 	private static ContrastChanger contrastChanger;
 	private static BlurRenderer blur;
-
-	public static void init(boolean renderBlur, boolean renderContrast) {
+	private static Bloom bloom;
+	
+	public static void init() {
 		quad = Mift.loader.loadToVAO(POSITIONS, 2);
-		blur = new BlurRenderer(Display.getWidth(), Display.getHeight(), renderBlur);
-		contrastChanger = new ContrastChanger(renderer, renderContrast);
+		blur = new BlurRenderer(Display.getWidth(), Display.getHeight());
+		contrastChanger = new ContrastChanger(renderer);
+		bloom = new Bloom();
 	}
 
-	public static void doPostProcessing(int colorTexture) {
+	public static void doPostProcessing(int colorTexture, boolean renderBlur, boolean renderBloom, boolean renderContrast) {
 		start(); //start post processing effect rendering
-			blur.render(colorTexture, blur.DOUBLEPASS);
-			contrastChanger.render(blur.getColorTexture());
+			blur.render(colorTexture, blur.DOUBLEPASS, renderBlur);
+			bloom.render(blur.getColorTexture(), colorTexture, renderBloom);
+			contrastChanger.render(bloom.getColorTexture(), renderContrast);
 		end(); //stop rendering post processing
 	}
 
 	public static void cleanUp() {
-		contrastChanger.cleanUp();
 		blur.cleanUp();
+		bloom.cleanUp();
+		contrastChanger.cleanUp();
 	}
 
 	private static void start() {
@@ -59,8 +64,16 @@ public class PostProcessing {
 		return contrastChanger;
 	}
 	
+	public static Bloom getBloomRenderer() {
+		return bloom;
+	}
+	
 	public static void setRenderBlur(boolean r) {
 		blur.setRender(r);
+	}
+	
+	public static void setRenderBloom(boolean r) {
+		bloom.setRender(r);
 	}
 
 	public static void setRenderContrast(boolean r) {

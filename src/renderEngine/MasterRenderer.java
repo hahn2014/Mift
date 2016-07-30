@@ -105,25 +105,16 @@ public class MasterRenderer {
 		
 		//******************render with ppe***************
 		if (SettingHolder.get("cg_antialiasing_filtering").getValueB()) {
-			if (SettingHolder.get("cg_post_processing").getValueB()) {
-				multisampledFBO.bindFrameBuffer();
-				renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000), attackHolder);
-				multisampledFBO.unbindFrameBuffer();
-				multisampledFBO.resolveToFBO(outputFBO);
-				PostProcessing.doPostProcessing(outputFBO.getColorTexture());
-			} else {
-				multisampledFBO.bindFrameBuffer();
-				renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000), attackHolder);
-				multisampledFBO.unbindFrameBuffer();
-				multisampledFBO.resolveToScreen();
-			}
+			multisampledFBO.bindFrameBuffer();
+			renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000), attackHolder);
+			multisampledFBO.unbindFrameBuffer();
+			multisampledFBO.resolveToFBO(outputFBO);
+			PostProcessing.doPostProcessing(outputFBO.getColorTexture(), SettingHolder.get("cg_gaussian_blur").getValueB(), SettingHolder.get("cg_bloom").getValueB(), SettingHolder.get("cg_contrast_adjust").getValueB());
 		} else {
-			if (SettingHolder.get("cg_post_processing").getValueB()) {
-				singlesampleFBO.bindFrameBuffer();
-				renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000), attackHolder);
-				singlesampleFBO.unbindFrameBuffer();
-				PostProcessing.doPostProcessing(singlesampleFBO.getColorTexture());
-			}
+			singlesampleFBO.bindFrameBuffer();
+			renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000), attackHolder);
+			singlesampleFBO.unbindFrameBuffer();
+			PostProcessing.doPostProcessing(singlesampleFBO.getColorTexture(), SettingHolder.get("cg_gaussian_blur").getValueB(), SettingHolder.get("cg_bloom").getValueB(), SettingHolder.get("cg_contrast_adjust").getValueB());
 		}
 		
 		//***************render all scenes***************
@@ -165,25 +156,16 @@ public class MasterRenderer {
 		
 		//****************render with ppe****************
 		if (SettingHolder.get("cg_antialiasing_filtering").getValueB()) {
-			if (SettingHolder.get("cg_post_processing").getValueB()) {
-				multisampledFBO.bindFrameBuffer();
-				renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000), attackHolder);
-				multisampledFBO.unbindFrameBuffer();
-				multisampledFBO.resolveToFBO(outputFBO);
-				PostProcessing.doPostProcessing(outputFBO.getColorTexture());
-			} else {
-				multisampledFBO.bindFrameBuffer();
-				renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000), attackHolder);
-				multisampledFBO.unbindFrameBuffer();
-				multisampledFBO.resolveToScreen();
-			}
+			multisampledFBO.bindFrameBuffer();
+			renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000), attackHolder);
+			multisampledFBO.unbindFrameBuffer();
+			multisampledFBO.resolveToFBO(outputFBO);
+			PostProcessing.doPostProcessing(outputFBO.getColorTexture(), SettingHolder.get("cg_gaussian_blur").getValueB(), SettingHolder.get("cg_bloom").getValueB(), SettingHolder.get("cg_contrast_adjust").getValueB());
 		} else {
-			if (SettingHolder.get("cg_post_processing").getValueB()) {
-				singlesampleFBO.bindFrameBuffer();
-				renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000), attackHolder);
-				singlesampleFBO.unbindFrameBuffer();
-				PostProcessing.doPostProcessing(singlesampleFBO.getColorTexture());
-			}
+			singlesampleFBO.bindFrameBuffer();
+			renderScene(entities, normalMapEntities, lights, camera, new Vector4f(0, -1, 0, 100000), attackHolder);
+			singlesampleFBO.unbindFrameBuffer();
+			PostProcessing.doPostProcessing(singlesampleFBO.getColorTexture(), SettingHolder.get("cg_gaussian_blur").getValueB(), SettingHolder.get("cg_bloom").getValueB(), SettingHolder.get("cg_contrast_adjust").getValueB());
 		}
 	}
 

@@ -11,13 +11,13 @@ public class ContrastChanger {
 	
 	private boolean render = false;
 	
-	public ContrastChanger(ImageRenderer renderer, boolean render) {
-		setRender(render);
+	public ContrastChanger(ImageRenderer renderer) {
 		shader = new ContrastShader();
 		this.renderer = renderer;
 	}
 	
-	public void render(int texture) {
+	public void render(int texture, boolean render) {
+		this.render = render;
 		shader.start();
 			if (render) {
 				shader.loadContrast(0.25f);
@@ -31,6 +31,10 @@ public class ContrastChanger {
 	public void cleanUp() {
 		renderer.cleanUp();
 		shader.cleanUp();
+	}
+	
+	public int getColorTexture() {
+		return renderer.getOutputTexture();
 	}
 	
 	public boolean getRender() {

@@ -3,6 +3,7 @@ package io;
 public class Logger {
 	
 	public static void debug(String message) {
+		System.out.println("printing from debug method -> " + SettingHolder.get("cg_developer").getValueB());
 		if (SettingHolder.get("cg_developer").getValueB()) {
 			System.out.println("[DBUG] " + message);
 		}

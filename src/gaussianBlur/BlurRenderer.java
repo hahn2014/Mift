@@ -14,8 +14,7 @@ public class BlurRenderer {
 	private boolean render;
 	private int origTexture;
 	
-	public BlurRenderer(int width, int height, boolean render) {
-		setRender(render);
+	public BlurRenderer(int width, int height) {
 		setSize(width, height);
 		init();
 	}
@@ -27,7 +26,8 @@ public class BlurRenderer {
 		vBlur2 = new VerticalBlur(width, height);
 	}
 	
-	public void render(int colorTexture, int passes) {
+	public void render(int colorTexture, int passes, boolean render) {
+		this.render = render;
 		origTexture = colorTexture;
 		if (render) {
 			if (passes == DOUBLEPASS) {

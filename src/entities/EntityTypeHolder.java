@@ -17,6 +17,7 @@ public class EntityTypeHolder implements Serializable {
 		entities.add(new EntityType(entityType.BARREL, 			"Barrel", 			"barrel", 		"barrel", 		0.5f));
 		entities.add(new EntityType(entityType.PINE, 			"Pine Tree", 		"pine", 		"pine", 		1.3f));
 		entities.add(new EntityType(entityType.FERN, 			"Fern", 			"fern", 		"fern", 		1.0f));
+		entities.add(new EntityType(entityType.LAMP,			"Lamp",				"lantern",		"latern", 		1.0f));
 		entities.add(new EntityType(entityType.ATK_FIREBALL, 	"Fireball Attack", 	"attackSphere", "sphere", 		1f));
 		entities.add(new EntityType(entityType.ATK_WATERBALL, 	"Waterball Attack", "attackSphere", "waterball", 	1f));
 	}

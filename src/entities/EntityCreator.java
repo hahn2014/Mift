@@ -152,12 +152,25 @@ public class EntityCreator {
 	public List<Entity> generateObjects(List<Entity> entities, int generationLuck, Terrain terrain, int gridX, int gridZ) {
 		TexturedModel fern = createAtlasTexturedModel("fern", 2);
 		TexturedModel pine = createTexturedModel("pine", 0f, 0f);
+		TexturedModel barrel = createNormalTexturedModel("barrel", "barrelNormal", 10f, 0.6f);
+		TexturedModel lamp = createTexturedModel("lantern", 10f, 0.6f);
+		
 		pine.getTexture().setHasTransparency(true);
 		fern.getTexture().setHasTransparency(true);
+		barrel.getTexture().setHasTransparency(false);
+		barrel.getTexture().setSpecularMap(Mift.loader.loadTexture("speculars/barrelSpecular"));
+		lamp.getTexture().setHasTransparency(true);
+		lamp.getTexture().setSpecularMap(Mift.loader.loadTexture("speculars/lanternSpecular"));
 
 		Random random = new Random();
 		random.setSeed(System.currentTimeMillis());
 		for (int i = 0; i < generationLuck; i++) {
+			/********
+			 * FERN *
+			 * FERN *
+			 * FERN *
+			 * FERN *
+			 ********/
 			if (i % 3 == 0) {
 				float x = random.nextInt(1000) + gridX;
 				float z = random.nextInt(1000) + gridZ;
@@ -172,6 +185,12 @@ public class EntityCreator {
 					}
 				}
 			}
+			/********
+			 * PINE *
+			 * PINE *
+			 * PINE *
+			 * PINE *
+			 ********/
 			if (i % 2 == 0) {
 				float x = random.nextInt(1000) + gridX;
 				float z = random.nextInt(1000) + gridZ;
@@ -183,6 +202,40 @@ public class EntityCreator {
 						entities.add(e);
 						Mift.instance_count++;
 					}
+				}
+			}
+			/**********
+			 * BARREL *
+			 * BARREL *
+			 * BARREL *
+			 * BARREL *
+			 **********/
+			if (i % 2 == 0) {
+				float x = random.nextInt(1000) + gridX;
+				float z = random.nextInt(1000) + gridZ;
+				float y = terrain.getHeightOfTerrain(x, z);
+				Entity e = new Entity(barrel, 4, new Vector3f(x, y + 4, z), 0, random.nextFloat() * 360, 0,
+						random.nextFloat() * 0.6f + 0.4f, entityType.BARREL);
+				if (e != null) {
+					entities.add(e);
+					Mift.instance_count++;
+				}
+			}
+			/***********
+			 * LANTERN *
+			 * LANTERN *
+			 * LANTERN *
+			 * LANTERN *
+			 ***********/
+			if (i % 4 == 0) {
+				float x = random.nextInt(1000) + gridX;
+				float z = random.nextInt(1000) + gridZ;
+				float y = terrain.getHeightOfTerrain(x, z);
+				Entity e = new Entity(lamp, 4, new Vector3f(x, y, z), 0, random.nextFloat() * 360, 0,
+						random.nextFloat() * 0.6f + 0.4f, entityType.LAMP);
+				if (e != null) {
+					entities.add(e);
+					Mift.instance_count++;
 				}
 			}
 		}

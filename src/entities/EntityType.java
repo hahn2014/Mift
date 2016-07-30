@@ -14,6 +14,7 @@ public class EntityType implements Serializable {
 		PINE,
 		FERN,
 		GRASS,
+		LAMP,
 		ATK_FIREBALL,
 		ATK_WATERBALL
 	};
