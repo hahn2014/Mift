@@ -57,13 +57,13 @@ import water.WaterTile;
 
 /**
  * Already surpassed 16k lines of
- * cumulative code! - Mift Build 65
+ * cumulative code! - Mift Build 67
  * 
  * @author Bryce Hahn, Mason Cluff
  * @since 1.0 - 06/12/2015
  */
 public class Mift {
-	public static final String BUILD = "66";
+	public static final String BUILD = "67";
 	public static final String RELEASE = "1";
 	public static final String RELEASE_TITLE = "Pre-Alpha";
 	public static final String NAME = "Mift";

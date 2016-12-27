@@ -2,6 +2,10 @@ package attacks;
 
 import attacks.fireball.Fireball;
 import attacks.waterball.Waterball;
+import io.Logger;
+import main.Mift;
+import particles.ParticleEmitter;
+import particles.ParticleTexture;
 
 public class AttackUpdater {
 
@@ -10,6 +14,15 @@ public class AttackUpdater {
 		//check for deletables
 		for (Fireball fire : holder.getFireballHolder().getAll()) {
 			if (fire.isRenderable() == false) {
+				//create particle explosion
+//				ParticleEmitter pe = new ParticleEmitter(new ParticleTexture(Mift.loader.loadParticleTexture("fire"), 8, true), 120, 10, 0.1f, 1, 2);
+//				pe.setLifeError(0.1f);
+//				pe.setSpeedError(0.25f);
+//				pe.setScaleError(0.5f);
+//				pe.randomizeRotation();
+//				pe.randomizeDirection();
+				
+				//remove ball
 				holder.getFireballHolder().remove(fire);
 				break;
 			} else {

@@ -28,8 +28,9 @@ public class DisplayManager {
 	private static long currentFrameTime;
 
 	public static void createDisplay() {
+		WIDTH = SettingHolder.get("cg_resolution_w").getValueI();
+		HEIGHT = SettingHolder.get("cg_resolution_h").getValueI();
 		Display.destroy();
-		getQuality();
 		ContextAttribs attribs = new ContextAttribs(3, 3).withForwardCompatible(true).withProfileCore(true);
 		try {
 			setDisplayMode(WIDTH, HEIGHT);
@@ -131,28 +132,8 @@ public class DisplayManager {
 		}
 	}
 	
-	private static void getQuality() {
-		if (SettingHolder.get("cg_quality").getValueI() == 1) {
-			WIDTH = 1280;
-			HEIGHT = 720;
-		} else if (SettingHolder.get("cg_quality").getValueI() == 2) {
-			WIDTH = 1920;
-			HEIGHT = 1080;
-		} else if (SettingHolder.get("cg_quality").getValueI() == 3) {
-			WIDTH = 2560;
-			HEIGHT = 1440;
-		} else if (SettingHolder.get("cg_quality").getValueI() == 4) {
-			WIDTH = 3840;
-			HEIGHT = 2160;
-		} else {
-			SettingHolder.get("cg_quality").setValueI(1);
-			getQuality();
-		}
-	}
-	
 	public static void setQuality(int quality, boolean ingame) {
 		SettingHolder.get("cg_quality").setValueI(quality);
-		getQuality();
 		if (ingame) {
 			createDisplay();
 		}

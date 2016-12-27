@@ -65,12 +65,18 @@ public class SettingsRenderer {
 		defaultTexts.add(new GUIText(SettingHolder.get("cg_quality").getDebugNameAndValue(),
 				1f, FontHolder.getFreestyle(), new Vector2f(COLUMN1, ROW1 + (ROW_SPACE * 6)), 0.35f, ALIGNMENT.LEFT));
 				defaultTexts.get(6).setColor(255, 255, 255);
-		defaultTexts.add(new GUIText(SettingHolder.get("cg_vsync").getDebugNameAndValue(),
+		defaultTexts.add(new GUIText(SettingHolder.get("cg_resolution_w").getDebugNameAndValue(),
 				1f, FontHolder.getFreestyle(), new Vector2f(COLUMN1, ROW1 + (ROW_SPACE * 7)), 0.35f, ALIGNMENT.LEFT));
 				defaultTexts.get(7).setColor(255, 255, 255);
-		defaultTexts.add(new GUIText(SettingHolder.get("cg_fov").getDebugNameAndValue(),
+		defaultTexts.add(new GUIText(SettingHolder.get("cg_resolution_h").getDebugNameAndValue(),
 				1f, FontHolder.getFreestyle(), new Vector2f(COLUMN1, ROW1 + (ROW_SPACE * 8)), 0.35f, ALIGNMENT.LEFT));
 				defaultTexts.get(8).setColor(255, 255, 255);
+		defaultTexts.add(new GUIText(SettingHolder.get("cg_vsync").getDebugNameAndValue(),
+				1f, FontHolder.getFreestyle(), new Vector2f(COLUMN1, ROW1 + (ROW_SPACE * 9)), 0.35f, ALIGNMENT.LEFT));
+				defaultTexts.get(9).setColor(255, 255, 255);
+		defaultTexts.add(new GUIText(SettingHolder.get("cg_fov").getDebugNameAndValue(),
+				1f, FontHolder.getFreestyle(), new Vector2f(COLUMN1, ROW1 + (ROW_SPACE * 10)), 0.35f, ALIGNMENT.LEFT));
+				defaultTexts.get(10).setColor(255, 255, 255);
 		/*******************
 		 * POST PROCESSING *
 		 * POST PROCESSING *
