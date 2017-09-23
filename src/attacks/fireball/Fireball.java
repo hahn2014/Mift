@@ -9,6 +9,8 @@ import entities.EntityType.entityType;
 import main.Mift;
 import models.TexturedModel;
 import objConverter.OBJFileLoader;
+import particles.ParticleEmitter;
+import particles.ParticleTexture;
 import textures.ModelTexture;
 import toolbox.Maths;
 
@@ -20,6 +22,7 @@ public class Fireball extends Entity {
 	private float timeAlive = 0;
 	private final float maxTimeAlive = 300;
 	private Vector3f gotoPos;
+	private ParticleEmitter pe;
 	
 	private TexturedModel model;
 	
@@ -28,12 +31,16 @@ public class Fireball extends Entity {
 		this.isRenderable = true;
 		this.gotoPos = gotoPos;
 		this.model = new TexturedModel(OBJFileLoader.loadOBJ("attackSphere"), new ModelTexture(Mift.loader.loadTexture("sphere")));
+		this.pe = new ParticleEmitter(new ParticleTexture(Mift.loader.loadParticleTexture("fire"), 8, false), 13.0F, 10.0F, 0.5F, 100.0F, 3.0F);
 	}
 	
 	public void update() {
 		if (timeAlive + 1 <= maxTimeAlive) {
 			move();
 			collisionCheck();
+			pe.generateParticles(getCurrentPosition());
+			pe.randomizeDirection();
+			pe.randomizeRotation();
 			timeAlive++;
 		} else {
 			this.isRenderable = false;

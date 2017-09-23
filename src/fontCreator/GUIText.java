@@ -106,6 +106,10 @@ public class GUIText {
 		this.textString = text;
 		prepText();
 	}
+	
+	public String getText() {
+		return this.textString;
+	}
 
 	public int getNumberOfLines() {
 		return numberOfLines;

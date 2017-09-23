@@ -16,15 +16,14 @@ import main.Mift;
 import terrains.Terrain;
 
 public class WorldLoader {
-	private static final String SAVE_DIRECTORY = System.getProperty("user.dir") + "/saves/";
+	public static final String SAVE_DIRECTORY = System.getProperty("user.dir") + "/saves/";
 	
 	public static void loadWorld(String worldName) {
 		File worldSave = null;
 		boolean goodToGo = true;
 		
 		if (new File(SAVE_DIRECTORY).exists()) {
-			//worldSave = new File(SAVE_DIRECTORY + worldName + ".world");
-			worldSave = new File(SAVE_DIRECTORY + "1.world");
+			worldSave = new File(SAVE_DIRECTORY + worldName + ".world");
 			Logger.debug("Attemping to load save file from " + worldSave.getAbsolutePath());
 		} else {
 			Logger.error("We did not find a save directory in " + SAVE_DIRECTORY + ", so we will cancel the operation.");
@@ -68,6 +67,7 @@ public class WorldLoader {
 				}
 			}
 		}
+		Logger.debug("Sucessfully Loaded " + worldName);
 	}
 	
 	private static void translateObjects(List<Object> objs) {

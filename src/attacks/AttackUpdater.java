@@ -2,10 +2,6 @@ package attacks;
 
 import attacks.fireball.Fireball;
 import attacks.waterball.Waterball;
-import io.Logger;
-import main.Mift;
-import particles.ParticleEmitter;
-import particles.ParticleTexture;
 
 public class AttackUpdater {
 

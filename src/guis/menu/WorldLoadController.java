@@ -9,14 +9,16 @@ import main.Mift;
 
 public class WorldLoadController {
 	public static int selected = 0;
-	private int min = 1;
-	private int max = 5;
+	private int min = 0;
+	public int max = 0;
 	
 	public void checkInputs() {
 		while (Keyboard.next()) {
 			if (!Keyboard.getEventKeyState()) {
 				if (Keyboard.getEventKey() == Keyboard.KEY_RETURN) {
 					//load world
+					WorldLoader.loadWorld(WorldLoadRenderer.getTexts().get(selected).getText());
+					Mift.menuIndex = 4;
 				}
 				if (Keyboard.getEventKey() == Keyboard.KEY_UP) {
 					if (selected - 1 >= min) {
@@ -24,11 +26,11 @@ public class WorldLoadController {
 					} else {
 						selected = max;
 					}
-					for (int i = 1; i < MenuRenderer.getTexts().size(); i++) {
+					for (int i = 0; i < WorldLoadRenderer.getTexts().size(); i++) {
 						if (i == selected) {
-							MenuRenderer.getTexts().get(i).setColor(255, 100, 100);
+							WorldLoadRenderer.getTexts().get(i).setColor(255, 100, 100);
 						} else {
-							MenuRenderer.getTexts().get(i).setColor(255, 255, 255);
+							WorldLoadRenderer.getTexts().get(i).setColor(255, 255, 255);
 						}
 					}
 				}
@@ -38,11 +40,11 @@ public class WorldLoadController {
 					} else {
 						selected = min;
 					}
-					for (int i = 1; i < MenuRenderer.getTexts().size(); i++) {
+					for (int i = 0; i < WorldLoadRenderer.getTexts().size(); i++) {
 						if (i == selected) {
-							MenuRenderer.getTexts().get(i).setColor(255, 100, 100);
+							WorldLoadRenderer.getTexts().get(i).setColor(255, 100, 100);
 						} else {
-							MenuRenderer.getTexts().get(i).setColor(255, 255, 255);
+							WorldLoadRenderer.getTexts().get(i).setColor(255, 255, 255);
 						}
 					}
 				}
@@ -51,13 +53,10 @@ public class WorldLoadController {
 				}
 				if (Keyboard.getEventKey() == Keyboard.KEY_ESCAPE) {
 					Mift.menuIndex = 0;
-					MenuRenderer.selected = 2;
+					MenuController.selected = 2;
 				}
 				if (Keyboard.getEventKey() == Keyboard.KEY_S) {
 					WorldSaver.saveCurrentWorld();
-				}
-				if (Keyboard.getEventKey() == Keyboard.KEY_L) {
-					WorldLoader.loadWorld("249975");
 				}
 			}
 		}

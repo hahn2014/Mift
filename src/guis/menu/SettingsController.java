@@ -11,6 +11,7 @@ import main.Mift;
 public class SettingsController {
 	private int last1 = 0, last2 = 0, last3 = 0;
 	
+	private int changeValue = 10;
 	private int selected = 0;
 	private int index = 0;
 	
@@ -188,13 +189,13 @@ public class SettingsController {
 							SettingsRenderer.getDefaultTexts().get(selected).setColor(255, 25, 25);
 						}
 						SettingsRenderer.getStaticTexts().get(4).setText(SettingHolder.getDefinition(index, selected));
-					} else {
-						if (integerChangeNewVal + 1 < SettingHolder.get(index, selected).getMax()) {
-							integerChangeNewVal = SettingHolder.get(index, selected).getValueI() + 1;
+					} else { //on integer change
+						if (integerChangeNewVal + changeValue < SettingHolder.get(index, selected).getMax()) {
+							integerChangeNewVal = SettingHolder.get(index, selected).getValueI() + changeValue;
 							SettingHolder.get(index, selected).setValueI(integerChangeNewVal);
 							setChangedIntName(false, false);
-						} else if (integerChangeNewVal + 1 == SettingHolder.get(index, selected).getMax()) {
-							integerChangeNewVal = SettingHolder.get(index, selected).getValueI() + 1;
+						} else if (integerChangeNewVal + changeValue == SettingHolder.get(index, selected).getMax()) {
+							integerChangeNewVal = SettingHolder.get(index, selected).getValueI() + changeValue;
 							SettingHolder.get(index, selected).setValueI(integerChangeNewVal);
 							setChangedIntName(false, true);
 						} else {
@@ -233,12 +234,12 @@ public class SettingsController {
 						}
 						SettingsRenderer.getStaticTexts().get(4).setText(SettingHolder.getDefinition(index, selected));
 					} else {
-						if (integerChangeNewVal - 1 > SettingHolder.get(index, selected).getMin()) {
-							integerChangeNewVal = SettingHolder.get(index, selected).getValueI() - 1;
+						if (integerChangeNewVal - changeValue > SettingHolder.get(index, selected).getMin()) {
+							integerChangeNewVal = SettingHolder.get(index, selected).getValueI() - changeValue;
 							SettingHolder.get(index, selected).setValueI(integerChangeNewVal);
 							setChangedIntName(false, false);
-						} else if (integerChangeNewVal - 1 == SettingHolder.get(index, selected).getMin()) {
-							integerChangeNewVal = SettingHolder.get(index, selected).getValueI() - 1;
+						} else if (integerChangeNewVal - changeValue == SettingHolder.get(index, selected).getMin()) {
+							integerChangeNewVal = SettingHolder.get(index, selected).getValueI() - changeValue;
 							SettingHolder.get(index, selected).setValueI(integerChangeNewVal);
 							setChangedIntName(true, false);
 						} else {
@@ -271,12 +272,12 @@ public class SettingsController {
 			String curVal;
 			String nextVal;
 			if (isCapedMin == false) {
-				prevVal = (integerChangeNewVal - 1) + " ";
+				prevVal = (integerChangeNewVal - changeValue) + " ";
 			} else {
 				prevVal = " ";
 			}
 			if (isCapedMax == false) {
-				nextVal = " " + (integerChangeNewVal + 1);
+				nextVal = " " + (integerChangeNewVal + changeValue);
 			} else {
 				nextVal = " ";
 			}
